@@ -1,70 +1,67 @@
 # Onde Jogamos
 
-Uma forma simples de encontrar e combinar jogos de futebol: decidir quando e onde jogar e saber quem confirmou.
+A simple way to find and organize football games: choose when and where to play, fill the available spots, and see who is coming.
 
-## Problema
+## Problem
 
-Organizar um jogo em conversas dispersas torna difícil perceber a hora e o local finais, quantas pessoas vão e se ainda faltam jogadores.
+When a game is organized across chat messages, it becomes hard to know the final time and place, who has confirmed, and how many players are still needed.
 
-## Decisões de produto
+## Product decisions
 
-- O primeiro lançamento é apenas para futebol.
-- Os jogos são públicos e podem ser encontrados por outras pessoas. Jogos privados podem chegar mais tarde.
-- Qualquer pessoa pode consultar jogos sem entrar na aplicação.
-- Para criar jogos ou campos e confirmar presença, a pessoa entra com um código enviado por email. Na primeira entrada escolhe o nome que será apresentado nos jogos.
-- Cada conta pode confirmar uma presença por jogo e geri-la noutro navegador ou dispositivo.
-- O organizador escolhe um campo do catálogo do município. Se não existir, pode criar um campo novo nesse município.
+- The first release is for football only.
+- Games are public and discoverable. Private games may be added later.
+- Anyone can browse games without signing in.
+- Creating a game or pitch and joining a game requires signing in with a code sent by email. On first sign-in, the player chooses a public display name.
+- Each account can join a game once and manage its own participation from another browser or device.
+- The organizer chooses a pitch in the selected municipality and can add one if it is missing.
 
-O primeiro público continua a ser uma hipótese: grupos e jogadores em Portugal que precisam de completar jogos de futebol.
+The initial audience is still a hypothesis: groups and players in Portugal who need to fill football games.
 
-## Primeiro percurso a construir
+## Core journey
 
-1. O organizador entra com um código enviado por email, escolhe município e campo e, se necessário, adiciona um campo com nome e localização.
-2. Indica data, hora, número de vagas e, opcionalmente, uma nota; publica o jogo.
-3. O jogo aparece na lista pública e tem um link que pode ser partilhado.
-4. Um jogador encontra o jogo e vê os detalhes sem entrar. Para confirmar presença, entra com um código enviado por email e escolhe o nome apresentado na primeira vez.
-5. Todos veem os confirmados e as vagas restantes. Quem confirmou pode entrar novamente e retirar a sua presença.
-6. O organizador pode entrar novamente para atualizar ou cancelar o jogo; a página mostra claramente o estado atual.
+1. The organizer signs in, selects a municipality and pitch, and adds a pitch if needed.
+2. They set the date, time, player capacity, and an optional note, then publish the game.
+3. The game appears in the public list and has a shareable page.
+4. A player browses the game without signing in. To join, they sign in with an email code and choose a display name on first use.
+5. Everyone can see confirmed players and open spots. A player can later sign in and withdraw.
+6. The organizer can later sign in to edit or cancel the game.
 
-## MVP
+## MVP scope
 
-- Criar um jogo público associado a um município e a um campo.
-- Entrar por código de email para criar jogos ou campos e gerir presenças; consultar jogos não exige entrada.
-- Listar os próximos jogos e filtrar por município.
-- Consultar e partilhar a página de cada jogo por link.
-- Escolher um campo existente ou adicionar um novo ao município.
-- Confirmar ou retirar presença.
-- Mostrar confirmados, capacidade e vagas restantes.
-- Permitir ao organizador editar ou cancelar o jogo.
-- Interface em português, confortável no telemóvel.
+- Public game listing with a municipality filter.
+- Public game detail page and shareable link.
+- Email code sign-in for actions that change data.
+- Pitch selection and pitch creation within a municipality.
+- Game creation, editing, and cancellation by its organizer.
+- Joining and withdrawing from a game, limited to one spot per account.
+- Confirmed-player list, capacity, and remaining spots.
+- Portuguese interface designed for mobile use.
 
-### Fora do primeiro lançamento
+## Accounts and permissions
 
-Jogos privados, pagamentos, reserva de campos, equipas equilibradas, chat próprio, rankings e notificações automáticas. Podemos acrescentá-los quando houver um problema real que justifique cada um.
+- Email is verified through a sign-in code; passwords are not used.
+- Email addresses are private. Display names appear on game pages.
+- Only the organizer can edit or cancel their game. Only a player can withdraw their own participation.
+- Authentication and session management should use an established library instead of custom anonymous sessions.
 
-## Contas e permissões
+## Outside the first release
 
-- A conta é identificada por um email verificado através de um código de entrada, sem palavra-passe.
-- O email não aparece nas páginas públicas. O nome escolhido é apresentado na lista de jogadores.
-- Só o criador pode editar ou cancelar o seu jogo. Só a pessoa inscrita pode retirar a própria presença.
-- Uma pessoa pode voltar a entrar com o mesmo email noutro dispositivo para gerir os seus jogos e presenças.
-- A implementação deve usar uma solução de autenticação estabelecida para gerir os códigos e as sessões, em vez de criar um sistema de sessões anónimas.
+Private games, payments, pitch bookings, balanced teams, built-in chat, rankings, and automatic notifications.
 
-## Regras a fechar antes da implementação
+## Open product rules
 
-- Que informação de cada campo é obrigatória. Proposta: nome, município e endereço ou link para o mapa.
-- O que acontece quando o jogo fica cheio. Proposta: mostrar o estado «completo» e impedir novas confirmações; lista de espera fica para depois.
-- Se um organizador pode inscrever jogadores que ainda não têm conta. Proposta inicial: cada jogador confirma a sua própria presença.
+- Minimum pitch information. Initial proposal: name, municipality, and an address or map link.
+- What happens when a game is full. Initial proposal: show it as full and stop new joins; add a waitlist later.
+- Whether an organizer can add players without accounts. Initial proposal: each player joins for themselves.
 
-## O que aproveitar do projeto anterior
+## Local development first
 
-O repositório [tresquatrotres](https://github.com/andrefernandes-95/tresquatrotres/tree/main) já explora áreas e municípios portugueses, uma tabela de campos e uma interface inicial de criação de jogo. Podemos reutilizar as ideias e os dados geográficos. O fluxo de jogo e confirmações ainda terá de ser desenhado e implementado.
+The proposed stack is **Next.js with TypeScript for the UI and server, plus PostgreSQL**. Email code sign-in can run locally with Better Auth and Mailpit: Mailpit captures the messages so developers can read codes in a local browser without sending real email. The setup and implementation sequence are in [Local development](docs/local-development.md).
 
-## Sequência proposta
+We will get the complete user journey working locally before planning hosting or deployment.
 
-1. Fechar os dados mínimos do campo e a regra para jogadores sem conta.
-2. Desenhar a lista pública, a criação e a página do jogo, incluindo estados vazio, completo e cancelado.
-3. Implementar o percurso completo do MVP e testá-lo com um jogo real.
-4. Observar onde a organização ainda exige mensagens paralelas e ajustar o produto.
+## Earlier project
 
-**Sinal de sucesso inicial:** um organizador conseguir publicar um jogo e preencher as vagas com confirmações na página, sem precisar de reconstruir a lista de participantes no chat.
+[tresquatrotres](https://github.com/andrefernandes-95/tresquatrotres/tree/main) already explores Portuguese areas and municipalities, a pitches table, and an initial game creation form. Its geographic data and product ideas can inform this project. The game and participation flows still need to be built.
+
+**Initial success signal:** an organizer can publish a game and fill its spots through the app without rebuilding the participant list in chat.
