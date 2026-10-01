@@ -1,31 +1,35 @@
 # Onde Jogamos
 
-Uma forma simples de combinar jogatanas com amigos: decidir quando e onde jogar, convidar o grupo e saber quem confirmou.
+Uma forma simples de encontrar e combinar jogos de futebol: decidir quando e onde jogar e saber quem confirmou.
 
 ## Problema
 
 Organizar um jogo em conversas dispersas torna difícil perceber a hora e o local finais, quantas pessoas vão e se ainda faltam jogadores.
 
-## Hipóteses para validar
+## Decisões de produto
 
-- O primeiro público são grupos de amigos que organizam jogos de futebol em Portugal.
-- O organizador quer criar um jogo e partilhar um link no grupo onde já conversa.
-- Os convidados querem confirmar presença em poucos passos, sobretudo no telemóvel.
+- O primeiro lançamento é apenas para futebol.
+- Os jogos são públicos e podem ser encontrados por outras pessoas. Jogos privados podem chegar mais tarde.
+- Para confirmar presença basta indicar o nome; não é necessário criar conta.
+- O organizador escolhe um campo do catálogo do município. Se não existir, pode criar um campo novo nesse município.
 
-Estas hipóteses orientam o primeiro protótipo; ainda não são requisitos fechados.
+O primeiro público continua a ser uma hipótese: grupos e jogadores em Portugal que precisam de completar jogos de futebol.
 
 ## Primeiro percurso a construir
 
-1. O organizador indica data, hora, local, número de vagas e, opcionalmente, uma nota.
-2. Recebe uma página do jogo e partilha o link com o grupo.
-3. Cada convidado vê os detalhes e confirma ou retira a presença.
-4. Todos veem a lista de confirmados e quantas vagas restam.
-5. O organizador pode atualizar ou cancelar o jogo; a página mostra claramente o estado atual.
+1. O organizador escolhe município e campo; se necessário, adiciona um campo com nome e localização.
+2. Indica data, hora, número de vagas e, opcionalmente, uma nota; publica o jogo.
+3. O jogo aparece na lista pública e tem um link que pode ser partilhado.
+4. Um jogador encontra o jogo, vê os detalhes e confirma presença indicando o nome.
+5. Todos veem os confirmados e as vagas restantes. Quem confirmou pode retirar a sua presença.
+6. O organizador pode atualizar ou cancelar o jogo; a página mostra claramente o estado atual.
 
 ## MVP
 
-- Criar e consultar um jogo.
-- Partilhar o jogo por link.
+- Criar um jogo público associado a um município e a um campo.
+- Listar os próximos jogos e filtrar por município.
+- Consultar e partilhar a página de cada jogo por link.
+- Escolher um campo existente ou adicionar um novo ao município.
 - Confirmar ou retirar presença.
 - Mostrar confirmados, capacidade e vagas restantes.
 - Permitir ao organizador editar ou cancelar o jogo.
@@ -33,14 +37,14 @@ Estas hipóteses orientam o primeiro protótipo; ainda não são requisitos fech
 
 ### Fora do primeiro lançamento
 
-Pagamentos, reserva de campos, equipas equilibradas, chat próprio, rankings, descoberta pública de jogos e notificações automáticas. Podemos acrescentá-los quando houver um problema real que justifique cada um.
+Jogos privados, pagamentos, reserva de campos, equipas equilibradas, chat próprio, rankings e notificações automáticas. Podemos acrescentá-los quando houver um problema real que justifique cada um.
 
-## Decisões de produto pendentes
+## Regras a fechar antes da implementação
 
-1. O produto começa apenas com futebol ou deve servir outros desportos desde o primeiro dia?
-2. Os jogos são apenas para grupos convidados por link ou também podem ser públicos?
-3. É necessário criar conta para confirmar presença, ou basta indicar o nome?
-4. O local é escolhido livremente pelo organizador ou deve vir de um catálogo de campos?
+- Como comprovar que a mesma pessoa pode alterar ou retirar a presença sem conta. Proposta: dar-lhe um link pessoal de gestão após a confirmação.
+- Como o organizador volta a editar o jogo sem conta. Proposta: um link de gestão separado do link público.
+- Que informação de cada campo é obrigatória. Proposta: nome, município e endereço ou link para o mapa.
+- O que acontece quando o jogo fica cheio. Proposta: mostrar o estado «completo» e impedir novas confirmações; lista de espera fica para depois.
 
 ## O que aproveitar do projeto anterior
 
@@ -48,9 +52,9 @@ O repositório [tresquatrotres](https://github.com/andrefernandes-95/tresquatrot
 
 ## Sequência proposta
 
-1. Validar as quatro decisões acima com o primeiro grupo de utilizadores.
-2. Desenhar as páginas de criação e de jogo, incluindo estados vazio, cheio e cancelado.
+1. Fechar as regras de gestão sem conta e os dados mínimos do campo.
+2. Desenhar a lista pública, a criação e a página do jogo, incluindo estados vazio, completo e cancelado.
 3. Implementar o percurso completo do MVP e testá-lo com um jogo real.
 4. Observar onde a organização ainda exige mensagens paralelas e ajustar o produto.
 
-**Sinal de sucesso inicial:** um grupo conseguir marcar um jogo e fechar as presenças usando o link, sem precisar de reconstruir a lista de participantes no chat.
+**Sinal de sucesso inicial:** um organizador conseguir publicar um jogo e preencher as vagas com confirmações na página, sem precisar de reconstruir a lista de participantes no chat.
