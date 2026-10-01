@@ -10,6 +10,8 @@ When a game is organized across chat messages, it becomes hard to know the final
 
 - The first release is for football only.
 - Games are public and discoverable. Private games may be added later.
+- Players can browse games near their current location or choose a municipality themselves.
+- When no games match, players can opt in to an alert for that location. Email and WhatsApp are candidate channels; the first release's channel is still to be decided.
 - Anyone can browse games without signing in.
 - Creating a game or pitch and joining a game requires signing in with a code sent by email. On first sign-in, the player chooses a public display name.
 - Each account can join a game once and manage its own participation from another browser or device.
@@ -19,16 +21,18 @@ The initial audience is still a hypothesis: groups and players in Portugal who n
 
 ## Core journey
 
-1. The organizer signs in, selects a municipality and pitch, and adds a pitch if needed.
-2. They set the date, time, player capacity, and an optional note, then publish the game.
-3. The game appears in the public list and has a shareable page.
-4. A player browses the game without signing in. To join, they sign in with an email code and choose a display name on first use.
-5. Everyone can see confirmed players and open spots. A player can later sign in and withdraw.
-6. The organizer can later sign in to edit or cancel the game.
+1. A player sees games near their current location or chooses a municipality.
+2. They open a game and choose **“Vou jogar”**. Browsing does not require an account.
+3. To confirm, they enter an email code and choose the display name shown to other players on first use.
+4. They see the confirmed player list and remaining spots; they can later sign in and withdraw.
+5. If no games match, they can request an alert for that location.
+6. An organizer signs in, chooses a municipality and pitch, and adds the pitch if needed.
+7. They set the date, time, capacity, and an optional note, then publish the public game.
 
 ## MVP scope
 
-- Public game listing with a municipality filter.
+- Public game listing near the current location or filtered by municipality.
+- An opt-in alert when a new game appears for a location with no current games.
 - Public game detail page and shareable link.
 - Email code sign-in for actions that change data.
 - Pitch selection and pitch creation within a municipality.
@@ -53,6 +57,7 @@ Private games, payments, pitch bookings, balanced teams, built-in chat, rankings
 - Minimum pitch information. Initial proposal: name, municipality, and an address or map link.
 - What happens when a game is full. Initial proposal: show it as full and stop new joins; add a waitlist later.
 - Whether an organizer can add players without accounts. Initial proposal: each player joins for themselves.
+- Which alert channel to launch with, and whether alerts match a municipality or a distance radius.
 
 ## Local development first
 
