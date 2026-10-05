@@ -3,33 +3,31 @@
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { Location } from "@/app/services/locations";
-import {
-  Button,
-  Card,
-  Container,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Button, Card, Container, Stack } from "@mui/material";
 import { useState } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 import CreateGameModal from "@/app/components/modals/create-game-modal/create-game-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { Logo } from "@/app/components/logo/logo";
 import { Background } from "@/app/components/background/background";
-import { getPreferedArea, savePreferedArea } from "@/app/utils/constants";
+
 interface Props {
   data: Location[];
+  initialArea: string;
 }
 
-export default function HomeClient({ data }: Props) {
-  const [selectedArea, setSelectedArea] = useState<string>(getPreferedArea());
+export default function HomeClient({ data, initialArea }: Props) {
+  const [selectedArea, setSelectedArea] = useState<string>(initialArea);
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
   const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
 
   const handleSelectedArea = (selected: string) => {
-    savePreferedArea(selected);
     setSelectedArea(selected);
+
+    const secure = window.location.protocol === "https" ? "; Secure" : "";
+    document.cookie =
+      `preferredArea=${encodeURIComponent(selected)}` +
+      `; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
   };
 
   return (

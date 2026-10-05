@@ -1,9 +1,7 @@
 "use client";
 
-import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
+import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
-import { Pitch } from "@/app/services/pitches";
-import { CloudUpload, Delete } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
   Box,
@@ -14,7 +12,6 @@ import {
   DialogContentText,
   DialogTitle,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -33,6 +30,15 @@ export default function CreateGameModal({
   selectedArea,
 }: Props) {
   const pitches = useListPitchesForArea(selectedArea);
+  const [selectedPitchId, setSelectedPitchId] = useState<string>("");
+
+  const effectivePitchId = pitches.some(
+    (pitch) => String(pitch.id) === selectedPitchId,
+  )
+    ? selectedPitchId
+    : pitches[0]
+      ? String(pitches[0].id)
+      : "";
 
   const handleClose = () => {
     setOpen(false);
@@ -44,6 +50,10 @@ export default function CreateGameModal({
     const formData = new FormData();
   };
 
+  const handleSelectedPitch = (pitchId: string) => {
+    setSelectedPitchId(pitchId);
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle
@@ -51,14 +61,20 @@ export default function CreateGameModal({
         sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
       >
         <PlaceIcon />
-        <Typography variant="h5">Agendar Jogo</Typography>
+        <Typography>Agendar Jogo</Typography>
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText>A agendar jogo em {selectedArea}</DialogContentText>
 
         <Box component="form" id={formId} onSubmit={handleSubmit}>
-          <Stack spacing={2} sx={{ py: 2 }}></Stack>
+          <Stack spacing={2} sx={{ py: 2 }}>
+            <PitchSelector
+              data={pitches}
+              selectedPitch={effectivePitchId}
+              handleSelectedPitch={handleSelectedPitch}
+            />
+          </Stack>
         </Box>
       </DialogContent>
       <DialogActions>

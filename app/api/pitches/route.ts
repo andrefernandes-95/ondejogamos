@@ -1,7 +1,23 @@
 import { s3 } from "@/app/lib/s3";
-import { Pitch, savePitch, SavePitchInput } from "@/app/services/pitches";
+import {
+  listPitchesForArea,
+  savePitch,
+  SavePitchInput,
+} from "@/app/services/pitches";
 import { safeParseFormData } from "@/app/validations/pitch";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const area = url.searchParams.get("area");
+
+  if (!area) {
+    return Response.json({ error: "A área é obrigatória" }, { status: 400 });
+  }
+
+  const pitches = await listPitchesForArea(area);
+  return Response.json(pitches);
+}
 
 export async function POST(request: Request) {
   let formData: FormData;

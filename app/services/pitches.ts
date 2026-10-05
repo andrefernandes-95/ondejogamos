@@ -22,6 +22,21 @@ export async function listPitches(): Promise<Location[]> {
   return result.rows;
 }
 
+export async function listPitchesForArea(
+  area: string,
+): Promise<SavePitchInput[]> {
+  const result = await pool.query(
+    `
+            SELECT id, name, image_url, maps_url FROM pitches
+            WHERE area = $1
+            ORDER BY name
+        `,
+    [area],
+  );
+
+  return result.rows;
+}
+
 export type SavePitchInput = Pick<
   Pitch,
   "name" | "area" | "municipality" | "maps_url" | "image_url"
