@@ -22,11 +22,22 @@ export async function listPitches(): Promise<Location[]> {
   return result.rows;
 }
 
-export async function savePitch(pitch: Partial<Pitch>): Promise<Pitch> {
+export type SavePitchInput = Pick<
+  Pitch,
+  "name" | "area" | "municipality" | "maps_url" | "image_url"
+>;
+
+export async function savePitch(pitch: SavePitchInput): Promise<Pitch> {
   const result = await pool.query(
     `
-      insert into pitches(name, area, municipality, maps_url, image_url) values ($1, $2, $3, $4, $5)
-      returning *
+      INSERT INTO PITCHES(
+        name, area, municipality, maps_url, image_url
+      ) values ($1, $2, $3, $4, $5)
+      ON CONFLICT (area, municipality, name)
+      DO UPDATE SET
+        maps_url = EXCLUDED.maps_url,
+        image_url = EXCLUDED.image_url
+      RETURNING *
     `,
     [
       pitch.name,

@@ -6,14 +6,14 @@ import React from "react";
 
 interface Props {
   selectedArea: string;
-  setSelectedArea: React.Dispatch<React.SetStateAction<string>>;
+  handleSelectedArea: (value: string) => void;
   data: Location[];
 }
 
 export default function AreaSelector({
   data,
   selectedArea,
-  setSelectedArea,
+  handleSelectedArea,
 }: Props) {
   const preparedData = [...new Set(data.map((entry) => entry.area))];
 
@@ -25,7 +25,7 @@ export default function AreaSelector({
         id="select-area"
         value={selectedArea}
         label="Área"
-        onChange={({ target: { value } }) => setSelectedArea(value)}
+        onChange={({ target: { value } }) => handleSelectedArea(value)}
       >
         {preparedData.map((entry) => (
           <MenuItem key={entry} value={entry}>
