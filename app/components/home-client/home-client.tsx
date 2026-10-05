@@ -2,9 +2,11 @@
 
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreateGameForm from "@/app/components/create-game-form/create-game-form";
+import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { Location } from "@/app/services/locations";
 import { Button, Container, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import PlaceIcon from "@mui/icons-material/Place";
 
 interface Props {
   data: Location[];
@@ -13,6 +15,7 @@ interface Props {
 export default function HomeClient({ data }: Props) {
   const [selectedArea, setSelectedArea] = useState<string>("");
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
+  const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -34,8 +37,24 @@ export default function HomeClient({ data }: Props) {
           >
             Criar Jogo
           </Button>
+
+          <Button
+            disabled={!selectedArea}
+            sx={{ flexShrink: 0 }}
+            onClick={() => setIsCreatingPitch(true)}
+          >
+            <PlaceIcon />
+            Adicionar Campo
+          </Button>
         </Stack>
         {isCreatingGame && <CreateGameForm selectedArea={selectedArea} />}
+        {isCreatingPitch && (
+          <CreatePitchModal
+            open={isCreatingPitch}
+            setOpen={setIsCreatingPitch}
+            selectedArea={selectedArea}
+          />
+        )}
       </Stack>
     </Container>
   );

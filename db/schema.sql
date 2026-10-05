@@ -41,7 +41,8 @@ CREATE TABLE public.pitches (
     description text,
     address text,
     maps_url text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    image_url text
 );
 
 
@@ -121,4 +122,5 @@ ALTER TABLE ONLY public.pitches
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20260916221440'),
-    ('20260919081542');
+    ('20260919081542'),
+    ('20260928205158');

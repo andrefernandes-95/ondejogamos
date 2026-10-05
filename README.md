@@ -27,3 +27,11 @@ Then
 ```bash
 npx dbmate migrate
 ```
+
+## Local instructions
+
+```bash
+NODE_OPTIONS=--use-system-ca npm run dev
+```
+
+To be able to upload files
