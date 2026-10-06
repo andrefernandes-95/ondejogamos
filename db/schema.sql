@@ -20,6 +20,27 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: account; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.account (
+    id text NOT NULL,
+    "accountId" text NOT NULL,
+    "providerId" text NOT NULL,
+    "userId" text NOT NULL,
+    "accessToken" text,
+    "refreshToken" text,
+    "idToken" text,
+    "accessTokenExpiresAt" timestamp with time zone,
+    "refreshTokenExpiresAt" timestamp with time zone,
+    scope text,
+    password text,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL
+);
+
+
+--
 -- Name: locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -70,6 +91,59 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: session; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.session (
+    id text NOT NULL,
+    "expiresAt" timestamp with time zone NOT NULL,
+    token text NOT NULL,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "ipAddress" text,
+    "userAgent" text,
+    "userId" text NOT NULL
+);
+
+
+--
+-- Name: user; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public."user" (
+    id text NOT NULL,
+    name text NOT NULL,
+    email text NOT NULL,
+    "emailVerified" boolean NOT NULL,
+    image text,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: verification; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.verification (
+    id text NOT NULL,
+    identifier text NOT NULL,
+    value text NOT NULL,
+    "expiresAt" timestamp with time zone NOT NULL,
+    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: account account_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.account
+    ADD CONSTRAINT account_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -102,11 +176,88 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: session session_token_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_token_key UNIQUE (token);
+
+
+--
+-- Name: user user_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_email_key UNIQUE (email);
+
+
+--
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public."user"
+    ADD CONSTRAINT user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: verification verification_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verification
+    ADD CONSTRAINT verification_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: account_userId_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "account_userId_idx" ON public.account USING btree ("userId");
+
+
+--
+-- Name: session_userId_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "session_userId_idx" ON public.session USING btree ("userId");
+
+
+--
+-- Name: verification_identifier_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX verification_identifier_idx ON public.verification USING btree (identifier);
+
+
+--
+-- Name: account account_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.account
+    ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id) ON DELETE CASCADE;
+
+
+--
 -- Name: pitches pitches_area_municipality_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.pitches
     ADD CONSTRAINT pitches_area_municipality_fkey FOREIGN KEY (area, municipality) REFERENCES public.locations(area, municipality);
+
+
+--
+-- Name: session session_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id) ON DELETE CASCADE;
 
 
 --
@@ -123,4 +274,5 @@ ALTER TABLE ONLY public.pitches
 INSERT INTO public.schema_migrations (version) VALUES
     ('20260916221440'),
     ('20260919081542'),
-    ('20260928205158');
+    ('20260928205158'),
+    ('20261006203931');
