@@ -3,13 +3,23 @@
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { Location } from "@/app/services/locations";
-import { Button, Card, Container, Stack } from "@mui/material";
+import {
+  Button,
+  Card,
+  Container,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 import CreateGameModal from "@/app/components/modals/create-game-modal/create-game-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { Logo } from "@/app/components/logo/logo";
 import { Background } from "@/app/components/background/background";
+import NextLink from "next/link";
+import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
+import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 
 interface Props {
   data: Location[];
@@ -34,7 +44,10 @@ export default function HomeClient({ data, initialArea }: Props) {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Background />
       <Stack sx={{ gap: 2 }}>
-        <Logo />
+        <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Logo />
+          <AuthNavbar />
+        </Stack>
         <Card sx={{ p: 4 }} variant="outlined">
           <Stack direction="row" sx={{ gap: 2 }}>
             <AreaSelector
@@ -62,18 +75,25 @@ export default function HomeClient({ data, initialArea }: Props) {
             </Button>
           </Stack>
           {isCreatingGame && (
-            <CreateGameModal
-              selectedArea={selectedArea}
-              open={isCreatingGame}
-              setOpen={setIsCreatingGame}
-            />
+            <RequireAuthModal open={isCreatingGame} setOpen={setIsCreatingGame}>
+              <CreateGameModal
+                selectedArea={selectedArea}
+                open={isCreatingGame}
+                setOpen={setIsCreatingGame}
+              />
+            </RequireAuthModal>
           )}
           {isCreatingPitch && (
-            <CreatePitchModal
+            <RequireAuthModal
               open={isCreatingPitch}
               setOpen={setIsCreatingPitch}
-              selectedArea={selectedArea}
-            />
+            >
+              <CreatePitchModal
+                open={isCreatingPitch}
+                setOpen={setIsCreatingPitch}
+                selectedArea={selectedArea}
+              />
+            </RequireAuthModal>
           )}
         </Card>
       </Stack>
