@@ -1,4 +1,4 @@
-import { CreateMatchFormValues } from "@/app/components/modals/create-game-modal/create-game-modal";
+import { CreateMatchFormValues } from "@/app/schemas/match";
 import {
   FormGroup,
   FormLabel,
