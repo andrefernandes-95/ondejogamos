@@ -1,5 +1,4 @@
-import { Match } from "@/app/models/match";
-import { Card, Stack, Typography } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import Image from "next/image";
 
 interface Props {
