@@ -7,6 +7,7 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 10,
   },
+  trustedOrigins: ["https://ondejogamos.com", "https://www.ondejogamos.com"],
 });
 
 export default auth;
