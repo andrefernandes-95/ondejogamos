@@ -58,10 +58,14 @@ export function RequireAuthModalInner({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle
         color="primary"
-        sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
+        sx={{
+          flexDirection: "row",
+          display: "flex",
+          alignItems: "center",
+        }}
       >
         <PlaceIcon />
         <Typography variant="h5">Conta necessária</Typography>
@@ -72,7 +76,18 @@ export function RequireAuthModalInner({
           <Typography>Precisas de uma conta para continuar.</Typography>
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        sx={{
+          flexDirection: {
+            xs: "column-reverse",
+            sm: "row",
+          },
+          gap: {
+            xs: 2,
+            sm: 0,
+          },
+        }}
+      >
         <Button onClick={handleClose}>Cancelar</Button>
 
         <Button onClick={goToSignIn} variant="contained">

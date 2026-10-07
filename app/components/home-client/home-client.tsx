@@ -44,12 +44,28 @@ export default function HomeClient({ data, initialArea }: Props) {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Background />
       <Stack sx={{ gap: 2 }}>
-        <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Stack
+          sx={{
+            flexDirection: {
+              xs: "column",
+              sm: "row",
+            },
+            justifyContent: "space-between",
+          }}
+        >
           <Logo />
           <AuthNavbar />
         </Stack>
         <Card sx={{ p: 4 }} variant="outlined">
-          <Stack direction="row" sx={{ gap: 2 }}>
+          <Stack
+            sx={{
+              gap: 2,
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+            }}
+          >
             <AreaSelector
               selectedArea={selectedArea}
               handleSelectedArea={handleSelectedArea}

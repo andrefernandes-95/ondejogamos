@@ -1,18 +1,26 @@
 "use client";
 
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import React from "react";
 
 interface Props {
   selectedMunicipality: string;
-  setSelectedMunicipality: React.Dispatch<React.SetStateAction<string>>;
+  onMunicipalitySelected: (value: string) => void;
   data: string[];
+  errorMessage?: string;
 }
 
 export default function MunicipalitySelector({
   data,
   selectedMunicipality,
-  setSelectedMunicipality,
+  onMunicipalitySelected,
+  errorMessage,
 }: Props) {
   return (
     <FormControl fullWidth>
@@ -22,7 +30,8 @@ export default function MunicipalitySelector({
         id="select-municipality"
         value={selectedMunicipality}
         label="Município"
-        onChange={({ target: { value } }) => setSelectedMunicipality(value)}
+        onChange={({ target: { value } }) => onMunicipalitySelected(value)}
+        error={!!errorMessage?.length}
       >
         {data.map((entry) => (
           <MenuItem key={entry} value={entry}>
@@ -30,6 +39,7 @@ export default function MunicipalitySelector({
           </MenuItem>
         ))}
       </Select>
+      {errorMessage && <Typography color="error">{errorMessage}</Typography>}
     </FormControl>
   );
 }

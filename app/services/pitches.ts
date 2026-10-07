@@ -9,8 +9,8 @@ export type Pitch = {
   address: string;
   maps_url: string;
   created_at: string;
-  image?: File | null;
   image_url: string;
+  created_by: string;
 };
 
 export async function listPitches(): Promise<Location[]> {
@@ -39,15 +39,15 @@ export async function listPitchesForArea(
 
 export type SavePitchInput = Pick<
   Pitch,
-  "name" | "area" | "municipality" | "maps_url" | "image_url"
+  "name" | "area" | "municipality" | "maps_url" | "image_url" | "created_by"
 >;
 
 export async function savePitch(pitch: SavePitchInput): Promise<Pitch> {
   const result = await pool.query(
     `
       INSERT INTO PITCHES(
-        name, area, municipality, maps_url, image_url
-      ) values ($1, $2, $3, $4, $5)
+        name, area, municipality, maps_url, image_url, created_by
+      ) values ($1, $2, $3, $4, $5, $6)
       ON CONFLICT (area, municipality, name)
       DO UPDATE SET
         maps_url = EXCLUDED.maps_url,
@@ -60,6 +60,7 @@ export async function savePitch(pitch: SavePitchInput): Promise<Pitch> {
       pitch.municipality,
       pitch.maps_url,
       pitch.image_url,
+      pitch.created_by,
     ],
   );
 

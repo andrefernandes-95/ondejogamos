@@ -1,8 +1,13 @@
 "use client";
 
 import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
-import { Pitch } from "@/app/services/pitches";
-import { CloudUpload, Delete } from "@mui/icons-material";
+import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_IMAGE_SIZE,
+  MAX_IMAGE_SIZE_IN_MB,
+} from "@/app/utils/image";
+import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
   Box,
@@ -17,6 +22,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
 
 interface Props {
   selectedArea: string;
@@ -25,6 +32,27 @@ interface Props {
 }
 
 const formId = "create-pitch-form";
+
+const schema = z.object({
+  name: z.string().trim().min(1, "Nome do campo obrigatório"),
+  area: z.string().trim().min(1, "Área obrigatória"),
+  municipality: z.string().trim().min(1, "Município obrigatório"),
+  mapsUrl: z.string().trim().url("URL Inválido").nullable(),
+  photo: z
+    .instanceof(File, { message: "Escolhe uma fotografia" })
+    .refine((file) => file.size > 0, "Ficheiro vazio")
+    .refine(
+      (file) => file.size <= MAX_IMAGE_SIZE,
+      `Máximo de ${MAX_IMAGE_SIZE_IN_MB} MB`,
+    )
+    .refine(
+      (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
+      "Usa JPEG ou PNG",
+    )
+    .nullable(),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 export default function CreatePitchModal({
   open,
@@ -35,10 +63,22 @@ export default function CreatePitchModal({
     [],
   );
 
-  const [name, setName] = useState<string>("");
-  const [municipality, setMunicipality] = useState<string>("");
-  const [file, setFile] = useState<File | null>(null);
-  const [mapsUrl, setMapsUrl] = useState<string>("");
+  const {
+    control,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      area: selectedArea,
+      municipality: "",
+      mapsUrl: "",
+      photo: null,
+    },
+  });
 
   useEffect(() => {
     const fetchMunicipalitiesForArea = async () => {
@@ -64,24 +104,37 @@ export default function CreatePitchModal({
     setOpen(false);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submit = async (values: FormValues) => {
+    const body = new FormData();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("area", selectedArea);
-    formData.append("municipality", municipality);
-    formData.append("maps_url", mapsUrl);
+    body.append("name", values.name);
+    body.append("area", values.area);
+    body.append("municipality", values.municipality);
+    body.append("maps_url", values.mapsUrl ?? "");
 
-    if (file) {
-      formData.append("image", file);
+    if (values.photo) {
+      body.append("image", values.photo);
     }
 
-    await fetch(`/api/pitches`, { method: "POST", body: formData });
+    try {
+      const response = await fetch(`/api/pitches`, { method: "POST", body });
+
+      if (!response.ok) {
+        setError("root.server", {
+          message: "Não foi possível guardar o campo ",
+        });
+        return;
+      }
+
+      reset();
+      setOpen(false);
+    } catch {
+      setError("root.server", { message: "Não foi possível guardar o campo " });
+    }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle
         color="primary"
         sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
@@ -95,80 +148,82 @@ export default function CreatePitchModal({
           Adiciona um novo campo a {selectedArea}
         </DialogContentText>
 
-        <Box component="form" id={formId} onSubmit={handleSubmit}>
+        <Box
+          component="form"
+          id={formId}
+          onSubmit={handleSubmit(submit)}
+          noValidate
+        >
           <Stack spacing={2} sx={{ py: 2 }}>
-            <TextField
-              autoFocus
-              required
-              id="name"
+            <Controller
               name="name"
-              label="Nome do campo"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-
-            <MunicipalitySelector
-              data={municipalitiesForArea}
-              selectedMunicipality={municipality}
-              setSelectedMunicipality={setMunicipality}
-            />
-
-            {file ? (
-              <Stack
-                sx={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography variant="body1">{file.name}</Typography>
-                <Button onClick={() => setFile(null)}>
-                  <Delete />
-                </Button>
-              </Stack>
-            ) : (
-              <Button
-                component="label"
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUpload />}
-              >
-                Carregar imagem
-                <input
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) {
-                      setFile(file);
-                    }
-                  }}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  inputRef={field.ref}
+                  label="Nome do campo"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                 />
-              </Button>
-            )}
+              )}
+            />
 
-            <TextField
-              autoFocus
-              required
-              id="mapsUrl"
+            <Controller
+              name="municipality"
+              control={control}
+              render={({ field, fieldState }) => (
+                <MunicipalitySelector
+                  selectedMunicipality={field.value}
+                  onMunicipalitySelected={(value) => field.onChange(value)}
+                  data={municipalitiesForArea}
+                  errorMessage={fieldState.error?.message ?? ""}
+                />
+              )}
+            />
+
+            <Controller
+              name="photo"
+              control={control}
+              render={({ field, fieldState }) => (
+                <UploadImageInput
+                  value={field.value}
+                  onChange={(value) => field.onChange(value)}
+                  errorMessage={
+                    fieldState.error ? fieldState.error?.message : ""
+                  }
+                />
+              )}
+            />
+
+            <Controller
               name="mapsUrl"
-              label="Link do Google Maps"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={name}
-              onChange={(e) => setMapsUrl(e.target.value)}
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  type="url"
+                  inputRef={field.ref}
+                  label="URL do Google Maps"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
             />
           </Stack>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleClose} disabled={isSubmitting}>
+          Cancelar
+        </Button>
 
-        <Button type="submit" form={formId} variant="contained">
+        <Button
+          type="submit"
+          form={formId}
+          variant="contained"
+          disabled={isSubmitting}
+        >
           Adicionar
         </Button>
       </DialogActions>

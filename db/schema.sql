@@ -63,7 +63,8 @@ CREATE TABLE public.pitches (
     address text,
     maps_url text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    image_url text
+    image_url text,
+    created_by text
 );
 
 
@@ -253,6 +254,14 @@ ALTER TABLE ONLY public.pitches
 
 
 --
+-- Name: pitches pitches_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pitches
+    ADD CONSTRAINT pitches_created_by_fkey FOREIGN KEY (created_by) REFERENCES public."user"(id);
+
+
+--
 -- Name: session session_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -275,4 +284,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20260916221440'),
     ('20260919081542'),
     ('20260928205158'),
-    ('20261006203931');
+    ('20261006203931'),
+    ('20261007071538');

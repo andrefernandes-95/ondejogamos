@@ -1,3 +1,4 @@
+import auth from "@/app/lib/auth";
 import { s3 } from "@/app/lib/s3";
 import {
   listPitchesForArea,
@@ -20,6 +21,23 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session) {
+    return Response.json(
+      {
+        error: "Inicia a sessão para criar um campo",
+      },
+      {
+        status: 401,
+      },
+    );
+  }
+
+  const createdBy = session.user.id;
+
   let formData: FormData;
 
   try {
@@ -98,6 +116,7 @@ export async function POST(request: Request) {
     municipality,
     image_url: imageUrl,
     maps_url,
+    created_by: createdBy,
   };
 
   let result: Awaited<ReturnType<typeof savePitch>>;

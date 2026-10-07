@@ -55,7 +55,7 @@ export default function CreateGameModal({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle
         color="primary"
         sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
