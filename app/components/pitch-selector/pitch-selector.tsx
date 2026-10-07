@@ -1,21 +1,14 @@
 "use client";
 
-import { Location } from "@/app/services/locations";
 import { Pitch } from "@/app/services/pitches";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-} from "@mui/material";
+import { Autocomplete, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
-import React from "react";
 
 interface Props {
   selectedPitch: string;
-  handleSelectedPitch: (value: string) => void;
+  handleSelectedPitch: (pitchId: number) => void;
   data: Pitch[];
+  errorMessage?: string;
 }
 
 const PitchOption = ({ pitch }: { pitch: Pitch }) => {
@@ -35,6 +28,12 @@ const PitchOption = ({ pitch }: { pitch: Pitch }) => {
       )}
 
       {pitch.name}
+
+      {pitch.municipality && (
+        <Typography variant="body2" color="text.secondary">
+          {pitch.municipality}
+        </Typography>
+      )}
     </Stack>
   );
 };
@@ -43,36 +42,57 @@ export default function PitchSelector({
   data,
   selectedPitch,
   handleSelectedPitch,
+  errorMessage,
 }: Props) {
   const options = [
     ...new Map(data.map((pitch) => [String(pitch.id), pitch])).values(),
   ];
 
-  const value = options.some((pitch) => String(pitch.id) === selectedPitch)
-    ? selectedPitch
-    : "";
+  const value = options.find((pitch) => String(pitch.id) === selectedPitch);
 
   return (
-    <FormControl fullWidth>
-      <InputLabel id="pitch-label">Selecionar campo</InputLabel>
-      <Select
-        labelId="pitch-label"
-        id="pitch-select"
+    <Stack sx={{ flexDirection: "column" }}>
+      <Autocomplete
+        multiple={false}
         value={value}
-        label="Selecionar campo"
-        onChange={({ target: { value } }) => handleSelectedPitch(value)}
-        renderValue={(id) => {
-          const pitch = options.find((entry) => String(entry.id) === id);
+        options={options}
+        filterOptions={(options, state) => {
+          const query = state.inputValue.toLowerCase().trim();
+          if (!query) {
+            return options;
+          }
 
-          return pitch ? <PitchOption pitch={pitch} /> : null;
+          return options.filter((pitch) => {
+            const name = pitch.name?.toLowerCase() ?? "";
+            const municipality =
+              pitch.municipality?.toLowerCase()?.trim() ?? "";
+
+            return name.includes(query) || municipality.includes(query);
+          });
         }}
-      >
-        {options.map((pitch) => (
-          <MenuItem key={pitch.id} value={String(pitch.id)}>
-            <PitchOption pitch={pitch} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+        onChange={(_, newValue) =>
+          newValue
+            ? handleSelectedPitch(newValue!.id)
+            : handleSelectedPitch(null!)
+        }
+        renderOption={(props, pitch) => {
+          return pitch ? (
+            <li {...props} key={pitch.id}>
+              <PitchOption pitch={pitch} />
+            </li>
+          ) : null;
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Selecionar campo"
+            placeholder="Pesquisar por campo ou localização"
+          />
+        )}
+        noOptionsText="Sem resultados"
+        renderValue={(value) => value && <PitchOption pitch={value} />}
+      />
+      {errorMessage && <Typography color="error">{errorMessage}</Typography>}
+    </Stack>
   );
 }

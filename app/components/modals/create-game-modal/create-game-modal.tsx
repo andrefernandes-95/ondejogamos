@@ -1,7 +1,11 @@
 "use client";
 
+import DatePicker from "@/app/components/date-picker/date-picker";
+import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
+import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
+import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
   Box,
@@ -9,12 +13,13 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
 
 interface Props {
   selectedArea: string;
@@ -29,50 +34,136 @@ export default function CreateGameModal({
   setOpen,
   selectedArea,
 }: Props) {
-  const pitches = useListPitchesForArea(selectedArea);
-  const [selectedPitchId, setSelectedPitchId] = useState<string>("");
+  const {
+    control,
+    handleSubmit,
+    setError,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<CreateMatchFormValues>({
+    resolver: zodResolver(createMatchSchema),
+    defaultValues: {
+      description: "",
+      pitchId: "",
+      durationInMinutes: 60,
+      startsAt: "",
+      format: "5x5",
+      minAttendance: 10,
+    },
+  });
 
-  const effectivePitchId = pitches.some(
-    (pitch) => String(pitch.id) === selectedPitchId,
-  )
-    ? selectedPitchId
-    : pitches[0]
-      ? String(pitches[0].id)
-      : "";
+  const pitches = useListPitchesForArea(selectedArea);
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = async (values: CreateMatchFormValues) => {
+    const body = new FormData();
 
-    const formData = new FormData();
-  };
+    body.append("pitchId", values.pitchId);
+    body.append("description", values.description!);
+    body.append("durationInMinutes", "60");
+    body.append("format", values.format);
+    body.append("minAttendance", values.minAttendance.toString());
+    body.append("startsAt", values.startsAt.toString());
 
-  const handleSelectedPitch = (pitchId: string) => {
-    setSelectedPitchId(pitchId);
+    try {
+      const response = await fetch(`/api/matches`, { method: "POST", body });
+
+      if (!response.ok) {
+        setError("root.server", {
+          message: "Não foi possível agendar o jogo ",
+        });
+        return;
+      }
+
+      reset();
+      setOpen(false);
+    } catch {
+      setError("root.server", { message: "Não foi possível agendar o jogo " });
+    }
   };
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
       <DialogTitle
         color="primary"
-        sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
+        sx={{
+          flexDirection: "row",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          py: 4,
+        }}
       >
         <PlaceIcon />
-        <Typography>Agendar Jogo</Typography>
+        <Typography variant="h5">Agendar jogo em {selectedArea}</Typography>
       </DialogTitle>
 
       <DialogContent>
-        <DialogContentText>A agendar jogo em {selectedArea}</DialogContentText>
+        <Box component="form" id={formId} onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={2} sx={{ py: 2, gap: 2 }}>
+            <Controller
+              name="pitchId"
+              control={control}
+              render={({ field, fieldState }) => (
+                <PitchSelector
+                  data={pitches}
+                  selectedPitch={field.value}
+                  handleSelectedPitch={(value) => field.onChange(value)}
+                  errorMessage={fieldState.error?.message}
+                />
+              )}
+            />
 
-        <Box component="form" id={formId} onSubmit={handleSubmit}>
-          <Stack spacing={2} sx={{ py: 2 }}>
-            <PitchSelector
-              data={pitches}
-              selectedPitch={effectivePitchId}
-              handleSelectedPitch={handleSelectedPitch}
+            <MatchFormatInput
+              control={control}
+              onChange={(newValue) => {
+                if (newValue === "5x5")
+                  setValue("minAttendance", 10, { shouldDirty: true });
+                if (newValue === "7x7")
+                  setValue("minAttendance", 14, { shouldDirty: true });
+                if (newValue === "11x11")
+                  setValue("minAttendance", 22, { shouldDirty: true });
+              }}
+            />
+
+            <Controller
+              name="startsAt"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Stack>
+                  <DatePicker
+                    {...field}
+                    label="Data e Hora do Jogo"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+
+                  {fieldState?.error && (
+                    <Typography color="error">
+                      {fieldState?.error?.message}
+                    </Typography>
+                  )}
+                </Stack>
+              )}
+            />
+
+            <Controller
+              name="description"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  multiline
+                  type="text"
+                  label="Observações"
+                  helperText={fieldState.error?.message}
+                  error={!!fieldState.error}
+                />
+              )}
             />
           </Stack>
         </Box>

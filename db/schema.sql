@@ -51,6 +51,41 @@ CREATE TABLE public.locations (
 
 
 --
+-- Name: matches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.matches (
+    id bigint NOT NULL,
+    created_by text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    starts_at timestamp with time zone NOT NULL,
+    duration_in_minutes integer DEFAULT 60 NOT NULL,
+    format text NOT NULL,
+    cancelled_at timestamp with time zone,
+    pitch_id bigint NOT NULL,
+    min_attendance integer DEFAULT 10 NOT NULL,
+    description text,
+    CONSTRAINT matches_duration_in_minutes_check CHECK ((duration_in_minutes > 0)),
+    CONSTRAINT matches_format_check CHECK ((format = ANY (ARRAY['5x5'::text, '7x7'::text, '11x11'::text]))),
+    CONSTRAINT matches_min_attendance_check CHECK ((min_attendance > 0))
+);
+
+
+--
+-- Name: matches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.matches ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.matches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: pitches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -153,6 +188,14 @@ ALTER TABLE ONLY public.locations
 
 
 --
+-- Name: matches matches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.matches
+    ADD CONSTRAINT matches_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pitches pitches_area_municipality_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -224,6 +267,20 @@ CREATE INDEX "account_userId_idx" ON public.account USING btree ("userId");
 
 
 --
+-- Name: matches_pitch_starts_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX matches_pitch_starts_at_idx ON public.matches USING btree (pitch_id, starts_at);
+
+
+--
+-- Name: matches_starts_at_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX matches_starts_at_idx ON public.matches USING btree (starts_at);
+
+
+--
 -- Name: session_userId_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -243,6 +300,22 @@ CREATE INDEX verification_identifier_idx ON public.verification USING btree (ide
 
 ALTER TABLE ONLY public.account
     ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES public."user"(id) ON DELETE CASCADE;
+
+
+--
+-- Name: matches matches_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.matches
+    ADD CONSTRAINT matches_created_by_fkey FOREIGN KEY (created_by) REFERENCES public."user"(id);
+
+
+--
+-- Name: matches matches_pitch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.matches
+    ADD CONSTRAINT matches_pitch_id_fkey FOREIGN KEY (pitch_id) REFERENCES public.pitches(id);
 
 
 --
@@ -285,4 +358,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20260919081542'),
     ('20260928205158'),
     ('20261006203931'),
-    ('20261007071538');
+    ('20261007071538'),
+    ('20261007091531'),
+    ('20261007095904');

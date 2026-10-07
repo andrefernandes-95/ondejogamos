@@ -20,6 +20,7 @@ import { Background } from "@/app/components/background/background";
 import NextLink from "next/link";
 import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
+import MatchList from "@/app/components/match-list/match-list";
 
 interface Props {
   data: Location[];
@@ -56,6 +57,7 @@ export default function HomeClient({ data, initialArea }: Props) {
           <Logo />
           <AuthNavbar />
         </Stack>
+
         <Card sx={{ p: 4 }} variant="outlined">
           <Stack
             sx={{
@@ -112,6 +114,8 @@ export default function HomeClient({ data, initialArea }: Props) {
             </RequireAuthModal>
           )}
         </Card>
+
+        <MatchList area={selectedArea} />
       </Stack>
     </Container>
   );

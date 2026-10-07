@@ -13,21 +13,12 @@ export type Pitch = {
   created_by: string;
 };
 
-export async function listPitches(): Promise<Location[]> {
-  const result = await pool.query(`
-            select * from pitches
-            order by name
-        `);
-
-  return result.rows;
-}
-
 export async function listPitchesForArea(
   area: string,
 ): Promise<SavePitchInput[]> {
   const result = await pool.query(
     `
-            SELECT id, name, image_url, maps_url FROM pitches
+            SELECT id, name, image_url, maps_url, municipality FROM pitches
             WHERE area = $1
             ORDER BY name
         `,

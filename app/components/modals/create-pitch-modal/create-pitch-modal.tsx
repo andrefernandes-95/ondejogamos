@@ -37,7 +37,7 @@ const schema = z.object({
   name: z.string().trim().min(1, "Nome do campo obrigatório"),
   area: z.string().trim().min(1, "Área obrigatória"),
   municipality: z.string().trim().min(1, "Município obrigatório"),
-  mapsUrl: z.string().trim().url("URL Inválido").nullable(),
+  mapsUrl: z.string().trim().url("URL Inválido").nullable().optional(),
   photo: z
     .instanceof(File, { message: "Escolhe uma fotografia" })
     .refine((file) => file.size > 0, "Ficheiro vazio")
