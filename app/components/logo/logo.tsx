@@ -15,12 +15,26 @@ export const Logo = () => {
         }}
       >
         <Stack sx={{ flexDirection: "row" }}>
-          <SportsSoccerIcon sx={{ opacity: 0.25 }} color="primary" />
-          <SportsSoccerIcon sx={{ opacity: 0.5 }} color="primary" />
-          <SportsSoccerIcon color="primary" />
+          <SportsSoccerIcon
+            sx={{ opacity: 0.15, fontSize: 24, color: "white" }}
+          />
+          <SportsSoccerIcon
+            sx={{
+              opacity: 0.5,
+              fontSize: 24,
+              marginLeft: -0.25,
+              color: "white",
+            }}
+          />
+          <SportsSoccerIcon
+            sx={{ opacity: 1, fontSize: 24, marginLeft: -0.25, color: "white" }}
+          />
         </Stack>
-        <Typography variant="h5" sx={{ fontWeight: 900 }} color="primary">
-          onde jogamos?
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 900, textTransform: "capitalize", color: "white" }}
+        >
+          onde jogamos
         </Typography>
       </Link>
     </Stack>

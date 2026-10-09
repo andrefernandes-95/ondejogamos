@@ -17,7 +17,12 @@ export interface Match {
 }
 
 export interface FullMatch extends Match {
-  attendances: Array<Pick<Attendance, "id" | "user_id" | "created_at">>;
+  attendances: Array<{
+    user_id: string;
+    user_name: string;
+    created_at: string;
+  }>;
   is_attending: boolean;
   is_creator: boolean;
+  creator: { id: string; name: string };
 }

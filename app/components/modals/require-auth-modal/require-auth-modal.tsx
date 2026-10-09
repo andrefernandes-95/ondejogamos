@@ -2,6 +2,7 @@
 
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
+import { AccountCircle, NoAccounts } from "@mui/icons-material";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
   Button,
@@ -18,7 +19,7 @@ import { useRouter } from "next/navigation";
 interface Props {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function RequireAuthModal({ open, setOpen, children }: Props) {
@@ -65,9 +66,10 @@ export function RequireAuthModalInner({
           flexDirection: "row",
           display: "flex",
           alignItems: "center",
+          gap: 1,
         }}
       >
-        <PlaceIcon />
+        <AccountCircle />
         <Typography variant="h5">Conta necessária</Typography>
       </DialogTitle>
 
@@ -82,20 +84,34 @@ export function RequireAuthModalInner({
             xs: "column-reverse",
             sm: "row",
           },
+          justifyContent: "space-between",
           gap: {
             xs: 2,
             sm: 0,
           },
+          p: 2,
         }}
       >
         <Button onClick={handleClose}>Cancelar</Button>
-
-        <Button onClick={goToSignIn} variant="contained">
-          Iniciar Sessão
-        </Button>
-        <Button onClick={goToSignUp} variant="contained">
-          Criar Conta
-        </Button>
+        <Stack
+          sx={{
+            flexDirection: {
+              xs: "column-reverse",
+              sm: "row",
+            },
+            gap: {
+              xs: 2,
+              sm: 2,
+            },
+          }}
+        >
+          <Button onClick={goToSignIn} variant="contained">
+            Iniciar Sessão
+          </Button>
+          <Button onClick={goToSignUp} variant="contained">
+            Criar Conta
+          </Button>
+        </Stack>
       </DialogActions>
     </Dialog>
   );

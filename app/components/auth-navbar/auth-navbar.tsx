@@ -2,13 +2,11 @@
 
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
-import { Button, Link, Stack, Typography } from "@mui/material";
-import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+import { ExitToApp, GroupAdd } from "@mui/icons-material";
+import { Button, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 
 export default function AuthNavbar() {
-  const router = useRouter();
   const { data: session, isPending, error } = authClient.useSession();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -25,7 +23,7 @@ export default function AuthNavbar() {
         return;
       }
 
-      router.refresh();
+      window.location.reload();
     } catch {
       setLogoutError("Não foi possível contactar o servidor");
     } finally {
@@ -54,12 +52,16 @@ export default function AuthNavbar() {
   if (session) {
     return (
       <Container>
-        <Typography align="center">Olá, {session.user.name}</Typography>
+        <Typography align="center" sx={{ color: "white" }}>
+          Olá, {session.user.name}
+        </Typography>
 
         <Button
           onClick={handleSignOut}
           loading={isSigningOut}
           disabled={isSigningOut}
+          variant="text"
+          color="inherit"
         >
           Sair
         </Button>
@@ -75,12 +77,25 @@ export default function AuthNavbar() {
 
   return (
     <Container>
-      <Link component={NextLink} href={AppRoutes.LOGIN}>
-        <Typography>Iniciar sessão</Typography>
-      </Link>
-      <Link component={NextLink} href={AppRoutes.SIGN_UP}>
-        <Typography>Criar conta</Typography>
-      </Link>
+      <Button
+        component="a"
+        href={AppRoutes.LOGIN}
+        color="inherit"
+        sx={{ gap: 1 }}
+      >
+        <ExitToApp />
+        <Typography sx={{ color: "white" }}>Iniciar sessão</Typography>
+      </Button>
+      <Button
+        sx={{ gap: 1 }}
+        component="a"
+        href={AppRoutes.SIGN_UP}
+        color="inherit"
+      >
+        <GroupAdd />
+
+        <Typography sx={{ color: "white" }}>Criar conta</Typography>
+      </Button>
     </Container>
   );
 }

@@ -1,4 +1,6 @@
+import ParticipateButton from "@/app/components/participate-button/participate-button";
 import { FullMatch } from "@/app/models/match";
+import { AppRoutes } from "@/app/utils/routes";
 import {
   AccessTime,
   CalendarMonth,
@@ -62,7 +64,14 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
   const hasEnoughPlayers = match.attendances.length + 1 >= match.min_attendance;
 
   return (
-    <Card sx={{ flexDirection: "column", borderRadius: 6, p: 1 }}>
+    <Card
+      sx={(theme) => ({
+        flexDirection: "column",
+        borderRadius: 6,
+        p: 1,
+      })}
+      variant="outlined"
+    >
       <Box
         sx={{
           position: "relative",
@@ -187,23 +196,37 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
         <Divider sx={{ mb: 1, mt: 1, opacity: 0 }} />
 
-        {match.is_creator ? (
-          <Typography variant="caption">Agendaste este jogo</Typography>
-        ) : !match.is_attending ? (
-          <Button
-            variant="contained"
-            onClick={() => handleAttendance({ isAttending: true })}
-          >
-            Participar
-          </Button>
-        ) : (
+        <Stack
+          sx={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {match.is_creator ? (
+            <Typography variant="caption">Agendaste este jogo</Typography>
+          ) : !match.is_attending ? (
+            <ParticipateButton handleAttendance={handleAttendance} />
+          ) : (
+            <Button
+              variant="text"
+              onClick={() => handleAttendance({ isAttending: false })}
+            >
+              Cancelar Participação
+            </Button>
+          )}
+
           <Button
             variant="text"
-            onClick={() => handleAttendance({ isAttending: false })}
+            component="a"
+            href={AppRoutes.MATCH_DETAILS(String(match.id))}
+            size="small"
+            sx={{ minWidth: "unset" }}
+            aria-label="Abrir detalhes da partida"
           >
-            Cancelar Participação
+            Ver detalhes
           </Button>
-        )}
+        </Stack>
       </Box>
     </Card>
   );

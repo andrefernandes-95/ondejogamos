@@ -1,10 +1,12 @@
 "use client";
 
+import MatchDatePicker from "@/app/components/date-picker/date-picker";
 import DatePicker from "@/app/components/date-picker/date-picker";
 import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
+import { AppRoutes } from "@/app/utils/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -18,6 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -34,24 +37,20 @@ export default function CreateGameModal({
   setOpen,
   selectedArea,
 }: Props) {
-  const {
-    control,
-    handleSubmit,
-    setError,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<CreateMatchFormValues>({
-    resolver: zodResolver(createMatchSchema),
-    defaultValues: {
-      description: "",
-      pitchId: "",
-      durationInMinutes: 60,
-      startsAt: "",
-      format: "5x5",
-      minAttendance: 10,
-    },
-  });
+  const router = useRouter();
+
+  const { control, handleSubmit, setError, reset, setValue } =
+    useForm<CreateMatchFormValues>({
+      resolver: zodResolver(createMatchSchema),
+      defaultValues: {
+        description: "",
+        pitchId: "",
+        durationInMinutes: 60,
+        startsAt: "",
+        format: "5x5",
+        minAttendance: 10,
+      },
+    });
 
   const pitches = useListPitchesForArea(selectedArea);
 
@@ -81,6 +80,7 @@ export default function CreateGameModal({
 
       reset();
       setOpen(false);
+      window.location.reload();
     } catch {
       setError("root.server", { message: "Não foi possível agendar o jogo " });
     }
@@ -135,9 +135,8 @@ export default function CreateGameModal({
               control={control}
               render={({ field, fieldState }) => (
                 <Stack>
-                  <DatePicker
+                  <MatchDatePicker
                     {...field}
-                    label="Data e Hora do Jogo"
                     value={field.value}
                     onChange={field.onChange}
                   />
