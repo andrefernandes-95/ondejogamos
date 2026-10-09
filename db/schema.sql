@@ -41,6 +41,33 @@ CREATE TABLE public.account (
 
 
 --
+-- Name: attendance; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.attendance (
+    id bigint NOT NULL,
+    user_id text NOT NULL,
+    match_id bigint NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: attendance_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.attendance ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.attendance_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -180,6 +207,22 @@ ALTER TABLE ONLY public.account
 
 
 --
+-- Name: attendance attendance_match_id_user_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT attendance_match_id_user_id_key UNIQUE (match_id, user_id);
+
+
+--
+-- Name: attendance attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT attendance_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -303,6 +346,22 @@ ALTER TABLE ONLY public.account
 
 
 --
+-- Name: attendance attendance_match_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT attendance_match_id_fkey FOREIGN KEY (match_id) REFERENCES public.matches(id);
+
+
+--
+-- Name: attendance attendance_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.attendance
+    ADD CONSTRAINT attendance_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
+
+
+--
 -- Name: matches matches_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -360,4 +419,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20261006203931'),
     ('20261007071538'),
     ('20261007091531'),
-    ('20261007095904');
+    ('20261007095904'),
+    ('20261008102442');

@@ -6,6 +6,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { ptPT } from "@mui/x-date-pickers/locales";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface Props {
   label: string;
@@ -23,10 +28,11 @@ export default function DatePicker({ label, value, onChange }: Props) {
       }
     >
       <DateTimePicker
+        timezone="Europe/Lisbon"
         label={label}
         format="DD/MM/YYYY HH:mm"
         disablePast
-        value={value ? dayjs(value) : null}
+        value={value ? dayjs.utc(value) : null}
         onChange={(date) => {
           onChange(date?.isValid() ? date.toISOString() : "");
         }}

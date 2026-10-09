@@ -1,6 +1,11 @@
 import auth from "@/app/lib/auth";
 import { createMatchSchema } from "@/app/schemas/match";
-import { listMatches, saveMatch, SaveMatchInput } from "@/app/services/matches";
+import {
+  listFullMatches,
+  listMatches,
+  saveMatch,
+  SaveMatchInput,
+} from "@/app/services/matches";
 
 const safeParseFormData = (formData: FormData) =>
   createMatchSchema.safeParse({
@@ -104,6 +109,12 @@ export async function GET(request: Request) {
     return Response.json({ error: "A área é obrigatória" }, { status: 400 });
   }
 
-  const data = await listMatches(area);
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  const user_id = session?.user.id ?? "";
+
+  const data = await listFullMatches(area, user_id);
   return Response.json(data);
 }
