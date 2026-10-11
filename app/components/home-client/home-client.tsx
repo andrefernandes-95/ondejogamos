@@ -2,8 +2,8 @@
 
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
-import { Location } from "@/app/services/locations";
-import { Button, Card, Container, Stack } from "@mui/material";
+import { Location, LocationWithGameCount } from "@/app/services/locations";
+import { Button, Card, Container, Stack, Tooltip } from "@mui/material";
 import { useState } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Background } from "@/app/components/background/background";
@@ -12,7 +12,7 @@ import MatchList from "@/app/components/match-list/match-list";
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
 
 interface Props {
-  data: Location[];
+  data: LocationWithGameCount[];
   initialArea: string;
 }
 
@@ -48,16 +48,23 @@ export default function HomeClient({ data, initialArea }: Props) {
               handleSelectedArea={handleSelectedArea}
               data={data}
             />
+
             <ScheduleMatchButton selectedArea={selectedArea} />
 
-            <Button
-              disabled={!selectedArea}
-              sx={{ flexShrink: 0, gap: 1 }}
-              onClick={() => setIsCreatingPitch(true)}
+            <Tooltip
+              title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
             >
-              <PlaceIcon />
-              Adicionar Campo
-            </Button>
+              <span style={{ display: "inline-flex", flexShrink: 0 }}>
+                <Button
+                  disabled={!selectedArea}
+                  sx={{ flexShrink: 0, gap: 1 }}
+                  onClick={() => setIsCreatingPitch(true)}
+                >
+                  <PlaceIcon />
+                  Adicionar Campo
+                </Button>
+              </span>
+            </Tooltip>
           </Stack>
           {isCreatingPitch && (
             <RequireAuthModal

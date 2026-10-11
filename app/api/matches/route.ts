@@ -1,6 +1,7 @@
 import auth from "@/app/lib/auth";
 import { createMatchSchema } from "@/app/schemas/match";
 import {
+  listAllMatches,
   listFullMatches,
   listMatches,
   saveMatch,
@@ -105,16 +106,15 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const area = url.searchParams.get("area");
 
-  if (!area) {
-    return Response.json({ error: "A área é obrigatória" }, { status: 400 });
-  }
-
   const session = await auth.api.getSession({
     headers: request.headers,
   });
 
   const user_id = session?.user.id ?? "";
 
-  const data = await listFullMatches(area, user_id);
+  const data = area
+    ? await listFullMatches(area, user_id)
+    : await listAllMatches(user_id);
+
   return Response.json(data);
 }

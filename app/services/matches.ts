@@ -88,6 +88,61 @@ export async function listFullMatches(
   return result.rows;
 }
 
+export async function listAllMatches(user_id: string): Promise<FullMatch[]> {
+  const result = await pool.query(
+    `
+      SELECT 
+        m.id,
+        m.starts_at,
+        m.format,
+        m.description,
+        m.min_attendance,
+
+        json_build_object(
+          'id', p.id,
+          'area', p.area,
+          'municipality', p.municipality,
+          'name', p.name,
+          'image_url', p.image_url,
+          'maps_url', p.maps_url
+        ) AS pitch,
+
+        -- Build attendance array with user details --
+        COALESCE(
+          (
+            SELECT jsonb_agg(
+              jsonb_build_object(
+                'user_id', u.id,
+                'user_name', u.name,
+                'created_at', a.created_at
+              )
+            )
+            FROM attendance AS a
+            JOIN "user" AS u ON a.user_id = u.id
+            WHERE a.match_id = m.id
+          ),
+          '[]'::jsonb
+        ) AS attendances,
+
+        -- Is current user attending ? --
+        EXISTS(
+          SELECT 1
+          FROM attendance AS a
+          WHERE a.user_id = $1 AND m.id = a.match_id
+        ) AS is_attending,
+         
+        COALESCE(m.created_by = $1, false) AS is_creator
+
+      FROM matches AS m
+      JOIN pitches AS p on p.id = m.pitch_id
+      ORDER BY m.starts_at, m.id
+        `,
+    [user_id],
+  );
+
+  return result.rows;
+}
+
 export async function getFullMatchById(
   id: number,
   user_id: string | null | undefined,

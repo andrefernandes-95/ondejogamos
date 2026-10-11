@@ -2,8 +2,8 @@
 
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
-import { ExitToApp, GroupAdd } from "@mui/icons-material";
-import { Button, Stack, Typography } from "@mui/material";
+import { ExitToApp, GroupAdd, Instagram, WhatsApp } from "@mui/icons-material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 
 export default function AuthNavbar() {
@@ -103,5 +103,24 @@ export default function AuthNavbar() {
 const Container = ({ children }: { children: React.ReactNode }) => (
   <Stack direction="row" sx={{ gap: 2, py: 2, alignItems: "center" }}>
     {children}
+
+    <IconButton
+      sx={{ color: "white" }}
+      component="a"
+      rel="noopener noreferrer"
+      target="_blank"
+      href="https://chat.whatsapp.com/GfmyVK1nYxe22XqrhTmpiT"
+    >
+      <WhatsApp />
+    </IconButton>
+    <IconButton
+      sx={{ color: "white" }}
+      component="a"
+      rel="noopener noreferrer"
+      target="_blank"
+      href="http://instagram.com/ondejogamos"
+    >
+      <Instagram />
+    </IconButton>
   </Stack>
 );

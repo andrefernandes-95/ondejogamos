@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 import { useState } from "react";
 import CreateGameModal from "@/app/components/modals/create-game-modal/create-game-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
@@ -15,14 +15,20 @@ export default function ScheduleMatchButton({
 
   return (
     <>
-      <Button
-        disabled={!selectedArea}
-        sx={{ flexShrink: 0, gap: 1 }}
-        onClick={() => setIsCreatingGame(true)}
+      <Tooltip
+        title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
       >
-        <SportsSoccerIcon />
-        Agendar Jogo
-      </Button>
+        <span style={{ display: "inline-flex", flexShrink: 0 }}>
+          <Button
+            disabled={!selectedArea}
+            sx={{ flexShrink: 0, gap: 1 }}
+            onClick={() => setIsCreatingGame(true)}
+          >
+            <SportsSoccerIcon />
+            Agendar Jogo
+          </Button>
+        </span>
+      </Tooltip>
       {isCreatingGame && (
         <RequireAuthModal open={isCreatingGame} setOpen={setIsCreatingGame}>
           <CreateGameModal

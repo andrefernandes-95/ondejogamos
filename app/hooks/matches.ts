@@ -14,6 +14,7 @@ export function useListMatchesForArea(area: string) {
     }
 
     const data = await response.json();
+
     setMatches(data);
   };
 
