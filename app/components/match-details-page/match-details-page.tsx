@@ -3,6 +3,7 @@
 import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
 import { Background } from "@/app/components/background/background";
 import { Logo } from "@/app/components/logo/logo";
+import MatchShareButtons from "@/app/components/match-share-buttons/match-share-buttons";
 import ParticipateButton from "@/app/components/participate-button/participate-button";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
@@ -285,6 +286,10 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                     Cancelar Participação
                   </Button>
                 )}
+              </Stack>
+              <Divider />
+              <Stack sx={{ alignSelf: "flex-end" }}>
+                <MatchShareButtons id={match.id!} />
               </Stack>
             </Stack>
           </Stack>

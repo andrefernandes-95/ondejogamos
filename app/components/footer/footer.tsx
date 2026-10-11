@@ -1,5 +1,6 @@
 "use client";
 
+import { AppRoutes } from "@/app/utils/routes";
 import { Box, Container, Link, Stack, Typography } from "@mui/material";
 import NextLink from "next/link";
 
@@ -21,13 +22,13 @@ export default function Footer() {
           sx={{
             justifyContent: "space-between",
             alignItems: {
-              xs: "flex-start",
               sm: "center",
             },
+            textAlign: "center",
           }}
         >
           <Stack spacing={0.5}>
-            <Typography variant="caption">Programado por </Typography>
+            <Typography variant="body2">Programado por </Typography>
             <Link
               href="https://github.com/andrefernandes-95"
               rel="noopener noreferrer"
@@ -35,7 +36,7 @@ export default function Footer() {
               component={NextLink}
             >
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={(theme) => ({
                   fontWeight: 900,
                   color: theme.palette.primary.main,
@@ -46,8 +47,17 @@ export default function Footer() {
             </Link>
           </Stack>
 
+          <Stack>
+            <Link href={AppRoutes.HOME} variant="body2">
+              Início
+            </Link>
+            <Link href={AppRoutes.PLAYERS} variant="body2">
+              Lista de Jogadores
+            </Link>
+          </Stack>
+
           <Stack spacing={0.5}>
-            <Typography variant="caption">
+            <Typography variant="body2">
               Onde Jogamos © {new Date().getFullYear()}
             </Typography>
           </Stack>

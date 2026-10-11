@@ -13,7 +13,15 @@ export default function NoMatchesFound({ area }: { area: string }) {
         flexDirection: "column",
       }}
     >
-      <Typography>Ainda não há jogos agendados para {area}</Typography>
+      {area ? (
+        <Typography>
+          Ainda não há jogos agendados para {area}. Sê o(a) primeiro(a)!
+        </Typography>
+      ) : (
+        <Typography>
+          Ainda não há jogos agendados. Sê o(a) primeiro(a)!
+        </Typography>
+      )}
       <ScheduleMatchButton selectedArea={area} />
     </Card>
   );

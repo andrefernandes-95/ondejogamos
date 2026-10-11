@@ -3,4 +3,5 @@ export const AppRoutes = {
   LOGIN: "/login",
   SIGN_UP: "/signup",
   MATCH_DETAILS: (id: string) => `/match/${id}`,
+  PLAYERS: "/players",
 };
