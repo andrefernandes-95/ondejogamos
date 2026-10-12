@@ -9,15 +9,6 @@ export interface LocationWithGameCount extends Location {
   game_count: number;
 }
 
-export async function listLocations(): Promise<Location[]> {
-  const result = await pool.query(`
-            select area, municipality from locations
-            order by area
-        `);
-
-  return result.rows;
-}
-
 export async function listLocationsWithGameCount(): Promise<
   LocationWithGameCount[]
 > {
@@ -28,7 +19,7 @@ export async function listLocationsWithGameCount(): Promise<
               COUNT(m.id)::int AS game_count
             FROM "locations" AS l
             LEFT JOIN "pitches" AS p ON p.municipality = l.municipality AND p.municipality = l.municipality
-            LEFT JOIN "matches" AS m ON m.pitch_id = p.id
+            LEFT JOIN "matches" AS m ON m.pitch_id = p.id AND m.starts_at >= NOW()
             GROUP BY l.area, l.municipality
             ORDER BY area
         `);

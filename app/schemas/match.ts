@@ -16,4 +16,8 @@ export const createMatchSchema = z.object({
   description: z.string().trim().nullable().optional(),
 });
 
+export const editMatchSchema = createMatchSchema.extend({
+  id: z.string("Campo obrigatório").trim().min(1, "Campo obrigatório"),
+});
+
 export type CreateMatchFormValues = z.infer<typeof createMatchSchema>;

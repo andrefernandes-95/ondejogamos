@@ -2,7 +2,7 @@
 
 import { Button, Tooltip } from "@mui/material";
 import { useState } from "react";
-import CreateGameModal from "@/app/components/modals/create-game-modal/create-game-modal";
+import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 
@@ -31,7 +31,7 @@ export default function ScheduleMatchButton({
       </Tooltip>
       {isCreatingGame && (
         <RequireAuthModal open={isCreatingGame} setOpen={setIsCreatingGame}>
-          <CreateGameModal
+          <CreateMatchModal
             selectedArea={selectedArea}
             open={isCreatingGame}
             setOpen={setIsCreatingGame}

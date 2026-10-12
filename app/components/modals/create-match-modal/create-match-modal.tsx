@@ -1,12 +1,11 @@
 "use client";
 
 import MatchDatePicker from "@/app/components/date-picker/date-picker";
-import DatePicker from "@/app/components/date-picker/date-picker";
 import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
+import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
-import { AppRoutes } from "@/app/utils/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -20,35 +19,35 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import z from "zod";
 
 interface Props {
   selectedArea: string;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  existingMatch?: FullMatch;
 }
 
 const formId = "create-pitch-form";
 
-export default function CreateGameModal({
+export default function CreateMatchModal({
   open,
   setOpen,
   selectedArea,
+  existingMatch,
 }: Props) {
-  const router = useRouter();
-
   const { control, handleSubmit, setError, reset, setValue } =
     useForm<CreateMatchFormValues>({
       resolver: zodResolver(createMatchSchema),
       defaultValues: {
-        description: "",
-        pitchId: "",
-        durationInMinutes: 60,
-        startsAt: "",
-        format: "5x5",
-        minAttendance: 10,
+        description: existingMatch ? existingMatch.description : "",
+        pitchId: existingMatch ? existingMatch.pitch.id?.toString() : "",
+        durationInMinutes: existingMatch
+          ? (existingMatch.durationInMinutes ?? 60)
+          : 60,
+        startsAt: existingMatch ? existingMatch.starts_at?.toISOString() : "",
+        format: existingMatch ? existingMatch.format : "5x5",
+        minAttendance: existingMatch ? existingMatch.min_attendance : 10,
       },
     });
 
@@ -61,6 +60,10 @@ export default function CreateGameModal({
   const onSubmit = async (values: CreateMatchFormValues) => {
     const body = new FormData();
 
+    if (existingMatch) {
+      body.append("id", existingMatch.id);
+    }
+
     body.append("pitchId", values.pitchId);
     body.append("description", values.description!);
     body.append("durationInMinutes", "60");
@@ -69,7 +72,10 @@ export default function CreateGameModal({
     body.append("startsAt", values.startsAt.toString());
 
     try {
-      const response = await fetch(`/api/matches`, { method: "POST", body });
+      const response = await fetch(`/api/matches`, {
+        method: existingMatch ? "PUT" : "POST",
+        body,
+      });
 
       if (!response.ok) {
         setError("root.server", {
@@ -171,7 +177,7 @@ export default function CreateGameModal({
         <Button onClick={handleClose}>Cancelar</Button>
 
         <Button type="submit" form={formId} variant="contained">
-          Agendar Jogo
+          {existingMatch ? "Guardar alterações" : "Agendar Jogo"}
         </Button>
       </DialogActions>
     </Dialog>

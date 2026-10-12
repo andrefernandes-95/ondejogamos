@@ -1,0 +1,3 @@
+- Founder Incentive
+- Allow players to generate and instagram share their FC Player Card with: Assists, Goals and Matches Played
+- Future: Match creator approves goals. Goals can stay unapproved.

@@ -2,6 +2,8 @@
 
 import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
 import { Background } from "@/app/components/background/background";
+import DeleteMatch from "@/app/components/delete-match-button/delete-match-button";
+import EditMatch from "@/app/components/edit-match/edit-match";
 import { Logo } from "@/app/components/logo/logo";
 import MatchShareButtons from "@/app/components/match-share-buttons/match-share-buttons";
 import ParticipateButton from "@/app/components/participate-button/participate-button";
@@ -11,6 +13,7 @@ import {
   AccessTime,
   CalendarMonth,
   ChevronLeft,
+  Edit,
   Group,
   Groups,
   LocationPin,
@@ -19,6 +22,7 @@ import {
   OpenInNew,
 } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -35,8 +39,6 @@ import { useState } from "react";
 export default function MatchDetailsPage({ match }: { match: FullMatch }) {
   const [serverError, setServerError] = useState("");
   const router = useRouter();
-
-  console.log("match:", match);
 
   const weekDay = new Intl.DateTimeFormat("pt-PT", {
     weekday: "long",
@@ -81,21 +83,39 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
     router.refresh();
   };
 
+  const isCreator = match.is_creator;
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Background />
       <Stack sx={{ gap: 2 }}>
-        <Button
-          component="a"
-          href={AppRoutes.HOME}
-          sx={{
-            flexGrow: 0,
-            alignSelf: "flex-start",
-            gap: 1,
-          }}
-        >
-          <ChevronLeft /> <Typography variant="body1">Voltar atrás</Typography>
-        </Button>
+        <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Button
+            component="a"
+            href={AppRoutes.HOME}
+            sx={{
+              flexGrow: 0,
+              alignSelf: "flex-start",
+              gap: 1,
+            }}
+          >
+            <ChevronLeft />{" "}
+            <Typography variant="body1">Voltar atrás</Typography>
+          </Button>
+
+          {isCreator && (
+            <Stack sx={{ flexDirection: "row", alignItems: "center" }}>
+              <EditMatch match={match} />
+              <DeleteMatch match={match} />
+            </Stack>
+          )}
+        </Stack>
+
+        {serverError && (
+          <Alert variant="filled" severity="error">
+            {serverError}
+          </Alert>
+        )}
 
         <Card
           variant="outlined"

@@ -79,7 +79,7 @@ export async function listFullMatches(
 
       FROM matches AS m
       JOIN pitches AS p on p.id = m.pitch_id
-      WHERE p.area = $1
+      WHERE p.area = $1 AND m.starts_at >= NOW()
       ORDER BY m.starts_at, m.id
         `,
     [area, user_id],
@@ -135,6 +135,7 @@ export async function listAllMatches(user_id: string): Promise<FullMatch[]> {
 
       FROM matches AS m
       JOIN pitches AS p on p.id = m.pitch_id
+      WHERE m.starts_at >= NOW()
       ORDER BY m.starts_at, m.id
         `,
     [user_id],
@@ -237,4 +238,84 @@ export async function saveMatch(pitch: SaveMatchInput): Promise<Match> {
   );
 
   return result.rows[0];
+}
+
+export interface UpdateMatchInput extends SaveMatchInput {
+  id: number;
+}
+
+export async function updateMatch(
+  match: UpdateMatchInput,
+  userId: string,
+): Promise<Match> {
+  const result = await pool.query(
+    `
+      UPDATE MATCHES
+      SET 
+        pitch_id = $1,
+        description = $2,
+        format = $3,
+        min_attendance = $4,
+        starts_at = $5
+      WHERE id = $6 AND created_by = $7
+      RETURNING *
+    `,
+    [
+      match.pitchId,
+      match.description,
+      match.format,
+      match.minAttendance,
+      match.startsAt,
+      match.id,
+      userId,
+    ],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function deleteMatch(
+  matchId: string,
+  userId: string,
+): Promise<void> {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      `
+        SELECT id
+        FROM "matches"
+        WHERE id = $1 AND created_by = $2
+        FOR UPDATE
+      `,
+      [matchId, userId],
+    );
+
+    if (result.rowCount === 0) {
+      throw new Error(`Match not found or unauthorized`);
+    }
+
+    await client.query(
+      `
+      DELETE FROM "attendance"
+      WHERE match_id = $1`,
+      [matchId],
+    );
+
+    await client.query(
+      `
+      DELETE FROM "matches"
+      WHERE id = $1 AND created_by = $2`,
+      [matchId, userId],
+    );
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }
