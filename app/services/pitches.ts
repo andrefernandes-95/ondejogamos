@@ -1,4 +1,5 @@
 import { pool } from "@/app/lib/db";
+import { Match } from "@/app/models/match";
 
 export type Pitch = {
   id: number;

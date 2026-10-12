@@ -1,17 +1,18 @@
 import MatchCard from "@/app/components/match-card/match-card";
 import NoMatchesFound from "@/app/components/no-matches-found/no-matches-found";
 import { useListMatchesForArea } from "@/app/hooks/matches";
-import { Box, Container, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface Props {
   area: string;
+  onAddPitch: () => void;
 }
 
-export default function MatchList({ area }: Props) {
+export default function MatchList({ area, onAddPitch }: Props) {
   const { matches, refresh } = useListMatchesForArea(area);
 
   if (!matches.length) {
-    return <NoMatchesFound area={area} />;
+    return <NoMatchesFound area={area} onAddPitch={onAddPitch} />;
   }
 
   return (

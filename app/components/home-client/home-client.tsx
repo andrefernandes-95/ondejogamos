@@ -49,7 +49,10 @@ export default function HomeClient({ data, initialArea }: Props) {
               data={data}
             />
 
-            <ScheduleMatchButton selectedArea={selectedArea} />
+            <ScheduleMatchButton
+              selectedArea={selectedArea}
+              onAddPitch={() => setIsCreatingPitch(true)}
+            />
 
             <Tooltip
               title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
@@ -80,7 +83,10 @@ export default function HomeClient({ data, initialArea }: Props) {
           )}
         </Card>
 
-        <MatchList area={selectedArea} />
+        <MatchList
+          area={selectedArea}
+          onAddPitch={() => setIsCreatingPitch(true)}
+        />
       </Stack>
     </Container>
   );

@@ -6,7 +6,7 @@ export interface Match {
   id: string;
   creator: Partial<User>;
   pitch: Partial<Pitch>;
-  durationInMinutes: number;
+  duration_in_minutes: number;
   format: "5x5" | "7x7" | "11x11"; // 5x5 | 7x7 | 11x11
   attendanceCount: number;
   min_attendance: number; // 10 players

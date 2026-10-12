@@ -8,8 +8,10 @@ import RequireAuthModal from "@/app/components/modals/require-auth-modal/require
 
 export default function ScheduleMatchButton({
   selectedArea,
+  onAddPitch,
 }: {
   selectedArea: string;
+  onAddPitch: () => void;
 }) {
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
 
@@ -35,6 +37,7 @@ export default function ScheduleMatchButton({
             selectedArea={selectedArea}
             open={isCreatingGame}
             setOpen={setIsCreatingGame}
+            onAddPitch={onAddPitch}
           />
         </RequireAuthModal>
       )}

@@ -319,3 +319,26 @@ export async function deleteMatch(
     client.release();
   }
 }
+
+export async function getPitchMatchesForDateInterval(
+  pitch_id: string,
+  from: string,
+  until: string,
+): Promise<Match[]> {
+  const result = await pool.query(
+    `
+            SELECT m.*
+            FROM "matches" AS m
+            WHERE
+              m.pitch_id = $1
+              AND m.starts_at < $3::timestamptz
+              AND (
+                m.starts_at + m.duration_in_minutes * INTERVAL '1 minute'
+              ) > $2::timestamptz
+            ORDER BY m.starts_at DESC, m.id DESC
+        `,
+    [pitch_id, from, until],
+  );
+
+  return result.rows;
+}
