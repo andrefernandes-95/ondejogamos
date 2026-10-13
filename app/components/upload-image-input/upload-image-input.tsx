@@ -1,3 +1,4 @@
+import useLocalization from "@/app/hooks/locale";
 import { Delete, CloudUpload } from "@mui/icons-material";
 import { Stack, Typography, Button } from "@mui/material";
 
@@ -12,6 +13,7 @@ export default function UploadImageInput({
   onChange,
   errorMessage,
 }: Props) {
+  const isEn = useLocalization() === "EN";
   return value ? (
     <Stack
       sx={{
@@ -32,7 +34,7 @@ export default function UploadImageInput({
       tabIndex={-1}
       startIcon={<CloudUpload />}
     >
-      Carregar imagem
+      {isEn ? "Upload image" : "Carregar imagem"}
       <input
         type="file"
         style={{ display: "none" }}

@@ -1,26 +1,23 @@
 "use client";
 
-import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
 import { Background } from "@/app/components/background/background";
 import DeleteMatch from "@/app/components/delete-match-button/delete-match-button";
 import EditMatch from "@/app/components/edit-match/edit-match";
-import { Logo } from "@/app/components/logo/logo";
 import MatchShareButtons from "@/app/components/match-share-buttons/match-share-buttons";
 import ParticipateButton from "@/app/components/participate-button/participate-button";
+import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import {
   AccessTime,
   CalendarMonth,
   ChevronLeft,
-  Edit,
   Group,
   Groups,
   LocationPin,
   ManageAccounts,
   MyLocation,
   OpenInNew,
-  TimeToLeave,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -41,15 +38,17 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
   const [serverError, setServerError] = useState("");
   const router = useRouter();
 
-  const weekDay = new Intl.DateTimeFormat("pt-PT", {
+  const isEn = useLocalization() === "EN";
+
+  const weekDay = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
     weekday: "long",
     day: "2-digit",
-    month: "narrow",
+    month: "long",
     year: "2-digit",
     timeZone: "Europe/Lisbon",
   }).format(new Date(match.starts_at));
 
-  const time = new Intl.DateTimeFormat("pt-PT", {
+  const time = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -74,11 +73,15 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
       });
 
       if (!response.ok) {
-        setServerError("Não foi possível aderir ao jogo");
+        setServerError(
+          isEn ? "Could not join game" : "Não foi possível aderir ao jogo",
+        );
         return;
       }
     } catch {
-      setServerError("Não foi possível aderir ao jogo");
+      setServerError(
+        isEn ? "Could not join game" : "Não foi possível aderir ao jogo",
+      );
     }
 
     router.refresh();
@@ -101,7 +104,9 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
             }}
           >
             <ChevronLeft />{" "}
-            <Typography variant="body1">Voltar atrás</Typography>
+            <Typography variant="body1">
+              {isEn ? "Go back" : "Voltar atrás"}
+            </Typography>
           </Button>
 
           {isCreator && (
@@ -211,7 +216,8 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               >
                 <MyLocation sx={{ fontSize: 24 }} />
                 <Typography variant="body1" color="textPrimary">
-                  Local: <strong>{match.pitch.name}</strong>
+                  {isEn ? "Place" : "Local"}:{" "}
+                  <strong>{match.pitch.name}</strong>
                 </Typography>
 
                 {match.pitch.maps_url && (
@@ -222,7 +228,11 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                     sx={{ minWidth: "unset" }}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Abrir localização no Google Maps"
+                    aria-label={
+                      isEn
+                        ? "Open in Google Maps"
+                        : "Abrir localização no Google Maps"
+                    }
                   >
                     <OpenInNew sx={{ fontSize: 18 }} />
                   </Button>
@@ -249,7 +259,8 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               >
                 <ManageAccounts sx={{ fontSize: 24 }} />
                 <Typography variant="body1" color="textPrimary">
-                  Organizado por <strong>{match.creator.name}</strong>
+                  {isEn ? "Organized by" : "Organizado por"}{" "}
+                  <strong>{match.creator.name}</strong>
                 </Typography>
               </Stack>
 
@@ -259,7 +270,8 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               >
                 <Group sx={{ fontSize: 24 }} />
                 <Typography variant="body1" color="textPrimary">
-                  Formato da partida: <strong>{match.format}</strong>
+                  {isEn ? "Match Format" : "Formato da partida"}:{" "}
+                  <strong>{match.format}</strong>
                 </Typography>
               </Stack>
 
@@ -269,7 +281,10 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               >
                 <AccessTime sx={{ fontSize: 24 }} />
                 <Typography variant="body1" color="textPrimary">
-                  Duração: <strong>{match.duration_in_minutes} Minutos</strong>
+                  {isEn ? "Duration" : "Duração"}:{" "}
+                  <strong>
+                    {match.duration_in_minutes} {isEn ? "Minutes" : "Minutos"}
+                  </strong>
                 </Typography>
               </Stack>
 
@@ -290,23 +305,25 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
 
                   {hasEnoughPlayers && (
                     <Typography variant="body1" color="warning">
-                      Já há jogadores suficientes
+                      {isEn
+                        ? "Enough players. You can still join!"
+                        : "Já há jogadores suficientes"}
                     </Typography>
                   )}
 
                   {!hasEnoughPlayers && (
                     <Typography variant="body1" color="success">
-                      Ainda faltam{" "}
-                      {Number(
-                        match.min_attendance - 1 - match.attendances.length,
-                      )}{" "}
-                      jogadores!
+                      {isEn
+                        ? `${Number(match.min_attendance - 1 - match.attendances.length)} spots available`
+                        : `Ainda faltam ${Number(match.min_attendance - 1 - match.attendances.length)} jogadores`}
                     </Typography>
                   )}
                 </Stack>
 
                 {match.is_creator ? (
-                  <Typography variant="caption">Agendaste este jogo</Typography>
+                  <Typography variant="caption">
+                    {isEn ? "Scheduled by you" : "Agendaste este jogo"}
+                  </Typography>
                 ) : !match.is_attending ? (
                   <ParticipateButton handleAttendance={handleAttendance} />
                 ) : (
@@ -314,7 +331,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                     variant="text"
                     onClick={() => handleAttendance({ isAttending: false })}
                   >
-                    Cancelar Participação
+                    {isEn ? "Cancel Participation" : "Cancelar Participação"}
                   </Button>
                 )}
               </Stack>
@@ -348,7 +365,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
             >
               <Groups sx={{ fontSize: 24 }} />
               <Typography variant="body1" color="textPrimary">
-                Lista de Inscritos
+                {isEn ? "Player List" : "Lista de Inscritos"}
               </Typography>
             </Stack>
 

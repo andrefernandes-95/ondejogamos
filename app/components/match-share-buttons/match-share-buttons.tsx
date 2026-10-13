@@ -1,21 +1,21 @@
 "use client";
-import {
-  WhatsappShareButton,
-  WhatsappIcon,
-  FacebookShareButton,
-  FacebookIcon,
-} from "react-share";
-import { Stack } from "@mui/material";
+import { WhatsappShareButton, WhatsappIcon } from "react-share";
+import { Stack, Typography } from "@mui/material";
+import useLocalization from "@/app/hooks/locale";
 
 export default function MatchShareButtons({ id }: { id: string }) {
   const url = `https://ondejogamos.com/match/${id}`;
+  const isEn = useLocalization() === "EN";
   return (
-    <Stack>
+    <Stack sx={{ alignItems: "center", flexDirection: "row", gap: 1 }}>
+      <Typography variant="caption">
+        {isEn ? "Share this match:" : "Partilhar jogo:"}
+      </Typography>
       <WhatsappShareButton
         url={url}
-        title="Bora jogar? Espreita este jogo: "
+        title={isEn ? "Lets play!" : "Bora jogar? Espreita este jogo: "}
         separator=""
-        aria-label="Partilhar no WhatsApp"
+        aria-label={isEn ? "Share on Whatsapp" : "Partilhar no WhatsApp"}
       >
         <WhatsappIcon size={30} round />
       </WhatsappShareButton>

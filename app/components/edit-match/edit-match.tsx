@@ -1,4 +1,5 @@
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
+import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { Edit } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
@@ -10,6 +11,9 @@ interface Props {
 
 export default function EditMatch({ match }: Props) {
   const [isEditing, setIsEditing] = useState(false);
+
+  const isEn = useLocalization() === "EN";
+
   return (
     <>
       <CreateMatchModal
@@ -27,7 +31,9 @@ export default function EditMatch({ match }: Props) {
         onClick={() => setIsEditing(true)}
       >
         <Edit />
-        <Typography variant="body1">Editar Detalhes</Typography>
+        <Typography variant="body1">
+          {isEn ? "Edit Details" : "Editar Detalhes"}
+        </Typography>
       </Button>
     </>
   );

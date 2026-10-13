@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { DatePicker, TimeGrid } from "@mantine/dates";
 import { Match } from "@/app/models/match";
+import useLocalization from "@/app/hooks/locale";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -58,6 +59,7 @@ export default function MatchDatePicker({
   current_match_pitch_id,
   current_match_duration_in_minutes,
 }: Props) {
+  const isEn = useLocalization() === "EN";
   const id = useId();
 
   const [loading, setLoading] = useState(false);
@@ -140,8 +142,6 @@ export default function MatchDatePicker({
             );
           }
 
-          console.log("slots:", slots);
-
           // Existing Match: 20.00
           // We want to unavailable the slots prior according to our match duration
           // So we for a 60 minute match we block:
@@ -159,8 +159,6 @@ export default function MatchDatePicker({
             );
           }
 
-          console.log(slots);
-
           return slots;
         });
 
@@ -173,7 +171,12 @@ export default function MatchDatePicker({
     };
 
     void load();
-  }, [current_match_pitch_id, day, current_match_duration_in_minutes]);
+  }, [
+    day,
+    current_match_pitch_id,
+    current_match_id,
+    current_match_duration_in_minutes,
+  ]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -194,7 +197,7 @@ export default function MatchDatePicker({
         }}
       >
         <Stack spacing={1}>
-          <Typography>Dia do Jogo</Typography>
+          <Typography>{isEn ? "Match Day" : "Dia do Jogo"}</Typography>
 
           <DatePicker
             value={day}
@@ -206,7 +209,9 @@ export default function MatchDatePicker({
           />
         </Stack>
         <Stack spacing={1}>
-          <Typography id={`${id}-time-label`}>Hora de Início</Typography>
+          <Typography id={`${id}-time-label`}>
+            {isEn ? "Start Time" : "Hora de Início"}
+          </Typography>
 
           <Box
             role="group"
@@ -238,7 +243,13 @@ export default function MatchDatePicker({
             sx={{ alignSelf: "flex-start" }}
             onClick={() => setShowAllTimes((current) => !current)}
           >
-            {showAllTimes ? "Ver horas habituais" : "Ver todas as horas"}
+            {showAllTimes
+              ? isEn
+                ? "See common times"
+                : "Ver horas habituais"
+              : isEn
+                ? "See all times"
+                : "Ver todas as horas"}
           </Button>
         </Stack>
       </Box>

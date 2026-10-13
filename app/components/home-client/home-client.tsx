@@ -2,7 +2,7 @@
 
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
-import { Location, LocationWithGameCount } from "@/app/services/locations";
+import { LocationWithGameCount } from "@/app/services/locations";
 import { Button, Card, Container, Stack, Tooltip } from "@mui/material";
 import { useState } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -10,6 +10,7 @@ import { Background } from "@/app/components/background/background";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 import MatchList from "@/app/components/match-list/match-list";
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
+import useLocalization from "@/app/hooks/locale";
 
 interface Props {
   data: LocationWithGameCount[];
@@ -19,6 +20,8 @@ interface Props {
 export default function HomeClient({ data, initialArea }: Props) {
   const [selectedArea, setSelectedArea] = useState<string>(initialArea);
   const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
+
+  const isEn = useLocalization() === "EN";
 
   const handleSelectedArea = (selected: string) => {
     setSelectedArea(selected);
@@ -55,7 +58,13 @@ export default function HomeClient({ data, initialArea }: Props) {
             />
 
             <Tooltip
-              title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
+              title={
+                selectedArea?.length
+                  ? ""
+                  : isEn
+                    ? "Select an area first"
+                    : "Seleciona uma área primeiro"
+              }
             >
               <span style={{ display: "inline-flex", flexShrink: 0 }}>
                 <Button
@@ -64,7 +73,7 @@ export default function HomeClient({ data, initialArea }: Props) {
                   onClick={() => setIsCreatingPitch(true)}
                 >
                   <PlaceIcon />
-                  Adicionar Campo
+                  {isEn ? "Add Pitch" : "Adicionar Campo"}
                 </Button>
               </span>
             </Tooltip>

@@ -1,5 +1,6 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import { AppRoutes } from "@/app/utils/routes";
 import { Instagram, WhatsApp } from "@mui/icons-material";
 import {
@@ -10,9 +11,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import NextLink from "next/link";
 
 export default function Footer() {
+  const isEn = useLocalization() === "EN";
+
   return (
     <Box
       component="footer"
@@ -58,10 +60,10 @@ export default function Footer() {
 
           <Stack>
             <Link href={AppRoutes.HOME} variant="body2">
-              Início
+              {isEn ? "Home" : "Início"}
             </Link>
             <Link href={AppRoutes.PLAYERS} variant="body2">
-              Lista de Jogadores
+              {isEn ? "Player List" : "Lista de Jogadores"}
             </Link>
           </Stack>
 

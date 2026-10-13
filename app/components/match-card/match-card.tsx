@@ -1,4 +1,5 @@
 import ParticipateButton from "@/app/components/participate-button/participate-button";
+import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@mui/icons-material";
 import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
 
 interface Props {
   match: FullMatch;
@@ -19,16 +19,16 @@ interface Props {
 }
 
 export default function MatchCard({ match, onAttendanceChanged }: Props) {
-  const [serverError, setServerError] = useState("");
+  const isEn = useLocalization() === "EN";
 
-  const weekDay = new Intl.DateTimeFormat("pt-PT", {
+  const weekDay = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
     weekday: "long",
     day: "2-digit",
     month: "long",
     timeZone: "Europe/Lisbon",
   }).format(new Date(match.starts_at));
 
-  const time = new Intl.DateTimeFormat("pt-PT", {
+  const time = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -51,21 +51,18 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
       });
 
       if (!response.ok) {
-        setServerError("Não foi possível aderir ao jogo");
         return;
       }
 
       onAttendanceChanged?.();
-    } catch {
-      setServerError("Não foi possível aderir ao jogo");
-    }
+    } catch {}
   };
 
   const hasEnoughPlayers = match.attendances.length + 1 >= match.min_attendance;
 
   return (
     <Card
-      sx={(theme) => ({
+      sx={() => ({
         flexDirection: "column",
         borderRadius: 6,
         p: 1,
@@ -147,7 +144,11 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
                 sx={{ minWidth: "unset" }}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Abrir localização no Google Maps"
+                aria-label={
+                  isEn
+                    ? "Open in Google Maps"
+                    : "Abrir localização no Google Maps"
+                }
               >
                 <OpenInNew sx={{ fontSize: 18 }} />
               </Button>
@@ -180,15 +181,17 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
             {hasEnoughPlayers && (
               <Typography variant="body1" color="warning">
-                Já há jogadores suficientes
+                {isEn
+                  ? "Match is full. You can still participate!"
+                  : "Já há jogadores suficientes"}
               </Typography>
             )}
 
             {!hasEnoughPlayers && (
               <Typography variant="body1" color="success">
-                Ainda faltam{" "}
-                {Number(match.min_attendance - 1 - match.attendances.length)}{" "}
-                jogadores!
+                {isEn
+                  ? `${Number(match.min_attendance - 1 - match.attendances.length)} spots available!`
+                  : `Ainda faltam ${Number(match.min_attendance - 1 - match.attendances.length)} jogadores!`}
               </Typography>
             )}
           </Stack>
@@ -204,7 +207,9 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
           }}
         >
           {match.is_creator ? (
-            <Typography variant="caption">Agendaste este jogo</Typography>
+            <Typography variant="caption">
+              {isEn ? "Scheduled by you" : "Agendaste este jogo"}
+            </Typography>
           ) : !match.is_attending ? (
             <ParticipateButton handleAttendance={handleAttendance} />
           ) : (
@@ -212,7 +217,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
               variant="text"
               onClick={() => handleAttendance({ isAttending: false })}
             >
-              Cancelar Participação
+              {isEn ? "Cancel Participation" : "Cancelar Participação"}
             </Button>
           )}
 
@@ -222,9 +227,11 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
             href={AppRoutes.MATCH_DETAILS(String(match.id))}
             size="small"
             sx={{ minWidth: "unset" }}
-            aria-label="Abrir detalhes da partida"
+            aria-label={
+              isEn ? "Open match details" : "Abrir detalhes da partida"
+            }
           >
-            Ver detalhes
+            {isEn ? "See Details" : "Ver detalhes"}
           </Button>
         </Stack>
       </Box>

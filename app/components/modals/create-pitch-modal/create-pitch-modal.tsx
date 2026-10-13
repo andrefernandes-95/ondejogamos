@@ -2,6 +2,8 @@
 
 import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
 import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
+import useLocalization from "@/app/hooks/locale";
+import { REQUIRED_FIELD } from "@/app/utils/constants";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_IMAGE_SIZE,
@@ -33,31 +35,47 @@ interface Props {
 
 const formId = "create-pitch-form";
 
-const schema = z.object({
-  name: z.string().trim().min(1, "Nome do campo obrigatório"),
-  area: z.string().trim().min(1, "Área obrigatória"),
-  municipality: z.string().trim().min(1, "Município obrigatório"),
-  mapsUrl: z
-    .string()
-    .trim()
-    .pipe(z.union([z.url("Url Inválido"), z.literal("")]))
-    .nullable()
-    .optional(),
-  photo: z
-    .instanceof(File, { message: "Escolhe uma fotografia" })
-    .refine((file) => file.size > 0, "Ficheiro vazio")
-    .refine(
-      (file) => file.size <= MAX_IMAGE_SIZE,
-      `Máximo de ${MAX_IMAGE_SIZE_IN_MB} MB`,
-    )
-    .refine(
-      (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
-      "Usa JPEG ou PNG",
-    )
-    .nullable(),
-});
+const getSchema = (isEn: boolean) =>
+  z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, isEn ? REQUIRED_FIELD : "Nome do campo obrigatório"),
+    area: z
+      .string()
+      .trim()
+      .min(1, isEn ? REQUIRED_FIELD : "Área obrigatória"),
+    municipality: z
+      .string()
+      .trim()
+      .min(1, isEn ? REQUIRED_FIELD : "Município obrigatório"),
+    mapsUrl: z
+      .string()
+      .trim()
+      .pipe(
+        z.union([z.url(isEn ? "Invalid URL" : "Url Inválido"), z.literal("")]),
+      )
+      .nullable()
+      .optional(),
+    photo: z
+      .instanceof(File, {
+        message: isEn ? "Choose a photo" : "Escolhe uma fotografia",
+      })
+      .refine((file) => file.size > 0, isEn ? "Empty file" : "Ficheiro vazio")
+      .refine(
+        (file) => file.size <= MAX_IMAGE_SIZE,
+        isEn
+          ? `Maximum ${MAX_IMAGE_SIZE_IN_MB} MB`
+          : `Máximo de ${MAX_IMAGE_SIZE_IN_MB} MB`,
+      )
+      .refine(
+        (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
+        isEn ? "Use JPEG or PNG" : "Usa JPEG ou PNG",
+      )
+      .nullable(),
+  });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof getSchema>>;
 
 export default function CreatePitchModal({
   open,
@@ -68,6 +86,8 @@ export default function CreatePitchModal({
     [],
   );
 
+  const isEn = useLocalization() === "EN";
+
   const {
     control,
     handleSubmit,
@@ -75,7 +95,7 @@ export default function CreatePitchModal({
     reset,
     formState: { isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(getSchema(isEn)),
     defaultValues: {
       name: "",
       area: selectedArea,
@@ -92,7 +112,11 @@ export default function CreatePitchModal({
       );
 
       if (!response.ok) {
-        throw new Error("Falha ao carregar municípios");
+        throw new Error(
+          isEn
+            ? "Failed to load municipalities"
+            : "Falha ao carregar municípios",
+        );
       }
 
       const municipalities = await response.json();
@@ -126,7 +150,9 @@ export default function CreatePitchModal({
 
       if (!response.ok) {
         setError("root.server", {
-          message: "Não foi possível guardar o campo ",
+          message: isEn
+            ? "Could not save pitch"
+            : "Não foi possível guardar o campo",
         });
         return;
       }
@@ -134,7 +160,11 @@ export default function CreatePitchModal({
       reset();
       setOpen(false);
     } catch {
-      setError("root.server", { message: "Não foi possível guardar o campo " });
+      setError("root.server", {
+        message: isEn
+          ? "Could not save pitch"
+          : "Não foi possível guardar o campo",
+      });
     }
   };
 
@@ -145,12 +175,16 @@ export default function CreatePitchModal({
         sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
       >
         <PlaceIcon />
-        <Typography variant="h5">Adicionar Campo</Typography>
+        <Typography variant="h5">
+          {isEn ? "Add Pitch" : "Adicionar Campo"}
+        </Typography>
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText>
-          Adiciona um novo campo a {selectedArea}
+          {isEn
+            ? `Add a new pitch to ${selectedArea}`
+            : `Adiciona um novo campo a ${selectedArea}`}
         </DialogContentText>
 
         <Box
@@ -167,7 +201,7 @@ export default function CreatePitchModal({
                 <TextField
                   {...field}
                   inputRef={field.ref}
-                  label="Nome do campo"
+                  label={isEn ? "Pitch Name" : "Nome do campo"}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -209,7 +243,7 @@ export default function CreatePitchModal({
                   {...field}
                   type="url"
                   inputRef={field.ref}
-                  label="URL do Google Maps"
+                  label={isEn ? "Google Maps URL" : "URL do Google Maps"}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -220,7 +254,7 @@ export default function CreatePitchModal({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Cancelar
+          {isEn ? "Cancel" : "Cancelar"}
         </Button>
 
         <Button
@@ -229,7 +263,7 @@ export default function CreatePitchModal({
           variant="contained"
           disabled={isSubmitting}
         >
-          Adicionar
+          {isEn ? "Add" : "Adicionar"}
         </Button>
       </DialogActions>
     </Dialog>

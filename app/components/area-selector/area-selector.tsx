@@ -1,7 +1,8 @@
 "use client";
 
-import { Location, LocationWithGameCount } from "@/app/services/locations";
-import { Close, Delete, Remove, RemoveCircle } from "@mui/icons-material";
+import useLocalization from "@/app/hooks/locale";
+import { LocationWithGameCount } from "@/app/services/locations";
+import { Close } from "@mui/icons-material";
 import {
   Button,
   FormControl,
@@ -11,7 +12,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React from "react";
 
 interface Props {
   selectedArea: string;
@@ -31,15 +31,17 @@ export default function AreaSelector({
       (preparedData[entry.area] ?? 0) + entry.game_count;
   });
 
+  const isEn = useLocalization() === "EN";
+
   return (
     <Stack sx={{ flexDirection: "row", flexGrow: 1 }}>
       <FormControl fullWidth>
-        <InputLabel id="select-area">Área</InputLabel>
+        <InputLabel id="select-area">{isEn ? "Area" : "Área"}</InputLabel>
         <Select
           labelId="select-area"
           id="select-area"
           value={selectedArea}
-          label="Área"
+          label={isEn ? "Area" : "Área"}
           renderValue={(value) => value}
           onChange={({ target: { value } }) => handleSelectedArea(value)}
         >
@@ -52,8 +54,16 @@ export default function AreaSelector({
               {entry[0]}
 
               <Typography color="primary">
-                {entry[1] === 1 ? `1 jogo agendado` : ""}
-                {entry[1] > 1 ? `${entry[1]} jogos agendados` : ""}
+                {entry[1] === 1
+                  ? isEn
+                    ? `1 game scheduled`
+                    : `1 jogo agendado`
+                  : ""}
+                {entry[1] > 1
+                  ? isEn
+                    ? `${entry[1]} games scheduled`
+                    : `${entry[1]} jogos agendados`
+                  : ""}
               </Typography>
             </MenuItem>
           ))}

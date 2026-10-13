@@ -2,8 +2,10 @@ import { Stack, Typography } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import useLocalization from "@/app/hooks/locale";
 export const Logo = () => {
-  const t = useTranslations("Navbar");
+  const isEn = useLocalization() === "EN";
+
   return (
     <Stack sx={{ gap: 1, flexDirection: "row", alignItems: "center" }}>
       <Link
@@ -86,7 +88,9 @@ export const Logo = () => {
             onde jogamos
           </Typography>
           <Typography variant="caption" sx={{ color: "white" }}>
-            {t("description")}
+            {isEn
+              ? "A community to play casual football"
+              : "Uma comunidade para combinar futeboladas"}
           </Typography>
         </Stack>
       </Link>

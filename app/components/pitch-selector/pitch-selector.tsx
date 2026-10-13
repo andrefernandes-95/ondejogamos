@@ -1,5 +1,6 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import { Pitch } from "@/app/services/pitches";
 import { Autocomplete, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
@@ -50,6 +51,8 @@ export default function PitchSelector({
 
   const value = options.find((pitch) => String(pitch.id) === selectedPitch);
 
+  const isEn = useLocalization() === "EN";
+
   return (
     <Stack sx={{ flexDirection: "column" }}>
       <Autocomplete
@@ -85,11 +88,15 @@ export default function PitchSelector({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Selecionar campo"
-            placeholder="Pesquisar por campo ou localização"
+            label={isEn ? "Select pitch" : "Selecionar campo"}
+            placeholder={
+              isEn
+                ? "Search for a pitch or a place"
+                : "Pesquisar por campo ou localização"
+            }
           />
         )}
-        noOptionsText="Sem resultados"
+        noOptionsText={isEn ? "No results" : "Sem resultados"}
         renderValue={(value) => value && <PitchOption pitch={value} />}
       />
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}

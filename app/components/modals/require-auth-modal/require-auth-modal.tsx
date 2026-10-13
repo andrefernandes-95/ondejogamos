@@ -1,9 +1,9 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
-import { AccountCircle, NoAccounts } from "@mui/icons-material";
-import PlaceIcon from "@mui/icons-material/Place";
+import { AccountCircle } from "@mui/icons-material";
 import {
   Button,
   CircularProgress,
@@ -42,6 +42,8 @@ export function RequireAuthModalInner({
 }: Pick<Props, "open" | "setOpen">) {
   const router = useRouter();
 
+  const isEn = useLocalization() === "EN";
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -70,12 +72,18 @@ export function RequireAuthModalInner({
         }}
       >
         <AccountCircle />
-        <Typography variant="h5">Conta necessária</Typography>
+        <Typography variant="h5">
+          {isEn ? "Account required" : "Conta necessária"}
+        </Typography>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} sx={{ py: 2 }}>
-          <Typography>Precisas de uma conta para continuar.</Typography>
+          <Typography>
+            {isEn
+              ? "An account is required to proceed"
+              : "Precisas de uma conta para continuar"}
+          </Typography>
         </Stack>
       </DialogContent>
       <DialogActions
@@ -92,7 +100,7 @@ export function RequireAuthModalInner({
           p: 2,
         }}
       >
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleClose}>{isEn ? "Cancel" : "Cancelar"}</Button>
         <Stack
           sx={{
             flexDirection: {
@@ -106,10 +114,10 @@ export function RequireAuthModalInner({
           }}
         >
           <Button onClick={goToSignIn} variant="contained">
-            Iniciar Sessão
+            {isEn ? "Login" : "Iniciar Sessão"}
           </Button>
           <Button onClick={goToSignUp} variant="contained">
-            Criar Conta
+            {isEn ? "Create account" : "Criar Conta"}
           </Button>
         </Stack>
       </DialogActions>

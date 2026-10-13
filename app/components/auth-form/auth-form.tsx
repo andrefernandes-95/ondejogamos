@@ -22,6 +22,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import NextLink from "next/link";
 import { AppRoutes } from "@/app/utils/routes";
+import useLocalization from "@/app/hooks/locale";
 
 type Mode = "login" | "signup";
 
@@ -31,15 +32,18 @@ interface Props {
 
 const MIN_PASSWORD_LENGTH = 10;
 
-function createSchema(mode: Mode) {
+function createSchema(mode: Mode, isEn: boolean) {
   return z
     .object({
-      name: z.string().trim().max(100, "Máximo de 100 caracteres"),
-      email: z.email("Introduz um e-mail válido"),
+      name: z
+        .string()
+        .trim()
+        .max(100, isEn ? `Max 100 characters` : "Máximo de 100 caracteres"),
+      email: z.email(isEn ? "Invalid email" : "Introduz um e-mail válido"),
       password: z
         .string()
-        .min(1, "Introduz uma password")
-        .max(128, "Máximo de 128 caracteres"),
+        .min(1, isEn ? "Invalid password" : "Introduz uma password")
+        .max(128, isEn ? "Max 128 characters" : "Máximo de 128 caracteres"),
       confirmPassword: z.string(),
     })
     .superRefine((values, ctx) => {
@@ -51,7 +55,7 @@ function createSchema(mode: Mode) {
         ctx.addIssue({
           code: "custom",
           path: ["name"],
-          message: "Introduz o teu nome",
+          message: isEn ? "Insert a name" : "Introduz o teu nome",
         });
       }
 
@@ -59,7 +63,9 @@ function createSchema(mode: Mode) {
         ctx.addIssue({
           code: "custom",
           path: ["password"],
-          message: `Usa pelo menos ${MIN_PASSWORD_LENGTH} caracteres`,
+          message: isEn
+            ? `Use at least ${MIN_PASSWORD_LENGTH} characters`
+            : `Usa pelo menos ${MIN_PASSWORD_LENGTH} caracteres`,
         });
       }
 
@@ -67,7 +73,9 @@ function createSchema(mode: Mode) {
         ctx.addIssue({
           code: "custom",
           path: ["confirmPassword"],
-          message: `As passwords não coincidem`,
+          message: isEn
+            ? "Passwords do not match"
+            : `As passwords não coincidem`,
         });
       }
     });
@@ -81,7 +89,7 @@ export default function AuthForm({ mode }: Props) {
 
   const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState("");
-
+  const isEn = useLocalization() === "EN";
   const {
     control,
     handleSubmit,
@@ -90,7 +98,7 @@ export default function AuthForm({ mode }: Props) {
     resetField,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(createSchema(mode)),
+    resolver: zodResolver(createSchema(mode, isEn)),
     defaultValues: {
       name: "",
       email: "",
@@ -120,7 +128,10 @@ export default function AuthForm({ mode }: Props) {
 
         if (result.error) {
           setError("root.server", {
-            message: result.error.message || "Não foi possível criar a conta",
+            message:
+              result.error.message || isEn
+                ? "Could not create account"
+                : "Não foi possível criar a conta",
           });
           return;
         }
@@ -135,9 +146,6 @@ export default function AuthForm({ mode }: Props) {
         }
 
         // Without session - verify email flow
-        setNotice(
-          "Conta criada com sucesso! Verifica a tua caixa de e-mail para verificares a tua conta e finalizares o registo!",
-        );
         return;
       }
 
@@ -150,12 +158,17 @@ export default function AuthForm({ mode }: Props) {
       if (result.error) {
         let message = "";
         if (result.error.code === "EMAIL_NOT_VERIFIED") {
-          message = "Confirma o teu e-mail antes de iniciar sessão.";
+          message = isEn
+            ? "Confirm your e-mail"
+            : "Confirma o teu e-mail antes de iniciar sessão.";
         } else if (result.error.status === 429) {
-          message = "Demasiadas tentativas. Tenta novamente daqui a pouco.";
+          message = isEn
+            ? "Too many attempts. Try again later."
+            : "Demasiadas tentativas. Tenta novamente daqui a pouco.";
         } else {
-          message =
-            "Não foi possível entrar. Verifica os dados e tenta novamente.";
+          message = isEn
+            ? "Could not sign in. Please try again."
+            : "Não foi possível entrar. Verifica os dados e tenta novamente.";
         }
 
         setError("root.server", { message });
@@ -165,7 +178,9 @@ export default function AuthForm({ mode }: Props) {
       goHome();
     } catch {
       setError("root.server", {
-        message: "Não foi possível contactar o servidor. Tenta novamente.",
+        message: isEn
+          ? "Something went wrong!"
+          : "Não foi possível contactar o servidor. Tenta novamente.",
       });
     }
   };
@@ -176,13 +191,23 @@ export default function AuthForm({ mode }: Props) {
         <Stack spacing={3}>
           <Box>
             <Typography component="h1" variant="h5">
-              {isSignup ? "Criar conta" : "Entrar"}
+              {isSignup
+                ? isEn
+                  ? "Sign Up"
+                  : "Criar conta"
+                : isEn
+                  ? "Sign In"
+                  : "Entrar"}
             </Typography>
 
             <Typography color="text.secondary" sx={{ mt: 1 }}>
               {isSignup
-                ? "Cria uma conta para organizar e participar em jogos"
-                : "Entra na tua conta para continuar"}
+                ? isEn
+                  ? "Create an account to organize and participate in games"
+                  : "Cria uma conta para organizar e participar em jogos"
+                : isEn
+                  ? "Sign in to your account"
+                  : "Entra na tua conta para continuar"}
             </Typography>
           </Box>
 
@@ -209,7 +234,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label="Nome"
+                      label={isEn ? "Name" : "Nome"}
                       autoComplete="name"
                       required
                       fullWidth
@@ -273,8 +298,12 @@ export default function AuthForm({ mode }: Props) {
                               disabled={isSubmitting}
                               aria-label={
                                 showPassword
-                                  ? "Ocultar password"
-                                  : "Mostrar password"
+                                  ? isEn
+                                    ? "Hide password"
+                                    : "Ocultar password"
+                                  : isEn
+                                    ? "Show password"
+                                    : "Mostrar password"
                               }
                               aria-pressed={showPassword}
                               onClick={() => setShowPassword((value) => !value)}
@@ -304,7 +333,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label="Confirmar password"
+                      label={isEn ? "Confirm password" : "Confirmar password"}
                       type={showPassword ? "text" : "password"}
                       autoComplete={"new-password"}
                       required
@@ -324,19 +353,37 @@ export default function AuthForm({ mode }: Props) {
                 loading={isSubmitting}
                 disabled={isSubmitting}
               >
-                {isSignup ? "Criar conta" : "Entrar"}
+                {isSignup
+                  ? isEn
+                    ? "Create account"
+                    : "Criar conta"
+                  : isEn
+                    ? "Sign In"
+                    : "Entrar"}
               </Button>
             </Stack>
           </Box>
 
           <Typography variant="body2">
-            {isSignup ? "Já tens conta? " : "Ainda não tens conta? "}
+            {isSignup
+              ? isEn
+                ? "Already have an account? "
+                : "Já tens conta? "
+              : isEn
+                ? "No account yet? "
+                : "Ainda não tens conta? "}
 
             <Link
               component={NextLink}
               href={isSignup ? AppRoutes.LOGIN : AppRoutes.SIGN_UP}
             >
-              {isSignup ? "Entrar" : "Criar conta"}
+              {isSignup
+                ? isEn
+                  ? "Sign In"
+                  : "Entrar"
+                : isEn
+                  ? "Create account"
+                  : "Criar conta"}
             </Link>
           </Typography>
         </Stack>

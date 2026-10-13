@@ -1,3 +1,4 @@
+import useLocalization from "@/app/hooks/locale";
 import { CreateMatchFormValues } from "@/app/schemas/match";
 import {
   FormGroup,
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function MatchFormatInput({ control, onChange }: Props) {
+  const isEn = useLocalization() === "EN";
   return (
     <Controller
       name="format"
@@ -26,7 +28,7 @@ export default function MatchFormatInput({ control, onChange }: Props) {
           <Stack sx={{ flexDirection: "column" }}>
             <FormGroup>
               <FormLabel id={labelId} color="primary">
-                Formato de Jogo
+                {isEn ? "Match Format" : "Formato de Jogo"}
               </FormLabel>
               <ToggleButtonGroup
                 id={groupId}

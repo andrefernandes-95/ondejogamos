@@ -1,6 +1,6 @@
 import { AppRoutes } from "@/app/utils/routes";
 import { ChevronLeft } from "@mui/icons-material";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 export default function PageTitle({ title }: { title: string }) {
   return (

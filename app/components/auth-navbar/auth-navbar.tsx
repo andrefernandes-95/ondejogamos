@@ -51,7 +51,7 @@ export default function AuthNavbar() {
     return (
       <Container>
         <Typography color="alert" role="alert">
-          Não foi possível verificar a sessão .
+          {localization === "EN" ? "Something went wrong" : "Um erro ocorreu"}
         </Typography>
       </Container>
     );
@@ -88,6 +88,8 @@ export default function AuthNavbar() {
             {logoutError}
           </Typography>
         )}
+
+        <LanguageSettings />
       </Container>
     );
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import {
   FormControl,
   InputLabel,
@@ -22,14 +23,18 @@ export default function MunicipalitySelector({
   onMunicipalitySelected,
   errorMessage,
 }: Props) {
+  const isEn = useLocalization() === "EN";
+
   return (
     <FormControl fullWidth>
-      <InputLabel id="select-municipality">Município</InputLabel>
+      <InputLabel id="select-municipality">
+        {isEn ? "Municipality" : "Município"}
+      </InputLabel>
       <Select
         labelId="select-municipality"
         id="select-municipality"
         value={selectedMunicipality}
-        label="Município"
+        label={isEn ? "Municipality" : "Município"}
         onChange={({ target: { value } }) => onMunicipalitySelected(value)}
         error={!!errorMessage?.length}
       >
