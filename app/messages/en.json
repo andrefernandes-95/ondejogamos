@@ -6,7 +6,8 @@
     "error": "An error occurred",
     "createAccount": "Create account",
     "login": "Sign in",
-    "sessionError": "Unable to check your session."
+    "sessionError": "Unable to check your session.",
+    "profile": "Profile"
   },
   "Match": {
     "join": "Join",

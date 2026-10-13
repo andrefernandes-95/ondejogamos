@@ -189,7 +189,11 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
             {!hasEnoughPlayers && (
               <Typography variant="body1" color="success">
-                {t("Match.missingPlayers", { count: Number(match.min_attendance - 1 - match.attendances.length) })}
+                {t("Match.missingPlayers", {
+                  count: Number(
+                    match.min_attendance - 1 - match.attendances.length,
+                  ),
+                })}
               </Typography>
             )}
           </Stack>

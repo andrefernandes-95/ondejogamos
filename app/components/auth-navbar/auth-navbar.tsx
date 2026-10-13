@@ -56,10 +56,19 @@ export default function AuthNavbar() {
   if (session) {
     return (
       <Container>
-        <Typography align="center" sx={{ color: "white" }}>
+        <Typography align="center" sx={{ color: "white", mr: 1 }}>
           {t("hello")}, {session.user.name}
         </Typography>
 
+        <Button
+          onClick={handleSignOut}
+          loading={isSigningOut}
+          disabled={isSigningOut}
+          variant="text"
+          color="inherit"
+        >
+          {t("profile")}
+        </Button>
         <Button
           onClick={handleSignOut}
           loading={isSigningOut}
@@ -90,7 +99,7 @@ export default function AuthNavbar() {
         sx={{ gap: 1 }}
       >
         <ExitToApp />
-        <Typography sx={{ color: "white" }}>{t('login')}</Typography>
+        <Typography sx={{ color: "white" }}>{t("login")}</Typography>
       </Button>
       <Button
         sx={{ gap: 1 }}
