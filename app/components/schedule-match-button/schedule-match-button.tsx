@@ -21,7 +21,7 @@ export default function ScheduleMatchButton({
   return (
     <>
       <Tooltip
-        title={selectedArea?.length ? "" : t("selectArea")}
+        title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
       >
         <span style={{ display: "inline-flex", flexShrink: 0 }}>
           <Button
@@ -30,7 +30,7 @@ export default function ScheduleMatchButton({
             onClick={() => setIsCreatingGame(true)}
           >
             <SportsSoccerIcon />
-            {t("schedule")}
+            {t("join")}
           </Button>
         </span>
       </Tooltip>

@@ -1,31 +1,27 @@
 import z from "zod";
-import { defaultValidationTranslator, type ValidationTranslator } from "@/app/i18n/validation";
 
-export const createMatchSchemaForLocale = (t: ValidationTranslator) => z.object({
-  pitchId: z.string(t("Validation.required")).trim().min(1, t("Validation.required")),
+export const createMatchSchema = z.object({
+  pitchId: z.string("Campo obrigatório").trim().min(1, "Campo obrigatório"),
   startsAt: z.iso
-    .datetime({ offset: true, error: t("Validation.invalidDateTime") })
+    .datetime({ offset: true, error: "Data e hora inválidas" })
     .refine(
       (value) => Date.parse(value) > Date.now(),
-      t("Validation.futureDate"),
+      "Escolhe uma data e uma hora no futuro",
     ),
   format: z.enum(["5x5", "7x7", "11x11"], {
-    message: t("Validation.invalidFormat"),
+    message: "Formato inválido",
   }),
-  minAttendance: z.number(t("Validation.minAttendance")).min(10, t("Validation.minAttendance")),
+  minAttendance: z.number().min(10, "Introduz um número mínimo de jogadores"),
   durationInMinutes: z.coerce
-    .number(t("Validation.durationInteger"))
-    .int(t("Validation.durationInteger"))
-    .min(30, t("Validation.minDuration"))
+    .number()
+    .int("A duração deve ser um número inteiro")
+    .min(30, "Introduz a duração em minutos")
     .default(60) as unknown as number,
   description: z.string().trim().nullable().optional(),
 });
 
-export const editMatchSchemaForLocale = (t: ValidationTranslator) => createMatchSchemaForLocale(t).extend({
-  id: z.string(t("Validation.required")).trim().min(1, t("Validation.required")),
+export const editMatchSchema = createMatchSchema.extend({
+  id: z.string("Campo obrigatório").trim().min(1, "Campo obrigatório"),
 });
-
-export const createMatchSchema = createMatchSchemaForLocale(defaultValidationTranslator);
-export const editMatchSchema = editMatchSchemaForLocale(defaultValidationTranslator);
 
 export type CreateMatchFormValues = z.infer<typeof createMatchSchema>;

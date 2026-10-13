@@ -1,7 +1,5 @@
-import type { ValidationTranslator } from "@/app/i18n/validation";
-import { getTranslations } from "next-intl/server";
 import auth from "@/app/lib/auth";
-import { createMatchSchemaForLocale, editMatchSchemaForLocale } from "@/app/schemas/match";
+import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
   listAllMatches,
@@ -21,20 +19,19 @@ const getCommonValues = (formData: FormData) => ({
   description: formData.get("description") ?? "",
 });
 
-const safeParseCreateFormData = (formData: FormData, t: ValidationTranslator) => {
-  return createMatchSchemaForLocale(t).safeParse(getCommonValues(formData));
+const safeParseCreateFormData = (formData: FormData) => {
+  return createMatchSchema.safeParse(getCommonValues(formData));
 };
-const safeParseUpdateFormData = (formData: FormData, t: ValidationTranslator) => {
+const safeParseUpdateFormData = (formData: FormData) => {
   const values = {
     ...getCommonValues(formData),
     id: formData.get("id"),
   };
 
-  return editMatchSchemaForLocale(t).safeParse(values);
+  return editMatchSchema.safeParse(values);
 };
 
 export async function POST(request: Request) {
-  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -42,7 +39,7 @@ export async function POST(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: t("Api.signInToSchedule"),
+        error: "Inicia a sessão para agendar um jogo",
       },
       {
         status: 401,
@@ -59,7 +56,7 @@ export async function POST(request: Request) {
   } catch {
     return Response.json(
       {
-        error: t("Api.invalidForm"),
+        error: "Formulário inválido",
       },
       {
         status: 400,
@@ -67,11 +64,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const validation = safeParseCreateFormData(formData, t);
+  const validation = safeParseCreateFormData(formData);
   if (!validation.success) {
     return Response.json(
       {
-        error: t("Api.invalidData"),
+        error: "Dados inválidos",
         issues: validation.error.issues,
       },
       {
@@ -108,7 +105,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        error: t("MatchForm.saveError"),
+        error: `Não foi possível agendar o jogo`,
       },
       {
         status: 500,
@@ -120,7 +117,6 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -128,7 +124,7 @@ export async function PUT(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: t("Api.signInToEdit"),
+        error: "Inicia a sessão para alterar um jogo",
       },
       {
         status: 401,
@@ -145,7 +141,7 @@ export async function PUT(request: Request) {
   } catch {
     return Response.json(
       {
-        error: t("Api.invalidForm"),
+        error: "Formulário inválido",
       },
       {
         status: 400,
@@ -153,11 +149,11 @@ export async function PUT(request: Request) {
     );
   }
 
-  const validation = safeParseUpdateFormData(formData, t);
+  const validation = safeParseUpdateFormData(formData);
   if (!validation.success) {
     return Response.json(
       {
-        error: t("Api.invalidData"),
+        error: "Dados inválidos",
         issues: validation.error.issues,
       },
       {
@@ -198,7 +194,7 @@ export async function PUT(request: Request) {
 
     return Response.json(
       {
-        error: t("MatchForm.updateError"),
+        error: `Não foi possível atualizar o jogo`,
       },
       {
         status: 500,
@@ -209,7 +205,7 @@ export async function PUT(request: Request) {
   if (!result) {
     return Response.json(
       {
-        error: t("Api.matchNotFound"),
+        error: "Jogo não encontrado ou sem permissão para o alterar",
       },
       {
         status: 404,
@@ -221,7 +217,6 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -229,7 +224,7 @@ export async function DELETE(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: t("Api.signInToDelete"),
+        error: "Inicia a sessão para remover um jogo",
       },
       {
         status: 401,
@@ -244,7 +239,7 @@ export async function DELETE(request: Request) {
   } catch {
     return Response.json(
       {
-        error: t("Api.invalidForm"),
+        error: "Formulário inválido",
       },
       {
         status: 400,
@@ -255,7 +250,7 @@ export async function DELETE(request: Request) {
   if (!formData.has("id")) {
     return Response.json(
       {
-        error: t("Api.invalidForm"),
+        error: "Formulário inválido",
       },
       {
         status: 400,
@@ -270,7 +265,7 @@ export async function DELETE(request: Request) {
 
     return Response.json(
       {
-        error: t("Match.cancelError"),
+        error: `Não foi possível remover o jogo`,
       },
       {
         status: 500,

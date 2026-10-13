@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import { AppRoutes } from "@/app/utils/routes";
 import { Instagram, WhatsApp } from "@mui/icons-material";
 import {
@@ -15,7 +13,6 @@ import {
 import NextLink from "next/link";
 
 export default function Footer() {
-  const t = useTranslations();
   return (
     <Box
       component="footer"
@@ -45,7 +42,6 @@ export default function Footer() {
               target="_blank"
               size="small"
               href="https://chat.whatsapp.com/GfmyVK1nYxe22XqrhTmpiT"
-              aria-label={t("Footer.whatsapp")}
             >
               <WhatsApp />
             </IconButton>
@@ -55,7 +51,6 @@ export default function Footer() {
               target="_blank"
               size="small"
               href="http://instagram.com/ondejogamos"
-              aria-label={t("Footer.instagram")}
             >
               <Instagram />
             </IconButton>
@@ -63,10 +58,10 @@ export default function Footer() {
 
           <Stack>
             <Link href={AppRoutes.HOME} variant="body2">
-              {t("Common.home")}
+              Início
             </Link>
             <Link href={AppRoutes.PLAYERS} variant="body2">
-              {t("Footer.players")}
+              Lista de Jogadores
             </Link>
           </Stack>
 

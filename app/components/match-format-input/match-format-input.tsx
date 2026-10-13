@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { CreateMatchFormValues } from "@/app/schemas/match";
 import {
   FormGroup,
@@ -16,7 +15,6 @@ interface Props {
 }
 
 export default function MatchFormatInput({ control, onChange }: Props) {
-  const t = useTranslations();
   return (
     <Controller
       name="format"
@@ -28,7 +26,7 @@ export default function MatchFormatInput({ control, onChange }: Props) {
           <Stack sx={{ flexDirection: "column" }}>
             <FormGroup>
               <FormLabel id={labelId} color="primary">
-                {t("MatchForm.format")}
+                Formato de Jogo
               </FormLabel>
               <ToggleButtonGroup
                 id={groupId}

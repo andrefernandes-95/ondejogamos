@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import "dayjs/locale/pt";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -60,7 +58,6 @@ export default function MatchDatePicker({
   current_match_pitch_id,
   current_match_duration_in_minutes,
 }: Props) {
-  const t = useTranslations();
   const id = useId();
 
   const [loading, setLoading] = useState(false);
@@ -197,21 +194,9 @@ export default function MatchDatePicker({
         }}
       >
         <Stack spacing={1}>
-          <Typography>{t("DatePicker.day")}</Typography>
+          <Typography>Dia do Jogo</Typography>
 
           <DatePicker
-            previousLabel={t("DatePicker.previousMonth")}
-            nextLabel={t("DatePicker.nextMonth")}
-            ariaLabels={{
-              monthLevelControl: t("DatePicker.chooseMonth"),
-              yearLevelControl: t("DatePicker.chooseYear"),
-              previousMonth: t("DatePicker.previousMonth"),
-              nextMonth: t("DatePicker.nextMonth"),
-              previousYear: t("DatePicker.previousYear"),
-              nextYear: t("DatePicker.nextYear"),
-              previousDecade: t("DatePicker.previousDecade"),
-              nextDecade: t("DatePicker.nextDecade"),
-            }}
             value={day}
             minDate={dayjs().tz(TIMEZONE).format("YYYY-MM-DD")}
             onChange={(nextDay) => {
@@ -221,7 +206,7 @@ export default function MatchDatePicker({
           />
         </Stack>
         <Stack spacing={1}>
-          <Typography id={`${id}-time-label`}>{t("DatePicker.time")}</Typography>
+          <Typography id={`${id}-time-label`}>Hora de Início</Typography>
 
           <Box
             role="group"
@@ -229,7 +214,7 @@ export default function MatchDatePicker({
             sx={{ maxHeight: 280, overflowY: "auto", p: 0.5 }}
           >
             {loading ? (
-              <CircularProgress aria-label={t("DatePicker.loading")} />
+              <CircularProgress />
             ) : (
               <TimeGrid
                 value={time}
@@ -253,7 +238,7 @@ export default function MatchDatePicker({
             sx={{ alignSelf: "flex-start" }}
             onClick={() => setShowAllTimes((current) => !current)}
           >
-            {showAllTimes ? t("DatePicker.commonTimes") : t("DatePicker.allTimes")}
+            {showAllTimes ? "Ver horas habituais" : "Ver todas as horas"}
           </Button>
         </Stack>
       </Box>

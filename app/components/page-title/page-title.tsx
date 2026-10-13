@@ -1,10 +1,8 @@
-import { useTranslations } from "next-intl";
 import { AppRoutes } from "@/app/utils/routes";
 import { ChevronLeft } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 
 export default function PageTitle({ title }: { title: string }) {
-  const t = useTranslations();
   return (
     <>
       <Button
@@ -17,7 +15,7 @@ export default function PageTitle({ title }: { title: string }) {
           gap: 1,
         }}
       >
-        <ChevronLeft /> <Typography variant="body1">{t("Common.back")}</Typography>
+        <ChevronLeft /> <Typography variant="body1">Voltar atrás</Typography>
       </Button>
 
       <Box sx={{ py: 1 }} />

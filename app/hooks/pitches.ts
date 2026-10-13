@@ -1,9 +1,7 @@
-import { useTranslations } from "next-intl";
 import { Pitch } from "@/app/services/pitches";
 import { useEffect, useState } from "react";
 
 export function useListPitchesForArea(area: string): Pitch[] {
-  const t = useTranslations();
   const [pitches, setPitches] = useState<Pitch[]>([]);
 
   useEffect(() => {
@@ -13,7 +11,7 @@ export function useListPitchesForArea(area: string): Pitch[] {
       );
 
       if (!response.ok) {
-        throw new Error(t("Common.loadPitchesError"));
+        throw new Error("Falha ao carregar campos");
       }
 
       const pitchesForArea = await response.json();
@@ -21,7 +19,7 @@ export function useListPitchesForArea(area: string): Pitch[] {
       setPitches(pitchesForArea);
     };
     fetchPitchesForArea();
-  }, [area, t]);
+  }, [area]);
 
   return pitches;
 }

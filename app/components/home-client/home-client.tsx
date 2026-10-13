@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { Location, LocationWithGameCount } from "@/app/services/locations";
@@ -19,7 +17,6 @@ interface Props {
 }
 
 export default function HomeClient({ data, initialArea }: Props) {
-  const t = useTranslations();
   const [selectedArea, setSelectedArea] = useState<string>(initialArea);
   const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
 
@@ -58,7 +55,7 @@ export default function HomeClient({ data, initialArea }: Props) {
             />
 
             <Tooltip
-              title={selectedArea?.length ? "" : t("Common.selectArea")}
+              title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
             >
               <span style={{ display: "inline-flex", flexShrink: 0 }}>
                 <Button
@@ -67,7 +64,7 @@ export default function HomeClient({ data, initialArea }: Props) {
                   onClick={() => setIsCreatingPitch(true)}
                 >
                   <PlaceIcon />
-                  {t("Pitch.add")}
+                  Adicionar Campo
                 </Button>
               </span>
             </Tooltip>

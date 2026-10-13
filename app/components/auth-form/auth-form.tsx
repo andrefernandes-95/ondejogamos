@@ -1,7 +1,5 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import z from "zod";
@@ -25,8 +23,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import NextLink from "next/link";
 import { AppRoutes } from "@/app/utils/routes";
 
-import type { ValidationTranslator } from "@/app/i18n/validation";
-
 type Mode = "login" | "signup";
 
 interface Props {
@@ -35,15 +31,15 @@ interface Props {
 
 const MIN_PASSWORD_LENGTH = 10;
 
-function createSchema(mode: Mode, t: ValidationTranslator) {
+function createSchema(mode: Mode) {
   return z
     .object({
-      name: z.string().trim().max(100, t("Validation.maxCharacters", { count: 100 })),
-      email: z.email(t("Validation.email")),
+      name: z.string().trim().max(100, "Máximo de 100 caracteres"),
+      email: z.email("Introduz um e-mail válido"),
       password: z
         .string()
-        .min(1, t("Validation.password"))
-        .max(128, t("Validation.maxCharacters", { count: 128 })),
+        .min(1, "Introduz uma password")
+        .max(128, "Máximo de 128 caracteres"),
       confirmPassword: z.string(),
     })
     .superRefine((values, ctx) => {
@@ -55,7 +51,7 @@ function createSchema(mode: Mode, t: ValidationTranslator) {
         ctx.addIssue({
           code: "custom",
           path: ["name"],
-          message: t("Validation.name"),
+          message: "Introduz o teu nome",
         });
       }
 
@@ -63,7 +59,7 @@ function createSchema(mode: Mode, t: ValidationTranslator) {
         ctx.addIssue({
           code: "custom",
           path: ["password"],
-          message: t("Validation.passwordMin", { count: MIN_PASSWORD_LENGTH }),
+          message: `Usa pelo menos ${MIN_PASSWORD_LENGTH} caracteres`,
         });
       }
 
@@ -71,7 +67,7 @@ function createSchema(mode: Mode, t: ValidationTranslator) {
         ctx.addIssue({
           code: "custom",
           path: ["confirmPassword"],
-          message: t("Validation.passwordMismatch"),
+          message: `As passwords não coincidem`,
         });
       }
     });
@@ -80,7 +76,6 @@ function createSchema(mode: Mode, t: ValidationTranslator) {
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export default function AuthForm({ mode }: Props) {
-  const t = useTranslations();
   const router = useRouter();
   const isSignup = mode === "signup";
 
@@ -95,7 +90,7 @@ export default function AuthForm({ mode }: Props) {
     resetField,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(createSchema(mode, t)),
+    resolver: zodResolver(createSchema(mode)),
     defaultValues: {
       name: "",
       email: "",
@@ -125,9 +120,7 @@ export default function AuthForm({ mode }: Props) {
 
         if (result.error) {
           setError("root.server", {
-            message: result.error.code === "USER_ALREADY_EXISTS" || result.error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"
-              ? t("Auth.emailAlreadyUsed")
-              : t("Auth.signupError"),
+            message: result.error.message || "Não foi possível criar a conta",
           });
           return;
         }
@@ -143,7 +136,7 @@ export default function AuthForm({ mode }: Props) {
 
         // Without session - verify email flow
         setNotice(
-          t("Auth.verifyEmailNotice"),
+          "Conta criada com sucesso! Verifica a tua caixa de e-mail para verificares a tua conta e finalizares o registo!",
         );
         return;
       }
@@ -157,12 +150,12 @@ export default function AuthForm({ mode }: Props) {
       if (result.error) {
         let message = "";
         if (result.error.code === "EMAIL_NOT_VERIFIED") {
-          message = t("Auth.verifyEmail");
+          message = "Confirma o teu e-mail antes de iniciar sessão.";
         } else if (result.error.status === 429) {
-          message = t("Auth.tooManyAttempts");
+          message = "Demasiadas tentativas. Tenta novamente daqui a pouco.";
         } else {
           message =
-            t("Auth.loginError");
+            "Não foi possível entrar. Verifica os dados e tenta novamente.";
         }
 
         setError("root.server", { message });
@@ -172,7 +165,7 @@ export default function AuthForm({ mode }: Props) {
       goHome();
     } catch {
       setError("root.server", {
-        message: t("Auth.networkError"),
+        message: "Não foi possível contactar o servidor. Tenta novamente.",
       });
     }
   };
@@ -183,13 +176,13 @@ export default function AuthForm({ mode }: Props) {
         <Stack spacing={3}>
           <Box>
             <Typography component="h1" variant="h5">
-              {isSignup ? t("Navbar.createAccount") : t("Navbar.login")}
+              {isSignup ? "Criar conta" : "Entrar"}
             </Typography>
 
             <Typography color="text.secondary" sx={{ mt: 1 }}>
               {isSignup
-                ? t("Auth.signupDescription")
-                : t("Auth.loginDescription")}
+                ? "Cria uma conta para organizar e participar em jogos"
+                : "Entra na tua conta para continuar"}
             </Typography>
           </Box>
 
@@ -216,7 +209,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label={t("Common.name")}
+                      label="Nome"
                       autoComplete="name"
                       required
                       fullWidth
@@ -238,7 +231,7 @@ export default function AuthForm({ mode }: Props) {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     inputRef={field.ref}
-                    label={t("Common.email")}
+                    label="Email"
                     type="email"
                     autoComplete="email"
                     required
@@ -260,7 +253,7 @@ export default function AuthForm({ mode }: Props) {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     inputRef={field.ref}
-                    label={t("Auth.password")}
+                    label="Password"
                     type={showPassword ? "text" : "password"}
                     autoComplete={
                       isSignup ? "new-password" : "current-password"
@@ -280,8 +273,8 @@ export default function AuthForm({ mode }: Props) {
                               disabled={isSubmitting}
                               aria-label={
                                 showPassword
-                                  ? t("Auth.hidePassword")
-                                  : t("Auth.showPassword")
+                                  ? "Ocultar password"
+                                  : "Mostrar password"
                               }
                               aria-pressed={showPassword}
                               onClick={() => setShowPassword((value) => !value)}
@@ -311,7 +304,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label={t("Auth.confirmPassword")}
+                      label="Confirmar password"
                       type={showPassword ? "text" : "password"}
                       autoComplete={"new-password"}
                       required
@@ -331,19 +324,19 @@ export default function AuthForm({ mode }: Props) {
                 loading={isSubmitting}
                 disabled={isSubmitting}
               >
-                {isSignup ? t("Navbar.createAccount") : t("Navbar.login")}
+                {isSignup ? "Criar conta" : "Entrar"}
               </Button>
             </Stack>
           </Box>
 
           <Typography variant="body2">
-            {isSignup ? t("Auth.alreadyAccount") : t("Auth.noAccount")} {" "}
+            {isSignup ? "Já tens conta? " : "Ainda não tens conta? "}
 
             <Link
               component={NextLink}
               href={isSignup ? AppRoutes.LOGIN : AppRoutes.SIGN_UP}
             >
-              {isSignup ? t("Navbar.login") : t("Navbar.createAccount")}
+              {isSignup ? "Entrar" : "Criar conta"}
             </Link>
           </Typography>
         </Stack>

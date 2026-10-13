@@ -1,4 +1,3 @@
-import { useTranslations, useLocale } from "next-intl";
 import ParticipateButton from "@/app/components/participate-button/participate-button";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
@@ -20,18 +19,16 @@ interface Props {
 }
 
 export default function MatchCard({ match, onAttendanceChanged }: Props) {
-  const t = useTranslations();
-  const locale = useLocale();
   const [serverError, setServerError] = useState("");
 
-  const weekDay = new Intl.DateTimeFormat(locale, {
+  const weekDay = new Intl.DateTimeFormat("pt-PT", {
     weekday: "long",
     day: "2-digit",
     month: "long",
     timeZone: "Europe/Lisbon",
   }).format(new Date(match.starts_at));
 
-  const time = new Intl.DateTimeFormat(locale, {
+  const time = new Intl.DateTimeFormat("pt-PT", {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -54,13 +51,13 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
       });
 
       if (!response.ok) {
-        setServerError(t("Match.attendanceError"));
+        setServerError("Não foi possível aderir ao jogo");
         return;
       }
 
       onAttendanceChanged?.();
     } catch {
-      setServerError(t("Match.attendanceError"));
+      setServerError("Não foi possível aderir ao jogo");
     }
   };
 
@@ -86,7 +83,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
       >
         <Image
           src={match.pitch.image_url!}
-          alt={t("Pitch.photo", { name: match.pitch.name ?? "" })}
+          alt={match.pitch.image_url!}
           fill
           sizes="(max-width: 600px) 100vw 50vw"
           style={{
@@ -150,7 +147,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
                 sx={{ minWidth: "unset" }}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={t("Common.openMaps")}
+                aria-label="Abrir localização no Google Maps"
               >
                 <OpenInNew sx={{ fontSize: 18 }} />
               </Button>
@@ -183,17 +180,15 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
             {hasEnoughPlayers && (
               <Typography variant="body1" color="warning">
-                {t("Match.enoughPlayers")}
+                Já há jogadores suficientes
               </Typography>
             )}
 
             {!hasEnoughPlayers && (
               <Typography variant="body1" color="success">
-                {t("Match.missingPlayers", {
-                  count: Number(
-                    match.min_attendance - 1 - match.attendances.length,
-                  ),
-                })}
+                Ainda faltam{" "}
+                {Number(match.min_attendance - 1 - match.attendances.length)}{" "}
+                jogadores!
               </Typography>
             )}
           </Stack>
@@ -209,7 +204,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
           }}
         >
           {match.is_creator ? (
-            <Typography variant="caption">{t("Match.createdByYou")}</Typography>
+            <Typography variant="caption">Agendaste este jogo</Typography>
           ) : !match.is_attending ? (
             <ParticipateButton handleAttendance={handleAttendance} />
           ) : (
@@ -217,7 +212,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
               variant="text"
               onClick={() => handleAttendance({ isAttending: false })}
             >
-              {t("Match.cancelAttendance")}
+              Cancelar Participação
             </Button>
           )}
 
@@ -227,9 +222,9 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
             href={AppRoutes.MATCH_DETAILS(String(match.id))}
             size="small"
             sx={{ minWidth: "unset" }}
-            aria-label={t("Match.openDetails")}
+            aria-label="Abrir detalhes da partida"
           >
-            {t("Match.details")}
+            Ver detalhes
           </Button>
         </Stack>
       </Box>

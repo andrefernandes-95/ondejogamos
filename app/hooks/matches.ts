@@ -1,9 +1,7 @@
-import { useTranslations } from "next-intl";
 import { FullMatch } from "@/app/models/match";
 import { useEffect, useState } from "react";
 
 export function useListMatchesForArea(area: string) {
-  const t = useTranslations();
   const [matches, setMatches] = useState<FullMatch[]>([]);
 
   const fetchData = async () => {
@@ -12,7 +10,7 @@ export function useListMatchesForArea(area: string) {
     );
 
     if (!response.ok) {
-      throw new Error(t("Common.loadMatchesError"));
+      throw new Error("Falha ao carregar jogos");
     }
 
     const data = await response.json();
@@ -24,7 +22,7 @@ export function useListMatchesForArea(area: string) {
     (() => {
       fetchData();
     })();
-  }, [area, t]);
+  }, [area]);
 
   return { matches, refresh: fetchData };
 }
