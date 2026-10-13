@@ -27,7 +27,7 @@ export default function Footer() {
             textAlign: "center",
           }}
         >
-          <Stack spacing={0.5}>
+          {/* <Stack spacing={0.5}>
             <Typography variant="body2">Programado por </Typography>
             <Link
               href="https://github.com/andrefernandes-95"
@@ -45,7 +45,7 @@ export default function Footer() {
                 André Fernandes
               </Typography>
             </Link>
-          </Stack>
+          </Stack> */}
 
           <Stack>
             <Link href={AppRoutes.HOME} variant="body2">

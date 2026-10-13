@@ -156,6 +156,7 @@ export async function getFullMatchById(
         m.format,
         m.description,
         m.min_attendance,
+        m.duration_in_minutes,
 
         json_build_object(
           'id', p.id,
@@ -217,14 +218,15 @@ export type SaveMatchInput = {
   minAttendance: number;
   startsAt: string;
   createdBy: string;
+  durationInMinutes: number;
 };
 
 export async function saveMatch(pitch: SaveMatchInput): Promise<Match> {
   const result = await pool.query(
     `
       INSERT INTO MATCHES(
-        created_by, pitch_id, description, format, min_attendance, starts_at
-      ) values ($1, $2, $3, $4, $5, $6)
+        created_by, pitch_id, description, format, min_attendance, starts_at, duration_in_minutes
+      ) values ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `,
     [
@@ -234,6 +236,7 @@ export async function saveMatch(pitch: SaveMatchInput): Promise<Match> {
       pitch.format,
       pitch.minAttendance,
       pitch.startsAt,
+      pitch.durationInMinutes,
     ],
   );
 
@@ -252,22 +255,24 @@ export async function updateMatch(
     `
       UPDATE MATCHES
       SET 
-        pitch_id = $1,
-        description = $2,
-        format = $3,
-        min_attendance = $4,
-        starts_at = $5
-      WHERE id = $6 AND created_by = $7
+        pitch_id = $3,
+        description = $4,
+        format = $5,
+        min_attendance = $6,
+        starts_at = $7,
+        duration_in_minutes = $8
+      WHERE id = $1 AND created_by = $2
       RETURNING *
     `,
     [
+      match.id,
+      userId,
       match.pitchId,
       match.description,
       match.format,
       match.minAttendance,
       match.startsAt,
-      match.id,
-      userId,
+      match.durationInMinutes,
     ],
   );
 

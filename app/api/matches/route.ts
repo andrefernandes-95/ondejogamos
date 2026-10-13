@@ -77,8 +77,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const { pitchId, minAttendance, startsAt, description, format } =
-    validation.data;
+  const {
+    pitchId,
+    minAttendance,
+    startsAt,
+    description,
+    format,
+    durationInMinutes,
+  } = validation.data;
 
   const matchInput: SaveMatchInput = {
     pitchId,
@@ -87,6 +93,7 @@ export async function POST(request: Request) {
     startsAt,
     createdBy: createdBy,
     format,
+    durationInMinutes: Number(durationInMinutes) || 60,
   };
 
   let result: Awaited<ReturnType<typeof saveMatch>>;
@@ -155,8 +162,17 @@ export async function PUT(request: Request) {
     );
   }
 
-  const { id, pitchId, minAttendance, startsAt, description, format } =
-    validation.data;
+  console.log("validation:", validation.data);
+
+  const {
+    id,
+    pitchId,
+    minAttendance,
+    startsAt,
+    description,
+    format,
+    durationInMinutes,
+  } = validation.data;
 
   const matchInput: UpdateMatchInput = {
     id: Number(id),
@@ -166,6 +182,7 @@ export async function PUT(request: Request) {
     startsAt,
     createdBy: createdBy,
     format,
+    durationInMinutes: Number(durationInMinutes) || 60,
   };
 
   let result: Awaited<ReturnType<typeof updateMatch>>;

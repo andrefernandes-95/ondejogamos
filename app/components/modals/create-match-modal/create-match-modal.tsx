@@ -19,7 +19,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 interface Props {
@@ -46,7 +45,7 @@ export default function CreateMatchModal({
         description: existingMatch ? existingMatch.description : "",
         pitchId: existingMatch ? existingMatch.pitch.id?.toString() : "",
         durationInMinutes: existingMatch
-          ? (existingMatch.duration_in_minutes ?? 60)
+          ? Number(existingMatch.duration_in_minutes)
           : 60,
         startsAt: existingMatch ? existingMatch.starts_at?.toISOString() : "",
         format: existingMatch ? existingMatch.format : "5x5",
@@ -54,7 +53,8 @@ export default function CreateMatchModal({
       },
     });
 
-  const selectedPitch = watch("pitchId");
+  const current_match_pitch_id = watch("pitchId");
+  const current_match_duration_in_minutes = watch("durationInMinutes");
 
   const pitches = useListPitchesForArea(selectedArea);
 
@@ -71,7 +71,10 @@ export default function CreateMatchModal({
 
     body.append("pitchId", values.pitchId);
     body.append("description", values.description!);
-    body.append("durationInMinutes", "60");
+    body.append(
+      "durationInMinutes",
+      values.durationInMinutes?.toString() ?? "60",
+    );
     body.append("format", values.format);
     body.append("minAttendance", values.minAttendance.toString());
     body.append("startsAt", values.startsAt.toString());
@@ -127,6 +130,20 @@ export default function CreateMatchModal({
         />
 
         <Controller
+          name="durationInMinutes"
+          control={control}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              type="number"
+              label="Duração (Minutos)"
+              helperText={fieldState.error?.message}
+              error={!!fieldState.error}
+            />
+          )}
+        />
+
+        <Controller
           name="startsAt"
           control={control}
           render={({ field, fieldState }) => (
@@ -135,7 +152,11 @@ export default function CreateMatchModal({
                 {...field}
                 value={field.value}
                 onChange={field.onChange}
-                pitch_id={selectedPitch}
+                current_match_id={existingMatch ? existingMatch.id : ""}
+                current_match_pitch_id={current_match_pitch_id}
+                current_match_duration_in_minutes={Number(
+                  current_match_duration_in_minutes,
+                )}
               />
 
               {fieldState?.error && (

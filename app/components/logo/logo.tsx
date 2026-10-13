@@ -16,18 +16,60 @@ export const Logo = () => {
       >
         <Stack sx={{ flexDirection: "row" }}>
           <SportsSoccerIcon
-            sx={{ opacity: 0.15, fontSize: 24, color: "white" }}
-          />
-          <SportsSoccerIcon
             sx={{
-              opacity: 0.5,
               fontSize: 24,
-              marginLeft: -0.25,
               color: "white",
+              animation: "myAnimation .1s ease-in-out forwards",
+              "@keyframes myAnimation": {
+                "0%": {
+                  opacity: 0,
+                  transform: `scale(2)`,
+                },
+
+                "100%": {
+                  opacity: 0.15,
+                  transform: `scale(1)`,
+                },
+              },
             }}
           />
           <SportsSoccerIcon
-            sx={{ opacity: 1, fontSize: 24, marginLeft: -0.25, color: "white" }}
+            sx={{
+              fontSize: 24,
+              marginLeft: -0.25,
+              color: "white",
+              animation: "myAnimation2 .25s ease-in-out forwards",
+              "@keyframes myAnimation2": {
+                "0%": {
+                  opacity: 0,
+                  transform: `scale(2)`,
+                },
+
+                "100%": {
+                  opacity: 0.25,
+                  transform: `scale(1)`,
+                },
+              },
+            }}
+          />
+          <SportsSoccerIcon
+            sx={{
+              fontSize: 24,
+              marginLeft: -0.25,
+              color: "white",
+              animation: "myAnimation3 .5s ease-in-out forwards",
+              "@keyframes myAnimation3": {
+                "0%": {
+                  opacity: 0,
+                  transform: `scale(2)`,
+                },
+
+                "100%": {
+                  opacity: 1,
+                  transform: `scale(1)`,
+                },
+              },
+            }}
           />
         </Stack>
         <Typography

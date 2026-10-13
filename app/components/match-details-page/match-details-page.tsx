@@ -20,6 +20,7 @@ import {
   ManageAccounts,
   MyLocation,
   OpenInNew,
+  TimeToLeave,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -259,6 +260,16 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                 <Group sx={{ fontSize: 24 }} />
                 <Typography variant="body1" color="textPrimary">
                   Formato da partida: <strong>{match.format}</strong>
+                </Typography>
+              </Stack>
+
+              {/** Duration */}
+              <Stack
+                sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}
+              >
+                <AccessTime sx={{ fontSize: 24 }} />
+                <Typography variant="body1" color="textPrimary">
+                  Duração: <strong>{match.duration_in_minutes} Minutos</strong>
                 </Typography>
               </Stack>
 

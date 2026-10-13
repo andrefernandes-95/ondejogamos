@@ -46,10 +46,18 @@ const ALL_TIMES = Array.from({ length: 48 }, (_, index) => {
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  pitch_id?: string;
+  current_match_id: string;
+  current_match_pitch_id: string;
+  current_match_duration_in_minutes: number;
 }
 
-export default function MatchDatePicker({ value, onChange, pitch_id }: Props) {
+export default function MatchDatePicker({
+  value,
+  onChange,
+  current_match_id,
+  current_match_pitch_id,
+  current_match_duration_in_minutes,
+}: Props) {
   const id = useId();
 
   const [loading, setLoading] = useState(false);
@@ -88,11 +96,9 @@ export default function MatchDatePicker({ value, onChange, pitch_id }: Props) {
   };
 
   const fetchAvailability = useCallback(() => {
-    const controller = new AbortController();
-
-    if (!pitch_id || !day) {
+    if (!current_match_pitch_id || !day) {
       setLoading(false);
-      return () => controller.abort();
+      return;
     }
 
     setLoading(true);
@@ -105,56 +111,74 @@ export default function MatchDatePicker({ value, onChange, pitch_id }: Props) {
         const until = dayjs.tz(nextDate, "Europe/Lisbon").toISOString();
 
         const params = new URLSearchParams({
-          pitch_id,
+          pitch_id: current_match_pitch_id,
           from,
           until,
         });
 
-        const response = await fetch(`/api/matches/availability?${params}`, {
-          signal: controller.signal,
-        });
+        const response = await fetch(`/api/matches/availability?${params}`);
 
         const matches: Match[] = await response.json();
 
-        const unavailableTimes = matches.flatMap((match) => {
-          const existingMatchStart = dayjs(match.starts_at).tz(TIMEZONE);
+        const unavailableTimes = matches.flatMap((existingMatch) => {
+          if (current_match_id === existingMatch.id) {
+            return [];
+          }
+          const existingMatchStart = dayjs(existingMatch.starts_at).tz(
+            TIMEZONE,
+          );
 
           const slots = [];
+
           for (
             let offset = 0;
-            offset < match.duration_in_minutes;
+            offset < existingMatch.duration_in_minutes;
             offset += 30
           ) {
             slots.push(
               existingMatchStart.add(offset, "minute").format("HH:mm"),
             );
           }
+
+          console.log("slots:", slots);
+
+          // Existing Match: 20.00
+          // We want to unavailable the slots prior according to our match duration
+          // So we for a 60 minute match we block:
+          // 19.30
+          // And allow 19.00
+          // For a 120 m match we block:
+          // 19.30, 19.00, 18.30 And we allo 18.00
+          for (
+            let offset = 0;
+            offset < current_match_duration_in_minutes; // While offset is greater than zero
+            offset += 30
+          ) {
+            slots.push(
+              existingMatchStart.subtract(offset, "minute").format("HH:mm"),
+            );
+          }
+
+          console.log(slots);
+
           return slots;
         });
 
-        if (!controller.signal.aborted) {
-          setUnavailableTimes(unavailableTimes);
-        }
+        setUnavailableTimes(unavailableTimes);
       } catch (e) {
-        if (!controller.signal.aborted) {
-          console.error("Erro ao consultar disponibilidade:", e);
-        }
+        console.error("Erro ao consultar disponibilidade:", e);
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     void load();
-
-    return () => controller.abort();
-  }, [day, pitch_id]);
+  }, [current_match_pitch_id, day, current_match_duration_in_minutes]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     return fetchAvailability();
-  }, [fetchAvailability, pitch_id]);
+  }, [fetchAvailability, current_match_pitch_id]);
 
   return (
     <Stack spacing={2}>

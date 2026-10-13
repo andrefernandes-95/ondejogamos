@@ -12,7 +12,11 @@ export const createMatchSchema = z.object({
     message: "Formato inválido",
   }),
   minAttendance: z.number().min(10, "Introduz um número mínimo de jogadores"),
-  durationInMinutes: z.number().min(30, "Introduz a duração em minutos"),
+  durationInMinutes: z.coerce
+    .number()
+    .int("A duração deve ser um número inteiro")
+    .min(30, "Introduz a duração em minutos")
+    .default(60) as unknown as number,
   description: z.string().trim().nullable().optional(),
 });
 
