@@ -1,3 +1,4 @@
+import { useTranslations, useLocale } from "next-intl";
 import ParticipateButton from "@/app/components/participate-button/participate-button";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
@@ -19,16 +20,18 @@ interface Props {
 }
 
 export default function MatchCard({ match, onAttendanceChanged }: Props) {
+  const t = useTranslations();
+  const locale = useLocale();
   const [serverError, setServerError] = useState("");
 
-  const weekDay = new Intl.DateTimeFormat("pt-PT", {
+  const weekDay = new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "2-digit",
     month: "long",
     timeZone: "Europe/Lisbon",
   }).format(new Date(match.starts_at));
 
-  const time = new Intl.DateTimeFormat("pt-PT", {
+  const time = new Intl.DateTimeFormat(locale, {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -51,13 +54,13 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
       });
 
       if (!response.ok) {
-        setServerError("Não foi possível aderir ao jogo");
+        setServerError(t("Match.attendanceError"));
         return;
       }
 
       onAttendanceChanged?.();
     } catch {
-      setServerError("Não foi possível aderir ao jogo");
+      setServerError(t("Match.attendanceError"));
     }
   };
 
@@ -83,7 +86,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
       >
         <Image
           src={match.pitch.image_url!}
-          alt={match.pitch.image_url!}
+          alt={t("Pitch.photo", { name: match.pitch.name ?? "" })}
           fill
           sizes="(max-width: 600px) 100vw 50vw"
           style={{
@@ -147,7 +150,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
                 sx={{ minWidth: "unset" }}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Abrir localização no Google Maps"
+                aria-label={t("Common.openMaps")}
               >
                 <OpenInNew sx={{ fontSize: 18 }} />
               </Button>
@@ -180,15 +183,13 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
             {hasEnoughPlayers && (
               <Typography variant="body1" color="warning">
-                Já há jogadores suficientes
+                {t("Match.enoughPlayers")}
               </Typography>
             )}
 
             {!hasEnoughPlayers && (
               <Typography variant="body1" color="success">
-                Ainda faltam{" "}
-                {Number(match.min_attendance - 1 - match.attendances.length)}{" "}
-                jogadores!
+                {t("Match.missingPlayers", { count: Number(match.min_attendance - 1 - match.attendances.length) })}
               </Typography>
             )}
           </Stack>
@@ -204,7 +205,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
           }}
         >
           {match.is_creator ? (
-            <Typography variant="caption">Agendaste este jogo</Typography>
+            <Typography variant="caption">{t("Match.createdByYou")}</Typography>
           ) : !match.is_attending ? (
             <ParticipateButton handleAttendance={handleAttendance} />
           ) : (
@@ -212,7 +213,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
               variant="text"
               onClick={() => handleAttendance({ isAttending: false })}
             >
-              Cancelar Participação
+              {t("Match.cancelAttendance")}
             </Button>
           )}
 
@@ -222,9 +223,9 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
             href={AppRoutes.MATCH_DETAILS(String(match.id))}
             size="small"
             sx={{ minWidth: "unset" }}
-            aria-label="Abrir detalhes da partida"
+            aria-label={t("Match.openDetails")}
           >
-            Ver detalhes
+            {t("Match.details")}
           </Button>
         </Stack>
       </Box>

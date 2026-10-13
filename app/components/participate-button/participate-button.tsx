@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 import { authClient } from "@/app/lib/auth-client";
 import { Button } from "@mui/material";
@@ -8,6 +9,7 @@ export default function ParticipateButton({
 }: {
   handleAttendance: ({ isAttending }: { isAttending: boolean }) => void;
 }) {
+  const t = useTranslations();
   const [open, setOpen] = useState<boolean>(false);
 
   const session = authClient.useSession();
@@ -24,7 +26,7 @@ export default function ParticipateButton({
             : setOpen(true)
         }
       >
-        Participar
+        {t("Match.join")}
       </Button>
     </>
   );

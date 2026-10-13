@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import { AccountCircle, Cancel, SportsSoccer } from "@mui/icons-material";
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function DeleteMatch({ match }: Props) {
+  const t = useTranslations();
   const [confirm, setConfirm] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -37,14 +39,14 @@ export default function DeleteMatch({ match }: Props) {
       });
 
       if (!response.ok) {
-        setServerError("Não foi possível cancelar o jogo");
+        setServerError(t("Match.cancelError"));
         return;
       }
 
       router.replace(AppRoutes.HOME);
       router.refresh();
     } catch {
-      setServerError(`Ocorreu um erro`);
+      setServerError(t("Common.error"));
     }
   };
 
@@ -60,7 +62,7 @@ export default function DeleteMatch({ match }: Props) {
             gap: 1,
           }}
         >
-          <Typography variant="h5">Desejas cancelar o jogo?</Typography>
+          <Typography variant="h5">{t("Match.confirmCancellation")}</Typography>
         </DialogTitle>
 
         <DialogContent>
@@ -68,7 +70,7 @@ export default function DeleteMatch({ match }: Props) {
             {serverError ? (
               <Alert severity="error">{serverError}</Alert>
             ) : (
-              <Typography>Esta acção é irreversível</Typography>
+              <Typography>{t("Match.irreversible")}</Typography>
             )}
           </Stack>
         </DialogContent>
@@ -87,7 +89,7 @@ export default function DeleteMatch({ match }: Props) {
           }}
         >
           <Button color="error" onClick={() => setConfirm(false)}>
-            Cancelar
+            {t("Common.cancel")}
           </Button>
           <Stack
             sx={{
@@ -102,7 +104,7 @@ export default function DeleteMatch({ match }: Props) {
             }}
           >
             <Button color="error" onClick={deleteMatch} variant="contained">
-              Cancelar Jogo
+              {t("Match.cancelMatch")}
             </Button>
           </Stack>
         </DialogActions>
@@ -117,7 +119,7 @@ export default function DeleteMatch({ match }: Props) {
         onClick={() => setConfirm(true)}
       >
         <Cancel />
-        <Typography variant="body1">Cancelar Jogo</Typography>
+        <Typography variant="body1">{t("Match.cancelMatch")}</Typography>
       </Button>
     </>
   );

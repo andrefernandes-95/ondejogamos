@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Pitch } from "@/app/services/pitches";
 import { Autocomplete, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
@@ -44,6 +46,7 @@ export default function PitchSelector({
   handleSelectedPitch,
   errorMessage,
 }: Props) {
+  const t = useTranslations();
   const options = [
     ...new Map(data.map((pitch) => [String(pitch.id), pitch])).values(),
   ];
@@ -85,11 +88,11 @@ export default function PitchSelector({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Selecionar campo"
-            placeholder="Pesquisar por campo ou localização"
+            label={t("Pitch.select")}
+            placeholder={t("Pitch.search")}
           />
         )}
-        noOptionsText="Sem resultados"
+        noOptionsText={t("Common.noResults")}
         renderValue={(value) => value && <PitchOption pitch={value} />}
       />
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}

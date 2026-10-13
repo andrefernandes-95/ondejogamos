@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import auth from "@/app/lib/auth";
 import { s3 } from "@/app/lib/s3";
 import {
@@ -9,11 +10,12 @@ import { safeParseFormData } from "@/app/validations/pitch";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 export async function GET(request: Request) {
+  const t = await getTranslations();
   const url = new URL(request.url);
   const area = url.searchParams.get("area");
 
   if (!area) {
-    return Response.json({ error: "A área é obrigatória" }, { status: 400 });
+    return Response.json({ error: t("Api.areaRequired") }, { status: 400 });
   }
 
   const pitches = await listPitchesForArea(area);
@@ -21,6 +23,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -28,7 +31,7 @@ export async function POST(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: "Inicia a sessão para criar um campo",
+        error: t("Api.signInToCreatePitch"),
       },
       {
         status: 401,
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
   } catch {
     return Response.json(
       {
-        error: "Formulário inválido",
+        error: t("Api.invalidForm"),
       },
       {
         status: 400,
@@ -53,11 +56,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const validation = safeParseFormData(formData);
+  const validation = safeParseFormData(formData, t);
   if (!validation.success) {
     return Response.json(
       {
-        error: "Dados inválidos",
+        error: t("Api.invalidData"),
         issues: validation.error.issues,
       },
       {
@@ -78,7 +81,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        error: "Serviço indisponível",
+        error: t("Api.serviceUnavailable"),
       },
       {
         status: 503,
@@ -100,7 +103,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        error: "Não foi possível enviar a imagem",
+        error: t("Api.uploadError"),
       },
       {
         status: 502,
@@ -142,7 +145,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        error: `Não foi possível guardar o campo`,
+        error: t("Pitch.saveError"),
       },
       {
         status: 500,

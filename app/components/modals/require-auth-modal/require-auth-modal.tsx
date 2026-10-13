@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
 import { AccountCircle, NoAccounts } from "@mui/icons-material";
@@ -40,6 +42,7 @@ export function RequireAuthModalInner({
   open,
   setOpen,
 }: Pick<Props, "open" | "setOpen">) {
+  const t = useTranslations();
   const router = useRouter();
 
   const handleClose = () => {
@@ -70,12 +73,12 @@ export function RequireAuthModalInner({
         }}
       >
         <AccountCircle />
-        <Typography variant="h5">Conta necessária</Typography>
+        <Typography variant="h5">{t("Auth.accountRequired")}</Typography>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} sx={{ py: 2 }}>
-          <Typography>Precisas de uma conta para continuar.</Typography>
+          <Typography>{t("Auth.accountRequiredDescription")}</Typography>
         </Stack>
       </DialogContent>
       <DialogActions
@@ -92,7 +95,7 @@ export function RequireAuthModalInner({
           p: 2,
         }}
       >
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleClose}>{t("Common.cancel")}</Button>
         <Stack
           sx={{
             flexDirection: {
@@ -106,10 +109,10 @@ export function RequireAuthModalInner({
           }}
         >
           <Button onClick={goToSignIn} variant="contained">
-            Iniciar Sessão
+            {t("Navbar.login")}
           </Button>
           <Button onClick={goToSignUp} variant="contained">
-            Criar Conta
+            {t("Navbar.createAccount")}
           </Button>
         </Stack>
       </DialogActions>

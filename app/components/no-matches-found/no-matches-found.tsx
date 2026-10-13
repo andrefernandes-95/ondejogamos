@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
 import { Card, Typography } from "@mui/material";
 
@@ -8,6 +9,7 @@ export default function NoMatchesFound({
   area: string;
   onAddPitch: () => void;
 }) {
+  const t = useTranslations();
   return (
     <Card
       variant="outlined"
@@ -21,11 +23,11 @@ export default function NoMatchesFound({
     >
       {area ? (
         <Typography>
-          Ainda não há jogos agendados para {area}. Sê o(a) primeiro(a)!
+          {t("Match.noMatchesInArea", { area })}
         </Typography>
       ) : (
         <Typography>
-          Ainda não há jogos agendados. Sê o(a) primeiro(a)!
+          {t("Match.noMatches")}
         </Typography>
       )}
       <ScheduleMatchButton selectedArea={area} onAddPitch={onAddPitch} />

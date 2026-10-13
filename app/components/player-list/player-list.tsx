@@ -1,3 +1,4 @@
+import { getTranslations, getLocale } from "next-intl/server";
 import PageTitle from "@/app/components/page-title/page-title";
 import { Player } from "@/app/services/user";
 import { AppRoutes } from "@/app/utils/routes";
@@ -20,22 +21,24 @@ import {
   Typography,
 } from "@mui/material";
 
-export default function PlayerList({ data }: { data: Player[] }) {
+export default async function PlayerList({ data }: { data: Player[] }) {
+  const t = await getTranslations();
+  const locale = await getLocale();
   return (
     <Container maxWidth="lg" sx={{ p: 2 }}>
-      <PageTitle title="Jogadores Registados" />
+      <PageTitle title={t("Players.title")} />
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Data de Registo</TableCell>
-              <TableCell>Jogos Criados</TableCell>
+              <TableCell>{t("Common.name")}</TableCell>
+              <TableCell>{t("Players.registrationDate")}</TableCell>
+              <TableCell>{t("Players.matchesCreated")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((player) => {
-              const weekDay = new Intl.DateTimeFormat("pt-PT", {
+              const weekDay = new Intl.DateTimeFormat(locale, {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",

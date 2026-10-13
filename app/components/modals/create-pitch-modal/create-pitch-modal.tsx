@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
 import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
 import {
@@ -24,6 +26,7 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
+import type { ValidationTranslator } from "@/app/i18n/validation";
 
 interface Props {
   selectedArea: string;
@@ -33,37 +36,38 @@ interface Props {
 
 const formId = "create-pitch-form";
 
-const schema = z.object({
-  name: z.string().trim().min(1, "Nome do campo obrigatório"),
-  area: z.string().trim().min(1, "Área obrigatória"),
-  municipality: z.string().trim().min(1, "Município obrigatório"),
+const createSchema = (t: ValidationTranslator) => z.object({
+  name: z.string(t("Validation.nameRequired")).trim().min(1, t("Validation.pitchName")),
+  area: z.string(t("Validation.area")).trim().min(1, t("Validation.area")),
+  municipality: z.string(t("Validation.municipality")).trim().min(1, t("Validation.municipality")),
   mapsUrl: z
     .string()
     .trim()
-    .pipe(z.union([z.url("Url Inválido"), z.literal("")]))
+    .pipe(z.union([z.url(t("Validation.url")), z.literal("")]))
     .nullable()
     .optional(),
   photo: z
-    .instanceof(File, { message: "Escolhe uma fotografia" })
-    .refine((file) => file.size > 0, "Ficheiro vazio")
+    .instanceof(File, { message: t("Validation.photo") })
+    .refine((file) => file.size > 0, t("Validation.emptyFile"))
     .refine(
       (file) => file.size <= MAX_IMAGE_SIZE,
-      `Máximo de ${MAX_IMAGE_SIZE_IN_MB} MB`,
+      t("Validation.maxImageSize", { count: MAX_IMAGE_SIZE_IN_MB }),
     )
     .refine(
       (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
-      "Usa JPEG ou PNG",
+      t("Validation.imageTypes"),
     )
     .nullable(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export default function CreatePitchModal({
   open,
   setOpen,
   selectedArea,
 }: Props) {
+  const t = useTranslations();
   const [municipalitiesForArea, setMunicipalitiesForArea] = useState<string[]>(
     [],
   );
@@ -75,7 +79,7 @@ export default function CreatePitchModal({
     reset,
     formState: { isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(createSchema(t)),
     defaultValues: {
       name: "",
       area: selectedArea,
@@ -92,7 +96,7 @@ export default function CreatePitchModal({
       );
 
       if (!response.ok) {
-        throw new Error("Falha ao carregar municípios");
+        throw new Error(t("Common.loadMunicipalitiesError"));
       }
 
       const municipalities = await response.json();
@@ -103,6 +107,7 @@ export default function CreatePitchModal({
   }, [
     // Run every time the area changes
     selectedArea,
+    t,
   ]);
 
   const handleClose = () => {
@@ -126,7 +131,7 @@ export default function CreatePitchModal({
 
       if (!response.ok) {
         setError("root.server", {
-          message: "Não foi possível guardar o campo ",
+          message: t("Pitch.saveError"),
         });
         return;
       }
@@ -134,7 +139,7 @@ export default function CreatePitchModal({
       reset();
       setOpen(false);
     } catch {
-      setError("root.server", { message: "Não foi possível guardar o campo " });
+      setError("root.server", { message: t("Pitch.saveError") });
     }
   };
 
@@ -145,12 +150,12 @@ export default function CreatePitchModal({
         sx={{ flexDirection: "row", display: "flex", alignItems: "center" }}
       >
         <PlaceIcon />
-        <Typography variant="h5">Adicionar Campo</Typography>
+        <Typography variant="h5">{t("Pitch.add")}</Typography>
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText>
-          Adiciona um novo campo a {selectedArea}
+          {t("Pitch.addInArea", { area: selectedArea })}
         </DialogContentText>
 
         <Box
@@ -167,7 +172,7 @@ export default function CreatePitchModal({
                 <TextField
                   {...field}
                   inputRef={field.ref}
-                  label="Nome do campo"
+                  label={t("Pitch.name")}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -209,7 +214,7 @@ export default function CreatePitchModal({
                   {...field}
                   type="url"
                   inputRef={field.ref}
-                  label="URL do Google Maps"
+                  label={t("Pitch.mapsUrl")}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -220,7 +225,7 @@ export default function CreatePitchModal({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Cancelar
+          {t("Common.cancel")}
         </Button>
 
         <Button
@@ -229,7 +234,7 @@ export default function CreatePitchModal({
           variant="contained"
           disabled={isSubmitting}
         >
-          Adicionar
+          {t("Pitch.addAction")}
         </Button>
       </DialogActions>
     </Dialog>

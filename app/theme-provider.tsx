@@ -4,6 +4,9 @@ import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
 import "dayjs/locale/pt";
+import { useLocale } from "next-intl";
+import { enUS, ptPT } from "@mui/material/locale";
+import { useMemo } from "react";
 
 const MAIN_COLOR = "#175CD3";
 
@@ -67,6 +70,11 @@ export default function AppThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = useLocale();
+  const localizedTheme = useMemo(
+    () => createTheme(theme, locale === "en" ? enUS : ptPT),
+    [locale],
+  );
   return (
     <MantineProvider
       forceColorScheme="light"
@@ -92,11 +100,11 @@ export default function AppThemeProvider({
     >
       <DatesProvider
         settings={{
-          locale: "pt",
+          locale: locale === "en" ? "en" : "pt",
           firstDayOfWeek: 1,
         }}
       >
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={localizedTheme}>
           <CssBaseline />
           {children}
         </ThemeProvider>

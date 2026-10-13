@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Delete, CloudUpload } from "@mui/icons-material";
 import { Stack, Typography, Button } from "@mui/material";
 
@@ -12,6 +13,7 @@ export default function UploadImageInput({
   onChange,
   errorMessage,
 }: Props) {
+  const t = useTranslations();
   return value ? (
     <Stack
       sx={{
@@ -21,7 +23,7 @@ export default function UploadImageInput({
       }}
     >
       <Typography variant="body1">{value.name}</Typography>
-      <Button onClick={() => onChange(null)}>
+      <Button aria-label={t("Pitch.removeImage")} onClick={() => onChange(null)}>
         <Delete />
       </Button>
     </Stack>
@@ -32,9 +34,10 @@ export default function UploadImageInput({
       tabIndex={-1}
       startIcon={<CloudUpload />}
     >
-      Carregar imagem
+      {t("Pitch.upload")}
       <input
         type="file"
+        aria-label={t("Pitch.upload")}
         style={{ display: "none" }}
         onChange={(event) => {
           const file = event.target.files?.[0];

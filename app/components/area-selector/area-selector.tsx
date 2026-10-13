@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Location, LocationWithGameCount } from "@/app/services/locations";
 import { Close, Delete, Remove, RemoveCircle } from "@mui/icons-material";
 import {
@@ -24,6 +26,7 @@ export default function AreaSelector({
   selectedArea,
   handleSelectedArea,
 }: Props) {
+  const t = useTranslations();
   const preparedData: Record<string, number> = {};
 
   data.forEach((entry) => {
@@ -34,12 +37,12 @@ export default function AreaSelector({
   return (
     <Stack sx={{ flexDirection: "row", flexGrow: 1 }}>
       <FormControl fullWidth>
-        <InputLabel id="select-area">Área</InputLabel>
+        <InputLabel id="select-area">{t("Common.area")}</InputLabel>
         <Select
           labelId="select-area"
           id="select-area"
           value={selectedArea}
-          label="Área"
+          label={t("Common.area")}
           renderValue={(value) => value}
           onChange={({ target: { value } }) => handleSelectedArea(value)}
         >
@@ -52,8 +55,7 @@ export default function AreaSelector({
               {entry[0]}
 
               <Typography color="primary">
-                {entry[1] === 1 ? `1 jogo agendado` : ""}
-                {entry[1] > 1 ? `${entry[1]} jogos agendados` : ""}
+                {entry[1] > 0 ? t("Match.scheduledCount", { count: entry[1] }) : ""}
               </Typography>
             </MenuItem>
           ))}
@@ -62,6 +64,7 @@ export default function AreaSelector({
       {selectedArea && (
         <Button
           sx={{ flexShrink: 0, flexGrow: 1 }}
+          aria-label={t("Common.clearArea")}
           onClick={() => handleSelectedArea("")}
         >
           <Close />

@@ -6,7 +6,7 @@ import Navbar from "@/app/components/navbar/navbar";
 import { Box } from "@mui/material";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 
 const geistSans = Geist({
@@ -19,10 +19,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Onde jogamos?",
-  description: "Combina futeboladas e faz novas amizades",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Metadata");
+  return {
+    title: "Onde Jogamos",
+    description: t("description"),
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();

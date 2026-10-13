@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   FormControl,
   InputLabel,
@@ -22,14 +24,15 @@ export default function MunicipalitySelector({
   onMunicipalitySelected,
   errorMessage,
 }: Props) {
+  const t = useTranslations();
   return (
     <FormControl fullWidth>
-      <InputLabel id="select-municipality">Município</InputLabel>
+      <InputLabel id="select-municipality">{t("Common.municipality")}</InputLabel>
       <Select
         labelId="select-municipality"
         id="select-municipality"
         value={selectedMunicipality}
-        label="Município"
+        label={t("Common.municipality")}
         onChange={({ target: { value } }) => onMunicipalitySelected(value)}
         error={!!errorMessage?.length}
       >

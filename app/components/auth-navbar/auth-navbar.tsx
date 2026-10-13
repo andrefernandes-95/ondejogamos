@@ -47,7 +47,7 @@ export default function AuthNavbar() {
     return (
       <Container>
         <Typography color="alert" role="alert">
-          Não foi possível verificar a sessão .
+          {t("sessionError")}
         </Typography>
       </Container>
     );
@@ -67,8 +67,10 @@ export default function AuthNavbar() {
           variant="text"
           color="inherit"
         >
-          {t("Exit")}
+          {t("exit")}
         </Button>
+
+        <LanguageSettings />
 
         {logoutError && (
           <Typography role="alert" color="error">

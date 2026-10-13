@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import auth from "@/app/lib/auth";
 import {
   deleteAttendance,
@@ -6,6 +7,7 @@ import {
 } from "@/app/services/attendance";
 
 export async function POST(request: Request) {
+  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -13,7 +15,7 @@ export async function POST(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: "Inicia a sessão para participar num jogo",
+        error: t("Api.signInToJoin"),
       },
       {
         status: 401,
@@ -30,7 +32,7 @@ export async function POST(request: Request) {
   } catch {
     return Response.json(
       {
-        error: "Formulário inválido",
+        error: t("Api.invalidForm"),
       },
       {
         status: 400,
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
   if (!match_id) {
     return Response.json(
       {
-        error: "Dados inválidos",
+        error: t("Api.invalidData"),
       },
       {
         status: 400,
@@ -59,7 +61,7 @@ export async function POST(request: Request) {
 
     return Response.json(
       {
-        error: `Não foi possível registar presença`,
+        error: t("Api.attendanceError"),
       },
       {
         status: 500,
@@ -71,12 +73,13 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const t = await getTranslations();
   const url = new URL(request.url);
   const match_id = url.searchParams.get("match_id");
 
   if (!match_id) {
     return Response.json(
-      { error: "O ID do jogo é obrigatório" },
+      { error: t("Api.matchIdRequired") },
       { status: 400 },
     );
   }
@@ -86,6 +89,7 @@ export async function GET(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const t = await getTranslations();
   const session = await auth.api.getSession({
     headers: request.headers,
   });
@@ -93,7 +97,7 @@ export async function DELETE(request: Request) {
   if (!session) {
     return Response.json(
       {
-        error: "Inicia a sessão para participar num jogo",
+        error: t("Api.signInToJoin"),
       },
       {
         status: 401,
@@ -110,7 +114,7 @@ export async function DELETE(request: Request) {
   } catch {
     return Response.json(
       {
-        error: "Formulário inválido",
+        error: t("Api.invalidForm"),
       },
       {
         status: 400,
@@ -122,7 +126,7 @@ export async function DELETE(request: Request) {
   if (!match_id) {
     return Response.json(
       {
-        error: "Dados inválidos",
+        error: t("Api.invalidData"),
       },
       {
         status: 400,
@@ -137,7 +141,7 @@ export async function DELETE(request: Request) {
 
     return Response.json(
       {
-        error: `Não foi possível apagar presença`,
+        error: t("Api.removeAttendanceError"),
       },
       {
         status: 500,

@@ -1,6 +1,8 @@
+import { getTranslations } from "next-intl/server";
 import { getPitchMatchesForDateInterval } from "@/app/services/matches";
 
 export async function GET(request: Request) {
+  const t = await getTranslations();
   const { searchParams } = new URL(request.url);
 
   const pitch_id = searchParams.get("pitch_id");
@@ -10,7 +12,7 @@ export async function GET(request: Request) {
   if (!pitch_id || !from || !until) {
     return Response.json(
       {
-        error: "Parâmetros inválidos",
+        error: t("Api.invalidParameters"),
       },
       {
         status: 400,
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
     console.error("Falha ao consultar disponibilidade: ", error);
     return Response.json(
       {
-        error: "Não foi possível consultar a disponibilidade",
+        error: t("Api.availabilityError"),
       },
       {
         status: 500,

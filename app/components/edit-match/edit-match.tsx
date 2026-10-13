@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
 import { FullMatch } from "@/app/models/match";
 import { Edit } from "@mui/icons-material";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function EditMatch({ match }: Props) {
+  const t = useTranslations();
   const [isEditing, setIsEditing] = useState(false);
   return (
     <>
@@ -27,7 +29,7 @@ export default function EditMatch({ match }: Props) {
         onClick={() => setIsEditing(true)}
       >
         <Edit />
-        <Typography variant="body1">Editar Detalhes</Typography>
+        <Typography variant="body1">{t("Match.edit")}</Typography>
       </Button>
     </>
   );

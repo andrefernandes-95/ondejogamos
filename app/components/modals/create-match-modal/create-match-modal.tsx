@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import MatchDatePicker from "@/app/components/match-date-picker/match-date-picker";
 import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
-import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
+import { CreateMatchFormValues, createMatchSchemaForLocale } from "@/app/schemas/match";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -38,9 +40,10 @@ export default function CreateMatchModal({
   existingMatch,
   onAddPitch,
 }: Props) {
+  const t = useTranslations();
   const { control, handleSubmit, setError, reset, setValue, watch } =
     useForm<CreateMatchFormValues>({
-      resolver: zodResolver(createMatchSchema),
+      resolver: zodResolver(createMatchSchemaForLocale(t)),
       defaultValues: {
         description: existingMatch ? existingMatch.description : "",
         pitchId: existingMatch ? existingMatch.pitch.id?.toString() : "",
@@ -87,7 +90,7 @@ export default function CreateMatchModal({
 
       if (!response.ok) {
         setError("root.server", {
-          message: "Não foi possível agendar o jogo ",
+          message: t(existingMatch ? "MatchForm.updateError" : "MatchForm.saveError"),
         });
         return;
       }
@@ -96,7 +99,7 @@ export default function CreateMatchModal({
       setOpen(false);
       window.location.reload();
     } catch {
-      setError("root.server", { message: "Não foi possível agendar o jogo " });
+      setError("root.server", { message: t(existingMatch ? "MatchForm.updateError" : "MatchForm.saveError") });
     }
   };
 
@@ -136,7 +139,7 @@ export default function CreateMatchModal({
             <TextField
               {...field}
               type="number"
-              label="Duração (Minutos)"
+              label={t("MatchForm.duration")}
               helperText={fieldState.error?.message}
               error={!!fieldState.error}
             />
@@ -176,7 +179,7 @@ export default function CreateMatchModal({
               {...field}
               multiline
               type="text"
-              label="Observações"
+              label={t("MatchForm.description")}
               helperText={fieldState.error?.message}
               error={!!fieldState.error}
             />
@@ -198,7 +201,7 @@ export default function CreateMatchModal({
         }}
       >
         <PlaceIcon />
-        <Typography variant="h5">Agendar jogo em {selectedArea}</Typography>
+        <Typography variant="h5">{t(existingMatch ? "MatchForm.editInArea" : "MatchForm.scheduleInArea", { area: selectedArea })}</Typography>
       </DialogTitle>
 
       <DialogContent>
@@ -206,7 +209,7 @@ export default function CreateMatchModal({
           <Stack spacing={2} sx={{ py: 2, gap: 2 }}>
             {pitches.length <= 0 && (
               <Typography>
-                Parece que ainda não existem campos em {selectedArea}.
+                {t("MatchForm.noPitches", { area: selectedArea })}
               </Typography>
             )}
             {RenderForm()}
@@ -214,11 +217,11 @@ export default function CreateMatchModal({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
+        <Button onClick={handleClose}>{t("Common.cancel")}</Button>
 
         {pitches.length > 0 ? (
           <Button type="submit" form={formId} variant="contained">
-            {existingMatch ? "Guardar alterações" : "Agendar Jogo"}
+            {existingMatch ? t("MatchForm.saveChanges") : t("Match.schedule")}
           </Button>
         ) : (
           <>
@@ -229,7 +232,7 @@ export default function CreateMatchModal({
               }}
               variant="contained"
             >
-              Adicionar Campo
+              {t("Pitch.add")}
             </Button>
           </>
         )}
