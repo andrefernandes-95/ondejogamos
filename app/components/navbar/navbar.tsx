@@ -12,6 +12,7 @@ export default function Navbar() {
         sx={(theme) => ({
           background: theme.palette.primary.main,
           color: theme.palette.common.white,
+          py: 1,
         })}
       >
         <Container maxWidth="lg">
