@@ -5,6 +5,7 @@ import { useState } from "react";
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
+import { useTranslations } from "next-intl";
 
 export default function ScheduleMatchButton({
   selectedArea,
@@ -14,6 +15,8 @@ export default function ScheduleMatchButton({
   onAddPitch: () => void;
 }) {
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
+
+  const t = useTranslations("Match");
 
   return (
     <>
@@ -27,7 +30,7 @@ export default function ScheduleMatchButton({
             onClick={() => setIsCreatingGame(true)}
           >
             <SportsSoccerIcon />
-            Agendar Jogo
+            {t("join")}
           </Button>
         </span>
       </Tooltip>

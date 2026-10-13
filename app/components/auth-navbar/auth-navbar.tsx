@@ -1,9 +1,11 @@
 "use client";
 
+import LanguageSettings from "@/app/components/language-settings/language-settings";
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
-import { ExitToApp, GroupAdd, Instagram, WhatsApp } from "@mui/icons-material";
-import { Button, IconButton, Stack, Typography } from "@mui/material";
+import { ExitToApp, GroupAdd } from "@mui/icons-material";
+import { Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export default function AuthNavbar() {
@@ -12,6 +14,8 @@ export default function AuthNavbar() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
 
+  const t = useTranslations("Navbar");
+
   const handleSignOut = async () => {
     setIsSigningOut(true);
     setLogoutError("");
@@ -19,13 +23,13 @@ export default function AuthNavbar() {
     try {
       const result = await authClient.signOut();
       if (result.error) {
-        setLogoutError("Não foi possível terminar a sessão");
+        setLogoutError(t("error"));
         return;
       }
 
       window.location.reload();
     } catch {
-      setLogoutError("Não foi possível contactar o servidor");
+      setLogoutError(t("error"));
     } finally {
       setIsSigningOut(false);
     }
@@ -34,7 +38,7 @@ export default function AuthNavbar() {
   if (isPending) {
     return (
       <Container>
-        <Typography color="textSecondary">A carregar...</Typography>
+        <CircularProgress />
       </Container>
     );
   }
@@ -53,7 +57,7 @@ export default function AuthNavbar() {
     return (
       <Container>
         <Typography align="center" sx={{ color: "white" }}>
-          Olá, {session.user.name}
+          {t("hello")}, {session.user.name}
         </Typography>
 
         <Button
@@ -63,7 +67,7 @@ export default function AuthNavbar() {
           variant="text"
           color="inherit"
         >
-          Sair
+          {t("Exit")}
         </Button>
 
         {logoutError && (
@@ -84,7 +88,7 @@ export default function AuthNavbar() {
         sx={{ gap: 1 }}
       >
         <ExitToApp />
-        <Typography sx={{ color: "white" }}>Iniciar sessão</Typography>
+        <Typography sx={{ color: "white" }}>{t('login')}</Typography>
       </Button>
       <Button
         sx={{ gap: 1 }}
@@ -94,33 +98,15 @@ export default function AuthNavbar() {
       >
         <GroupAdd />
 
-        <Typography sx={{ color: "white" }}>Criar conta</Typography>
+        <Typography sx={{ color: "white" }}>{t("createAccount")}</Typography>
       </Button>
+      <LanguageSettings />
     </Container>
   );
 }
 
 const Container = ({ children }: { children: React.ReactNode }) => (
-  <Stack direction="row" sx={{ gap: 2, py: 2, alignItems: "center" }}>
+  <Stack direction="row" sx={{ alignItems: "center" }}>
     {children}
-
-    <IconButton
-      sx={{ color: "white" }}
-      component="a"
-      rel="noopener noreferrer"
-      target="_blank"
-      href="https://chat.whatsapp.com/GfmyVK1nYxe22XqrhTmpiT"
-    >
-      <WhatsApp />
-    </IconButton>
-    <IconButton
-      sx={{ color: "white" }}
-      component="a"
-      rel="noopener noreferrer"
-      target="_blank"
-      href="http://instagram.com/ondejogamos"
-    >
-      <Instagram />
-    </IconButton>
   </Stack>
 );

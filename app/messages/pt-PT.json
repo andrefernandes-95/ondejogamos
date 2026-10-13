@@ -1,0 +1,15 @@
+{
+    "Navbar": {
+        "hello": "Olá",
+        "exit": "Sair",
+        "description": "Encontra uma futebolada perto de ti!",
+        "error": "Ocorreu um erro",
+        "createAccount": "Criar conta",
+        "login": "Entrar"
+    },
+    "Match": {
+        "join": "Participar",
+        "schedule": "Agendar jogo",
+        "missingPlayers": "Faltam {count} jogadores"
+    }
+}

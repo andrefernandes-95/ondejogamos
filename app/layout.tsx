@@ -6,6 +6,8 @@ import Navbar from "@/app/components/navbar/navbar";
 import { Box } from "@mui/material";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
+import { getLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,29 +24,32 @@ export const metadata: Metadata = {
   description: "Combina futeboladas e faz novas amizades",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const locale = await getLocale();
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <AppThemeProvider>
-          <Box
-            sx={{
-              minHeight: "100dvh",
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-            }}
-          >
-            <Navbar />
-            <Box component="main" sx={{ flex: 1 }}>
-              {children}
+        <NextIntlClientProvider>
+          <AppThemeProvider>
+            <Box
+              sx={{
+                minHeight: "100dvh",
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+              }}
+            >
+              <Navbar />
+              <Box component="main" sx={{ flex: 1 }}>
+                {children}
+              </Box>
+              <Footer />
             </Box>
-            <Footer />
-          </Box>
-        </AppThemeProvider>
+          </AppThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

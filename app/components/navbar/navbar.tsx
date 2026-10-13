@@ -2,7 +2,7 @@
 
 import AuthNavbar from "@/app/components/auth-navbar/auth-navbar";
 import { Logo } from "@/app/components/logo/logo";
-import { Box, Container, Divider, Stack } from "@mui/material";
+import { Box, Container, Stack } from "@mui/material";
 
 export default function Navbar() {
   return (

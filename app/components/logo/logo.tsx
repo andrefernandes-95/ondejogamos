@@ -1,7 +1,9 @@
 import { Stack, Typography } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 export const Logo = () => {
+  const t = useTranslations("Navbar");
   return (
     <Stack sx={{ gap: 1, flexDirection: "row", alignItems: "center" }}>
       <Link
@@ -14,7 +16,7 @@ export const Logo = () => {
           gap: 4,
         }}
       >
-        <Stack sx={{ flexDirection: "row" }}>
+        <Stack sx={{ flexDirection: "row", mb: 2 }}>
           <SportsSoccerIcon
             sx={{
               fontSize: 24,
@@ -72,12 +74,21 @@ export const Logo = () => {
             }}
           />
         </Stack>
-        <Typography
-          variant="h5"
-          sx={{ fontWeight: 900, textTransform: "capitalize", color: "white" }}
-        >
-          onde jogamos
-        </Typography>
+        <Stack>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 900,
+              textTransform: "capitalize",
+              color: "white",
+            }}
+          >
+            onde jogamos
+          </Typography>
+          <Typography variant="caption" sx={{ color: "white" }}>
+            {t("description")}
+          </Typography>
+        </Stack>
       </Link>
     </Stack>
   );

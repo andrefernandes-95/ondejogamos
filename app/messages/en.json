@@ -1,0 +1,15 @@
+{
+    "Navbar": {
+        "hello": "Hi",
+        "exit": "Exit",
+        "description": "Find football games near you!",
+        "error": "An error has occured",
+        "createAccount": "Create account",
+        "login": "Login"
+    },
+    "Match": {
+        "join": "Join",
+        "schedule": "Schedule match",
+        "missingPlayers": "{count} players needed"
+    }
+}

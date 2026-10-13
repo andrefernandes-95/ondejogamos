@@ -1,7 +1,15 @@
 "use client";
 
 import { AppRoutes } from "@/app/utils/routes";
-import { Box, Container, Link, Stack, Typography } from "@mui/material";
+import { Instagram, WhatsApp } from "@mui/icons-material";
+import {
+  Box,
+  Container,
+  IconButton,
+  Link,
+  Stack,
+  Typography,
+} from "@mui/material";
 import NextLink from "next/link";
 
 export default function Footer() {
@@ -27,25 +35,26 @@ export default function Footer() {
             textAlign: "center",
           }}
         >
-          {/* <Stack spacing={0.5}>
-            <Typography variant="body2">Programado por </Typography>
-            <Link
-              href="https://github.com/andrefernandes-95"
+          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+            <IconButton
+              component="a"
               rel="noopener noreferrer"
               target="_blank"
-              component={NextLink}
+              size="small"
+              href="https://chat.whatsapp.com/GfmyVK1nYxe22XqrhTmpiT"
             >
-              <Typography
-                variant="body2"
-                sx={(theme) => ({
-                  fontWeight: 900,
-                  color: theme.palette.primary.main,
-                })}
-              >
-                André Fernandes
-              </Typography>
-            </Link>
-          </Stack> */}
+              <WhatsApp />
+            </IconButton>
+            <IconButton
+              component="a"
+              rel="noopener noreferrer"
+              target="_blank"
+              size="small"
+              href="http://instagram.com/ondejogamos"
+            >
+              <Instagram />
+            </IconButton>
+          </Stack>
 
           <Stack>
             <Link href={AppRoutes.HOME} variant="body2">
