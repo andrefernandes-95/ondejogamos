@@ -3,7 +3,14 @@
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { LocationWithGameCount } from "@/app/services/locations";
-import { Button, Card, Container, Stack, Tooltip } from "@mui/material";
+import {
+  Button,
+  Card,
+  Container,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import PlaceIcon from "@mui/icons-material/Place";
 import { Background } from "@/app/components/background/background";
@@ -32,10 +39,35 @@ export default function HomeClient({ data, initialArea }: Props) {
       `; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
   };
 
+  const headerText = () =>
+    isEn ? (
+      <>
+        Want to play casual football? In <strong>Onde Jogamos</strong> you can
+        find matches, join other players and organize games in your area.
+      </>
+    ) : (
+      <>
+        Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes
+        encontrar jogos, juntar-te a outros jogadores e organizar partidas na
+        tua zona.
+      </>
+    );
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Background />
       <Stack sx={{ gap: 2 }}>
+        <Card variant="outlined">
+          <Typography
+            variant="body1"
+            sx={(theme) => ({
+              borderLeft: `2px solid ${theme.palette.primary.main}`,
+              paddingLeft: 2,
+            })}
+          >
+            {headerText()}
+          </Typography>
+        </Card>
         <Card sx={{ p: 4 }} variant="outlined">
           <Stack
             sx={{
@@ -91,7 +123,6 @@ export default function HomeClient({ data, initialArea }: Props) {
             </RequireAuthModal>
           )}
         </Card>
-
         <MatchList
           area={selectedArea}
           onAddPitch={() => setIsCreatingPitch(true)}

@@ -1,34 +1,73 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import { IconButton, Stack } from "@mui/material";
+import React from "react";
 
 export default function LanguageSettings() {
   const change = (nextLocale: string) => {
     document.cookie = `locale=${nextLocale}; Path=/; Max-Age:31536000; Same-Site=Lax`;
     window.location.reload();
   };
+
+  const iEn = useLocalization() === "EN";
+
   return (
     <Stack
       direction="row"
       sx={{
         alignItems: "center",
         p: 1,
+        gap: 0.5,
       }}
     >
-      <IconButton
-        onClick={() => change("pt-PT")}
-        sx={{ color: "white" }}
-        aria-label="Português"
+      <RenderFlagButton
+        isActive={iEn === false}
+        change={change}
+        code="pt-PT"
+        ariaLabel="Português"
       >
-        🇵🇹
-      </IconButton>
-      <IconButton
-        onClick={() => change("en")}
-        sx={{ color: "white" }}
-        aria-label="English"
+        <>🇵🇹</>
+      </RenderFlagButton>
+      <RenderFlagButton
+        isActive={iEn}
+        change={change}
+        code="en"
+        ariaLabel="English"
       >
-        🇬🇧
-      </IconButton>
+        <>🇬🇧</>
+      </RenderFlagButton>
     </Stack>
   );
 }
+
+const RenderFlagButton = ({
+  code,
+  children,
+  change,
+  ariaLabel,
+  isActive,
+}: {
+  children: React.ReactNode;
+  code: string;
+  change: (value: string) => void;
+  ariaLabel: string;
+  isActive: boolean;
+}) => (
+  <IconButton
+    onClick={() => change(code)}
+    sx={(theme) => ({
+      color: "white",
+      width: 35,
+      height: 35,
+      background: isActive ? theme.palette.primary.light : "transparent",
+      transition: ".25s ease all",
+      "&:hover": {
+        background: theme.palette.primary.light,
+      },
+    })}
+    aria-label={ariaLabel}
+  >
+    {children}
+  </IconButton>
+);

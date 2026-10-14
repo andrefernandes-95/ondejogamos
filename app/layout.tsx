@@ -20,8 +20,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Onde jogamos?",
-  description: "Combina futeboladas e faz novas amizades",
+  metadataBase: new URL("https://ondejogamos.com"),
+  title: "Onde jogamos | Encontra e Organiza Futeboladas em Portugal",
+  description:
+    "Queres jogar futebol? Encontra futeboladas perto de ti, junta-te a outros jogadores ou organiza os teus próprios jogos. Joga futebol em Portugal!",
+  openGraph: {
+    title: "Onde Jogamos ⚽ | Nunca mais fiques sem futebolada!",
+    description:
+      "Encontra jogos de futebol perto de ti, conhece novos jogadores e organiza futeboladas em Portugal.",
+    url: "https://ondejogamos.com",
+    siteName: "Onde Jogamos",
+    locale: "pt_PT",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Onde Jogamos - A tua próxima futebolada começa aqui",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Onde Jogamos ⚽ | Encontra Futeboladas em Portugal",
+    description:
+      "Encontra e organiza jogos de futebol perto de ti. Junta-te à comunidade!",
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
