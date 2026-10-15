@@ -8,6 +8,7 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import LanguageDetector from "@/app/components/language-detector/language-detector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>
+          <LanguageDetector />
           <AppThemeProvider>
             <Box
               sx={{

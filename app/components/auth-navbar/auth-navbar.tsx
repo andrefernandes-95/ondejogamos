@@ -1,6 +1,5 @@
 "use client";
 
-import LanguageSettings from "@/app/components/language-settings/language-settings";
 import useLocalization from "@/app/hooks/locale";
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
@@ -88,8 +87,6 @@ export default function AuthNavbar() {
             {logoutError}
           </Typography>
         )}
-
-        <LanguageSettings />
       </Container>
     );
   }
@@ -119,7 +116,6 @@ export default function AuthNavbar() {
           {localization === "EN" ? "Create Account" : "Criar Conta"}
         </Typography>
       </Button>
-      <LanguageSettings />
     </Container>
   );
 }

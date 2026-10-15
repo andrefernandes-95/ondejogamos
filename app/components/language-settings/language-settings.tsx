@@ -56,16 +56,11 @@ const RenderFlagButton = ({
 }) => (
   <IconButton
     onClick={() => change(code)}
-    sx={(theme) => ({
+    sx={{
       color: "white",
       width: 35,
       height: 35,
-      background: isActive ? theme.palette.primary.light : "transparent",
-      transition: ".25s ease all",
-      "&:hover": {
-        background: theme.palette.primary.light,
-      },
-    })}
+    }}
     aria-label={ariaLabel}
   >
     {children}

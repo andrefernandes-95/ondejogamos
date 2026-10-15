@@ -1,11 +1,13 @@
 "use client";
 
+import LanguageSettings from "@/app/components/language-settings/language-settings";
 import useLocalization from "@/app/hooks/locale";
 import { AppRoutes } from "@/app/utils/routes";
 import { Instagram, WhatsApp } from "@mui/icons-material";
 import {
   Box,
   Container,
+  Divider,
   IconButton,
   Link,
   Stack,
@@ -58,7 +60,7 @@ export default function Footer() {
             </IconButton>
           </Stack>
 
-          <Stack>
+          <Stack sx={{ alignItems: "center" }}>
             <Link href={AppRoutes.HOME} variant="body2">
               {isEn ? "Home" : "Início"}
             </Link>
@@ -67,7 +69,8 @@ export default function Footer() {
             </Link>
           </Stack>
 
-          <Stack spacing={0.5}>
+          <Stack spacing={0.5} sx={{ alignItems: "center" }}>
+            <LanguageSettings />
             <Typography variant="body2">
               Onde Jogamos © {new Date().getFullYear()}
             </Typography>

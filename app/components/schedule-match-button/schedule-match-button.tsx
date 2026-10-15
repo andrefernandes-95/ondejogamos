@@ -22,7 +22,13 @@ export default function ScheduleMatchButton({
   return (
     <>
       <Tooltip
-        title={selectedArea?.length ? "" : "Seleciona uma área primeiro"}
+        title={
+          selectedArea?.length
+            ? ""
+            : isEn
+              ? "Select an area first"
+              : "Seleciona uma área primeiro"
+        }
       >
         <span style={{ display: "inline-flex", flexShrink: 0 }}>
           <Button
