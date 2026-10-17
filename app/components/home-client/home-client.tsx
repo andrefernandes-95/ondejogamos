@@ -1,23 +1,15 @@
 "use client";
 
 import AreaSelector from "@/app/components/area-selector/area-selector";
-import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import { LocationWithGameCount } from "@/app/services/locations";
-import {
-  Button,
-  Card,
-  Container,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Card, Container, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import PlaceIcon from "@mui/icons-material/Place";
 import { Background } from "@/app/components/background/background";
-import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 import MatchList from "@/app/components/match-list/match-list";
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
 import useLocalization from "@/app/hooks/locale";
+import MatchScheduleSuggestion from "@/app/components/match-schedule-suggestion/match-schedule-suggestion";
+import CreatePitchButton from "@/app/components/create-pitch-button/create-pitch-button";
 
 interface Props {
   data: LocationWithGameCount[];
@@ -89,40 +81,14 @@ export default function HomeClient({ data, initialArea }: Props) {
               onAddPitch={() => setIsCreatingPitch(true)}
             />
 
-            <Tooltip
-              title={
-                selectedArea?.length
-                  ? ""
-                  : isEn
-                    ? "Select an area first"
-                    : "Seleciona uma área primeiro"
-              }
-            >
-              <span style={{ display: "inline-flex", flexShrink: 0 }}>
-                <Button
-                  disabled={!selectedArea}
-                  sx={{ flexShrink: 0, gap: 1 }}
-                  onClick={() => setIsCreatingPitch(true)}
-                >
-                  <PlaceIcon />
-                  {isEn ? "Add Pitch" : "Adicionar Campo"}
-                </Button>
-              </span>
-            </Tooltip>
+            <CreatePitchButton
+              isCreatingPitch={isCreatingPitch}
+              setIsCreatingPitch={setIsCreatingPitch}
+              selectedArea={selectedArea}
+            />
           </Stack>
-          {isCreatingPitch && (
-            <RequireAuthModal
-              open={isCreatingPitch}
-              setOpen={setIsCreatingPitch}
-            >
-              <CreatePitchModal
-                open={isCreatingPitch}
-                setOpen={setIsCreatingPitch}
-                selectedArea={selectedArea}
-              />
-            </RequireAuthModal>
-          )}
         </Card>
+        <MatchScheduleSuggestion area={selectedArea} />
         <MatchList
           area={selectedArea}
           onAddPitch={() => setIsCreatingPitch(true)}

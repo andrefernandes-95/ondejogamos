@@ -7,7 +7,6 @@ import { Instagram, WhatsApp } from "@mui/icons-material";
 import {
   Box,
   Container,
-  Divider,
   IconButton,
   Link,
   Stack,
@@ -66,6 +65,9 @@ export default function Footer() {
             </Link>
             <Link href={AppRoutes.PLAYERS} variant="body2">
               {isEn ? "Player List" : "Lista de Jogadores"}
+            </Link>
+            <Link href={AppRoutes.PITCHES} variant="body2">
+              {isEn ? "Pitches List" : "Lista de Campos"}
             </Link>
           </Stack>
 

@@ -6,15 +6,17 @@ interface Props {
   value: File | null;
   onChange: (file: File | null) => void;
   errorMessage?: string;
+  defaultImageUrl?: string;
 }
 
 export default function UploadImageInput({
   value,
   onChange,
   errorMessage,
+  defaultImageUrl,
 }: Props) {
   const isEn = useLocalization() === "EN";
-  return value ? (
+  return value || defaultImageUrl?.length ? (
     <Stack
       sx={{
         flexDirection: "row",
@@ -22,7 +24,7 @@ export default function UploadImageInput({
         justifyContent: "space-between",
       }}
     >
-      <Typography variant="body1">{value.name}</Typography>
+      <Typography variant="body1">{defaultImageUrl || value?.name}</Typography>
       <Button onClick={() => onChange(null)}>
         <Delete />
       </Button>

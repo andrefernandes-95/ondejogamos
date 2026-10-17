@@ -1,7 +1,17 @@
 import MatchCard from "@/app/components/match-card/match-card";
 import NoMatchesFound from "@/app/components/no-matches-found/no-matches-found";
+import useLocalization from "@/app/hooks/locale";
 import { useListMatchesForArea } from "@/app/hooks/matches";
-import { Alert, Box, CircularProgress, Container, Stack } from "@mui/material";
+import { SportsSoccer } from "@mui/icons-material";
+import {
+  Alert,
+  Box,
+  Card,
+  CircularProgress,
+  Container,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 interface Props {
   area: string;
@@ -11,6 +21,8 @@ interface Props {
 export default function MatchList({ area, onAddPitch }: Props) {
   const { matches, refresh, error, loading, hasFetched } =
     useListMatchesForArea(area);
+
+  const isEn = useLocalization() === "EN";
 
   if (loading || !hasFetched) {
     return (
@@ -43,19 +55,70 @@ export default function MatchList({ area, onAddPitch }: Props) {
   }
 
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: {
-          xs: "1fr",
-          md: "repeat(2, minmax(0, 1fr))",
-        },
-        gap: 3,
-      }}
-    >
-      {matches.map((match) => (
-        <MatchCard match={match} key={match.id} onAttendanceChanged={refresh} />
-      ))}
-    </Box>
+    <Card variant="outlined" sx={{ p: 2 }}>
+      <Stack
+        sx={{
+          justifyContent: "space-between",
+          flexDirection: {
+            xs: "column",
+            sm: "row",
+          },
+        }}
+      >
+        <Stack
+          sx={() => ({
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 0.5,
+            justifyContent: "flex-start",
+          })}
+        >
+          <SportsSoccer
+            color="primary"
+            sx={{
+              display: {
+                xs: "none",
+                sm: "flex",
+              },
+              marginRight: 0.5,
+            }}
+          />
+          <Typography variant="h6">
+            {area
+              ? isEn
+                ? `Upcoming matches in ${area}`
+                : `Próximos jogos em ${area}`
+              : isEn
+                ? `Upcoming matches`
+                : `Próximos jogos`}
+          </Typography>
+        </Stack>
+
+        <Typography variant="caption">
+          {isEn
+            ? "Join a scheduled or on-going matches"
+            : "Participa num jogo agendado ou a decorrer"}
+        </Typography>
+      </Stack>
+      <Box
+        sx={{
+          marginTop: 2,
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "repeat(2, minmax(0, 1fr))",
+          },
+          gap: 3,
+        }}
+      >
+        {matches.map((match) => (
+          <MatchCard
+            match={match}
+            key={match.id}
+            onAttendanceChanged={refresh}
+          />
+        ))}
+      </Box>
+    </Card>
   );
 }

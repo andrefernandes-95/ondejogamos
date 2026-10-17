@@ -1,4 +1,5 @@
 import ParticipateButton from "@/app/components/participate-button/participate-button";
+import PitchUrlButton from "@/app/components/pitch-url-button/pitch-url-button";
 import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
@@ -137,21 +138,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
             </Typography>
 
             {match.pitch.maps_url && (
-              <Button
-                component="a"
-                href={match.pitch.maps_url}
-                size="small"
-                sx={{ minWidth: "unset" }}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={
-                  isEn
-                    ? "Open in Google Maps"
-                    : "Abrir localização no Google Maps"
-                }
-              >
-                <OpenInNew sx={{ fontSize: 18 }} />
-              </Button>
+              <PitchUrlButton maps_url={match.pitch.maps_url} />
             )}
           </Stack>
 

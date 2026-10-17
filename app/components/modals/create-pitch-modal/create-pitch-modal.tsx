@@ -3,6 +3,7 @@
 import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
 import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
 import useLocalization from "@/app/hooks/locale";
+import { Pitch } from "@/app/services/pitches";
 import { REQUIRED_FIELD } from "@/app/utils/constants";
 import {
   ALLOWED_IMAGE_TYPES,
@@ -12,6 +13,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
+  Alert,
   Box,
   Button,
   Dialog,
@@ -31,6 +33,8 @@ interface Props {
   selectedArea: string;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  existingPitch?: Pitch;
+  onUpdatePitch?: () => void;
 }
 
 const formId = "create-pitch-form";
@@ -49,14 +53,21 @@ const getSchema = (isEn: boolean) =>
       .string()
       .trim()
       .min(1, isEn ? REQUIRED_FIELD : "Município obrigatório"),
-    mapsUrl: z
+    image_url: z.string().trim().nullable().optional(),
+    maps_url: z
       .string()
       .trim()
-      .pipe(
-        z.union([z.url(isEn ? "Invalid URL" : "Url Inválido"), z.literal("")]),
-      )
-      .nullable()
-      .optional(),
+      .refine((value) => {
+        if (value === "") {
+          return true;
+        }
+
+        try {
+          return ["http:", "https:"].includes(new URL(value).protocol);
+        } catch {
+          return false;
+        }
+      }, "URL do mapa inválido"),
     photo: z
       .instanceof(File, {
         message: isEn ? "Choose a photo" : "Escolhe uma fotografia",
@@ -81,6 +92,8 @@ export default function CreatePitchModal({
   open,
   setOpen,
   selectedArea,
+  existingPitch,
+  onUpdatePitch,
 }: Props) {
   const [municipalitiesForArea, setMunicipalitiesForArea] = useState<string[]>(
     [],
@@ -93,15 +106,16 @@ export default function CreatePitchModal({
     handleSubmit,
     setError,
     reset,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = useForm<FormValues>({
     resolver: zodResolver(getSchema(isEn)),
     defaultValues: {
-      name: "",
-      area: selectedArea,
-      municipality: "",
-      mapsUrl: "",
+      name: existingPitch ? existingPitch.name : "",
+      area: existingPitch ? existingPitch.area : selectedArea,
+      municipality: existingPitch ? existingPitch.municipality : "",
+      maps_url: existingPitch ? existingPitch.maps_url : "",
       photo: null,
+      image_url: existingPitch ? existingPitch.image_url : "",
     },
   });
 
@@ -136,17 +150,27 @@ export default function CreatePitchModal({
   const submit = async (values: FormValues) => {
     const body = new FormData();
 
+    console.log("existingPitch:", existingPitch);
+    if (existingPitch) {
+      body.append("id", existingPitch.id.toString());
+    }
+
     body.append("name", values.name);
     body.append("area", values.area);
     body.append("municipality", values.municipality);
-    body.append("maps_url", values.mapsUrl ?? "");
+    body.append("maps_url", values.maps_url ?? "");
 
     if (values.photo) {
       body.append("image", values.photo);
+    } else if (existingPitch?.image_url) {
+      body.append("image_url", existingPitch?.image_url);
     }
 
     try {
-      const response = await fetch(`/api/pitches`, { method: "POST", body });
+      const response = await fetch(`/api/pitches`, {
+        method: existingPitch ? "PUT" : "POST",
+        body,
+      });
 
       if (!response.ok) {
         setError("root.server", {
@@ -159,6 +183,7 @@ export default function CreatePitchModal({
 
       reset();
       setOpen(false);
+      window.location.reload();
     } catch {
       setError("root.server", {
         message: isEn
@@ -167,6 +192,8 @@ export default function CreatePitchModal({
       });
     }
   };
+
+  const serverError = errors?.root?.server?.message;
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
@@ -193,6 +220,7 @@ export default function CreatePitchModal({
           onSubmit={handleSubmit(submit)}
           noValidate
         >
+          {serverError && <Alert severity="error">{serverError}</Alert>}
           <Stack spacing={2} sx={{ py: 2 }}>
             <Controller
               name="name"
@@ -236,7 +264,7 @@ export default function CreatePitchModal({
             />
 
             <Controller
-              name="mapsUrl"
+              name="maps_url"
               control={control}
               render={({ field, fieldState }) => (
                 <TextField
@@ -263,7 +291,13 @@ export default function CreatePitchModal({
           variant="contained"
           disabled={isSubmitting}
         >
-          {isEn ? "Add" : "Adicionar"}
+          {existingPitch
+            ? isEn
+              ? "Save Changes"
+              : "Guardar Alterações"
+            : isEn
+              ? "Add"
+              : "Adicionar"}
         </Button>
       </DialogActions>
     </Dialog>

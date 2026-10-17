@@ -28,6 +28,7 @@ interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   existingMatch?: FullMatch;
   onAddPitch?: () => void;
+  selectedPitch?: string;
 }
 
 const formId = "create-pitch-form";
@@ -36,6 +37,7 @@ export default function CreateMatchModal({
   open,
   setOpen,
   selectedArea,
+  selectedPitch,
   existingMatch,
   onAddPitch,
 }: Props) {
@@ -46,7 +48,11 @@ export default function CreateMatchModal({
       resolver: zodResolver(createMatchSchema),
       defaultValues: {
         description: existingMatch ? existingMatch.description : "",
-        pitchId: existingMatch ? existingMatch.pitch.id?.toString() : "",
+        pitchId: selectedPitch
+          ? selectedPitch
+          : existingMatch
+            ? existingMatch.pitch.id?.toString()
+            : "",
         durationInMinutes: existingMatch
           ? Number(existingMatch.duration_in_minutes)
           : 60,

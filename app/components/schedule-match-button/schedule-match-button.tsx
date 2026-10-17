@@ -5,15 +5,19 @@ import { useState } from "react";
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
-import { useTranslations } from "next-intl";
 import useLocalization from "@/app/hooks/locale";
+import { CallMade, OpenInFull } from "@mui/icons-material";
 
 export default function ScheduleMatchButton({
   selectedArea,
+  selectedPitch,
   onAddPitch,
+  isSmall = false,
 }: {
   selectedArea: string;
   onAddPitch: () => void;
+  isSmall?: boolean;
+  selectedPitch?: string;
 }) {
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
 
@@ -35,9 +39,11 @@ export default function ScheduleMatchButton({
             disabled={!selectedArea}
             sx={{ flexShrink: 0, gap: 1 }}
             onClick={() => setIsCreatingGame(true)}
+            size={isSmall ? "small" : "medium"}
           >
-            <SportsSoccerIcon />
+            {!isSmall && <SportsSoccerIcon />}
             {isEn ? "Schedule Game" : "Agendar Jogo"}
+            {isSmall && <CallMade sx={{ fontSize: 12 }} />}
           </Button>
         </span>
       </Tooltip>
@@ -48,6 +54,7 @@ export default function ScheduleMatchButton({
             open={isCreatingGame}
             setOpen={setIsCreatingGame}
             onAddPitch={onAddPitch}
+            selectedPitch={selectedPitch}
           />
         </RequireAuthModal>
       )}

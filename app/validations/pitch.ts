@@ -5,7 +5,7 @@ import {
 } from "@/app/utils/image";
 import z from "zod";
 
-const pitchSchema = z.object({
+const basePitchSchema = z.object({
   name: z.string().trim().min(1, "Nome obrigatório").max(200),
   area: z.string().trim().min(1, "Área obrigatória").max(200),
   municipality: z.string().trim().min(1, "Município obrigatório").max(200),
@@ -23,6 +23,10 @@ const pitchSchema = z.object({
         return false;
       }
     }, "URL do mapa inválido"),
+  image: z.unknown().optional(),
+});
+
+const createPitchSchema = basePitchSchema.extend({
   image: z
     .instanceof(File, { message: "Imagem obrigatória" })
     .refine((file) => file.size > 0, "A imagem está vazia")
@@ -37,10 +41,19 @@ const pitchSchema = z.object({
 });
 
 export const safeParseFormData = (formData: FormData) =>
-  pitchSchema.safeParse({
+  createPitchSchema.safeParse({
     name: formData.get("name"),
     area: formData.get("area"),
     municipality: formData.get("municipality"),
     maps_url: formData.get("maps_url") ?? "",
     image: formData.get("image"),
+  });
+
+export const safeUpdateParseFormData = (formData: FormData) =>
+  basePitchSchema.safeParse({
+    name: formData.get("name"),
+    area: formData.get("area"),
+    municipality: formData.get("municipality"),
+    maps_url: formData.get("maps_url") ?? "",
+    image: formData.get("image") ?? "",
   });
