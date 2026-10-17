@@ -125,24 +125,25 @@ const MatchScheduleSuggestionItem = ({ pitch }: { pitch: Pitch }) => {
         />
       </Box>
       <Stack
-        sx={{ flexDirection: "row", justifyContent: "space-between", p: 1 }}
+        sx={{ flexDirection: "column", justifyContent: "space-between", p: 1 }}
       >
-        <Stack>
-          <Typography variant="button">{pitch.name}</Typography>
+        <Typography variant="button">{pitch.name}</Typography>
 
-          <Stack sx={{ flexDirection: "row", gap: 0.5, alignItems: "center" }}>
-            <LocationOn sx={{ fontSize: 14, opacity: 0.75 }} />
-            <Typography variant="body2" color="textSecondary">
-              {pitch.municipality}, {pitch.area}
-            </Typography>
-          </Stack>
+        <Stack sx={{ flexDirection: "row", gap: 0.5, alignItems: "center" }}>
+          <LocationOn sx={{ fontSize: 14, opacity: 0.75 }} />
+          <Typography variant="body2" color="textSecondary">
+            {pitch.municipality}, {pitch.area}
+          </Typography>
         </Stack>
-        <ScheduleMatchButton
-          isSmall
-          selectedArea={pitch.area}
-          onAddPitch={() => {}}
-          selectedPitch={pitch.id.toString()}
-        />
+
+        <Stack sx={{ alignSelf: "flex-end" }}>
+          <ScheduleMatchButton
+            isSmall
+            selectedArea={pitch.area}
+            onAddPitch={() => {}}
+            selectedPitch={pitch.id.toString()}
+          />
+        </Stack>
       </Stack>
     </Card>
   );
