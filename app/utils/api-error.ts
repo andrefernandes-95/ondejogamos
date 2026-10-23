@@ -6,6 +6,7 @@ export type ApiErrorCode =
   | "MATCH_UPDATE_FAILED"
   | "MATCH_DELETE_FAILED"
   | "MATCH_NOT_FOUND"
+  | "MATCH_TIME_CONFLICT"
   | "INTERNAL_ERROR";
 
 const apiErrorCodes: ApiErrorCode[] = [
@@ -16,6 +17,7 @@ const apiErrorCodes: ApiErrorCode[] = [
   "MATCH_UPDATE_FAILED",
   "MATCH_DELETE_FAILED",
   "MATCH_NOT_FOUND",
+  "MATCH_TIME_CONFLICT",
   "INTERNAL_ERROR",
 ];
 

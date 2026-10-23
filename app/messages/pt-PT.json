@@ -20,6 +20,7 @@
     "MATCH_UPDATE_FAILED": "Não foi possível atualizar o jogo. Tenta novamente.",
     "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
     "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
+    "MATCH_TIME_CONFLICT": "Já existe um jogo nesse campo durante esse horário. Escolhe outra hora.",
     "INTERNAL_ERROR": "Ocorreu um erro. Tenta novamente."
   }
 }

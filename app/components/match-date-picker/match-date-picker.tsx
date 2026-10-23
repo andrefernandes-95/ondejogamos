@@ -15,6 +15,7 @@ import {
 import { DatePicker, TimeGrid } from "@mantine/dates";
 import { Match } from "@/app/models/match";
 import useLocalization from "@/app/hooks/locale";
+import { matchTimeRangesOverlap } from "@/app/utils/match-time";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -110,7 +111,10 @@ export default function MatchDatePicker({
         const date = dayjs(day).format("YYYY-MM-DD");
         const nextDate = dayjs(day).add(1, "day").format("YYYY-MM-DD");
         const from = dayjs.tz(date, "Europe/Lisbon").toISOString();
-        const until = dayjs.tz(nextDate, "Europe/Lisbon").toISOString();
+        const until = dayjs
+          .tz(nextDate, TIMEZONE)
+          .add(current_match_duration_in_minutes, "minute")
+          .toISOString();
 
         const params = new URLSearchParams({
           pitch_id: current_match_pitch_id,
@@ -122,44 +126,27 @@ export default function MatchDatePicker({
 
         const matches: Match[] = await response.json();
 
-        const unavailableTimes = matches.flatMap((existingMatch) => {
-          if (current_match_id === existingMatch.id) {
-            return [];
+        const otherMatches = matches.filter(
+          (match) => String(match.id) !== String(current_match_id),
+        );
+        const unavailableTimes = ALL_TIMES.filter((slot) => {
+          const candidateStart = dayjs.tz(`${day} ${slot}`, TIMEZONE);
+          if (!candidateStart.isValid()) {
+            return false;
           }
-          const existingMatchStart = dayjs(existingMatch.starts_at).tz(
-            TIMEZONE,
+
+          return otherMatches.some((match) =>
+            matchTimeRangesOverlap(
+              {
+                startsAt: candidateStart.toISOString(),
+                durationInMinutes: current_match_duration_in_minutes,
+              },
+              {
+                startsAt: match.starts_at,
+                durationInMinutes: match.duration_in_minutes,
+              },
+            ),
           );
-
-          const slots = [];
-
-          for (
-            let offset = 0;
-            offset < existingMatch.duration_in_minutes;
-            offset += 30
-          ) {
-            slots.push(
-              existingMatchStart.add(offset, "minute").format("HH:mm"),
-            );
-          }
-
-          // Existing Match: 20.00
-          // We want to unavailable the slots prior according to our match duration
-          // So we for a 60 minute match we block:
-          // 19.30
-          // And allow 19.00
-          // For a 120 m match we block:
-          // 19.30, 19.00, 18.30 And we allo 18.00
-          for (
-            let offset = 0;
-            offset < current_match_duration_in_minutes; // While offset is greater than zero
-            offset += 30
-          ) {
-            slots.push(
-              existingMatchStart.subtract(offset, "minute").format("HH:mm"),
-            );
-          }
-
-          return slots;
         });
 
         setUnavailableTimes(unavailableTimes);

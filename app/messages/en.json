@@ -20,6 +20,7 @@
     "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
     "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
     "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
+    "MATCH_TIME_CONFLICT": "There is already a match at this pitch during that time. Choose another time.",
     "INTERNAL_ERROR": "Something went wrong. Try again."
   }
 }

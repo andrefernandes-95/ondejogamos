@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test app/utils/*.test.ts app/schemas/*.test.ts",
+    "test": "node --import tsx --test app/utils/*.test.ts app/schemas/*.test.ts app/services/*.test.ts",
     "seed-locations": "tsx --env-file=.env scripts/seed-locations.ts"
   },
   "dependencies": {

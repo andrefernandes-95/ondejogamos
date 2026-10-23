@@ -1,5 +1,6 @@
 import auth from "@/app/lib/auth";
 import { apiError } from "@/app/utils/api-error";
+import { MatchTimeConflictError } from "@/app/services/match-availability";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
@@ -82,6 +83,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(`Falha ao agendar jogo`, error);
 
+    if (error instanceof MatchTimeConflictError) {
+      return apiError("MATCH_TIME_CONFLICT", 409);
+    }
+
     return apiError("MATCH_CREATE_FAILED", 500);
   }
 
@@ -139,6 +144,10 @@ export async function PUT(request: Request) {
     result = await updateMatch(matchInput, session.user.id);
   } catch (error) {
     console.error(`Falha ao atualizar jogo`, error);
+
+    if (error instanceof MatchTimeConflictError) {
+      return apiError("MATCH_TIME_CONFLICT", 409);
+    }
 
     return apiError("MATCH_UPDATE_FAILED", 500);
   }
