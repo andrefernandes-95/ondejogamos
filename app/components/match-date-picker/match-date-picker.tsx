@@ -98,7 +98,7 @@ export default function MatchDatePicker({
     onChange(date.toISOString());
   };
 
-  const fetchAvailability = useCallback(() => {
+  const fetchAvailability = useCallback((signal: AbortSignal) => {
     if (!current_match_pitch_id || !day) {
       setLoading(false);
       return;
@@ -122,7 +122,13 @@ export default function MatchDatePicker({
           until,
         });
 
-        const response = await fetch(`/api/matches/availability?${params}`);
+        const response = await fetch(`/api/matches/availability?${params}`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Falha ao consultar disponibilidade");
+        }
 
         const matches: Match[] = await response.json();
 
@@ -149,11 +155,17 @@ export default function MatchDatePicker({
           );
         });
 
-        setUnavailableTimes(unavailableTimes);
+        if (!signal.aborted) {
+          setUnavailableTimes(unavailableTimes);
+        }
       } catch (e) {
-        console.error("Erro ao consultar disponibilidade:", e);
+        if (!signal.aborted) {
+          console.error("Erro ao consultar disponibilidade:", e);
+        }
       } finally {
-        setLoading(false);
+        if (!signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -166,9 +178,12 @@ export default function MatchDatePicker({
   ]);
 
   useEffect(() => {
+    const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    return fetchAvailability();
-  }, [fetchAvailability, current_match_pitch_id]);
+    fetchAvailability(controller.signal);
+
+    return () => controller.abort();
+  }, [fetchAvailability]);
 
   return (
     <Stack spacing={2}>

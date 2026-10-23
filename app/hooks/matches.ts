@@ -1,6 +1,6 @@
 import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useListMatchesForArea(area: string) {
   const [matches, setMatches] = useState<FullMatch[]>([]);
@@ -10,7 +10,7 @@ export function useListMatchesForArea(area: string) {
 
   const isEn = useLocalization() === "EN";
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     setHasFetched(true);
     setLoading(true);
     setError("");
@@ -18,6 +18,7 @@ export function useListMatchesForArea(area: string) {
     try {
       const response = await fetch(
         `/api/matches?area=${encodeURIComponent(area)}`,
+        { signal },
       );
 
       if (!response.ok) {
@@ -26,9 +27,13 @@ export function useListMatchesForArea(area: string) {
 
       const data = await response.json();
 
-      setMatches(data);
+      if (!signal?.aborted) {
+        setMatches(data);
+      }
     } catch (e) {
-      console.error(e);
+      if (signal?.aborted) {
+        return;
+      }
 
       if (typeof e === "string") {
         setError(e);
@@ -36,15 +41,19 @@ export function useListMatchesForArea(area: string) {
         setError(isEn ? "Something went wrong" : "Ocorreu um erro");
       }
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
-  };
+  }, [area, isEn]);
 
   useEffect(() => {
-    (() => {
-      fetchData();
-    })();
-  }, [area]);
+    const controller = new AbortController();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchData(controller.signal);
+
+    return () => controller.abort();
+  }, [fetchData]);
 
   return { matches, refresh: fetchData, loading, error, hasFetched };
 }
