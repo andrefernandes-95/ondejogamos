@@ -1,13 +1,12 @@
 "use client";
 
-import MatchDatePicker from "@/app/components/match-date-picker/match-date-picker";
-import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
-import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
+import CreateMatchFields from "@/app/components/modals/create-match-modal/create-match-fields";
 import useLocalization from "@/app/hooks/locale";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
 import { readApiErrorCode } from "@/app/utils/api-error";
+import { toMatchFormData } from "@/app/utils/match-form-data";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -18,11 +17,11 @@ import {
   DialogContent,
   DialogTitle,
   Alert,
+  CircularProgress,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 
 interface Props {
@@ -47,55 +46,60 @@ export default function CreateMatchModal({
   const isEn = useLocalization() === "EN";
   const tErrors = useTranslations("ApiErrors");
 
-  const { control, handleSubmit, setError, reset, setValue, watch, formState: { errors, isSubmitting } } =
-    useForm<CreateMatchFormValues>({
-      resolver: zodResolver(createMatchSchema),
-      defaultValues: {
-        description: existingMatch ? existingMatch.description : "",
-        pitchId: selectedPitch
-          ? selectedPitch
-          : existingMatch
-            ? existingMatch.pitch.id?.toString()
-            : "",
-        durationInMinutes: existingMatch
-          ? Number(existingMatch.duration_in_minutes)
-          : 60,
-        startsAt: existingMatch ? existingMatch.starts_at?.toISOString() : "",
-        format: existingMatch ? existingMatch.format : "5x5",
-        minAttendance: existingMatch ? existingMatch.min_attendance : 10,
-      },
-    });
+  const {
+    control,
+    handleSubmit,
+    setError,
+    reset,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateMatchFormValues>({
+    resolver: zodResolver(createMatchSchema),
+    defaultValues: {
+      description: existingMatch ? existingMatch.description : "",
+      pitchId: selectedPitch
+        ? selectedPitch
+        : existingMatch
+          ? existingMatch.pitch.id?.toString()
+          : "",
+      durationInMinutes: existingMatch
+        ? Number(existingMatch.duration_in_minutes)
+        : 60,
+      startsAt: existingMatch ? existingMatch.starts_at?.toISOString() : "",
+      format: existingMatch ? existingMatch.format : "5x5",
+      minAttendance: existingMatch ? existingMatch.min_attendance : 10,
+    },
+  });
 
-  const current_match_pitch_id = watch("pitchId");
-  const current_match_duration_in_minutes = watch("durationInMinutes");
+  const {
+    pitches,
+    loading: pitchesLoading,
+    error: pitchesError,
+    retry,
+  } = useListPitchesForArea(selectedArea);
 
-  const pitches = useListPitchesForArea(selectedArea);
+  const actionLabels = isEn
+    ? {
+        cancel: "Cancel",
+        addPitch: "Add Pitch",
+        save: "Save changes",
+        schedule: "Schedule match",
+      }
+    : {
+        cancel: "Cancelar",
+        addPitch: "Adicionar Campo",
+        save: "Guardar alterações",
+        schedule: "Agendar Jogo",
+      };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const isPitchListEmpty = !pitchesLoading && !pitchesError && pitches.length === 0;
+  const canSubmit = !pitchesLoading && !pitchesError && pitches.length > 0;
 
   const onSubmit = async (values: CreateMatchFormValues) => {
-    const body = new FormData();
-
-    if (existingMatch) {
-      body.append("id", existingMatch.id);
-    }
-
-    body.append("pitchId", values.pitchId);
-    body.append("description", values.description!);
-    body.append(
-      "durationInMinutes",
-      values.durationInMinutes?.toString() ?? "60",
-    );
-    body.append("format", values.format);
-    body.append("minAttendance", values.minAttendance.toString());
-    body.append("startsAt", values.startsAt.toString());
-
     try {
       const response = await fetch(`/api/matches`, {
         method: existingMatch ? "PUT" : "POST",
-        body,
+        body: toMatchFormData(values, existingMatch?.id),
       });
 
       if (!response.ok) {
@@ -118,93 +122,8 @@ export default function CreateMatchModal({
     }
   };
 
-  const RenderForm = () =>
-    pitches.length <= 0 ? (
-      <></>
-    ) : (
-      <>
-        <Controller
-          name="pitchId"
-          control={control}
-          render={({ field, fieldState }) => (
-            <PitchSelector
-              data={pitches}
-              selectedPitch={field.value}
-              handleSelectedPitch={(value) => field.onChange(value)}
-              errorMessage={fieldState.error?.message}
-            />
-          )}
-        />
-        <MatchFormatInput
-          control={control}
-          onChange={(newValue) => {
-            if (newValue === "5x5")
-              setValue("minAttendance", 10, { shouldDirty: true });
-            if (newValue === "7x7")
-              setValue("minAttendance", 14, { shouldDirty: true });
-            if (newValue === "11x11")
-              setValue("minAttendance", 22, { shouldDirty: true });
-          }}
-        />
-
-        <Controller
-          name="durationInMinutes"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextField
-              {...field}
-              type="number"
-              label={isEn ? "Duration (Minutes)" : "Duração (Minutos)"}
-              helperText={fieldState.error?.message}
-              error={!!fieldState.error}
-            />
-          )}
-        />
-
-        <Controller
-          name="startsAt"
-          control={control}
-          render={({ field, fieldState }) => (
-            <Stack>
-              <MatchDatePicker
-                {...field}
-                value={field.value}
-                onChange={field.onChange}
-                current_match_id={existingMatch ? existingMatch.id : ""}
-                current_match_pitch_id={current_match_pitch_id}
-                current_match_duration_in_minutes={Number(
-                  current_match_duration_in_minutes,
-                )}
-              />
-
-              {fieldState?.error && (
-                <Typography color="error">
-                  {fieldState?.error?.message}
-                </Typography>
-              )}
-            </Stack>
-          )}
-        />
-
-        <Controller
-          name="description"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextField
-              {...field}
-              multiline
-              type="text"
-              label={isEn ? "Observations" : "Observações"}
-              helperText={fieldState.error?.message}
-              error={!!fieldState.error}
-            />
-          )}
-        />
-      </>
-    );
-
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth>
+    <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
       <DialogTitle
         color="primary"
         sx={{
@@ -227,44 +146,75 @@ export default function CreateMatchModal({
         <Box component="form" id={formId} onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2} sx={{ py: 2, gap: 2 }}>
             {errors.root?.server?.message && (
-              <Alert severity="error" role="alert">{errors.root.server.message}</Alert>
+              <Alert severity="error" role="alert">
+                {errors.root.server.message}
+              </Alert>
             )}
-            {pitches.length <= 0 && (
+            {pitchesLoading && (
+              <Stack
+                sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}
+              >
+                <CircularProgress size={20} />
+                <Typography>
+                  {isEn ? "Loading pitches…" : "A carregar campos…"}
+                </Typography>
+              </Stack>
+            )}
+            {pitchesError && (
+              <Alert
+                severity="error"
+                action={
+                  <Button color="inherit" size="small" onClick={retry}>
+                    {isEn ? "Retry" : "Tentar novamente"}
+                  </Button>
+                }
+              >
+                {isEn
+                  ? "Could not load pitches. Try again."
+                  : "Não foi possível carregar os campos. Tenta novamente."}
+              </Alert>
+            )}
+            {isPitchListEmpty && (
               <Typography>
                 {isEn
                   ? `Could not find pitches in ${selectedArea}.`
                   : `Parece que ainda não existem campos em ${selectedArea}.`}
               </Typography>
             )}
-            {RenderForm()}
+            {!pitchesLoading && !pitchesError && pitches.length > 0 && (
+              <CreateMatchFields
+                control={control}
+                setValue={setValue}
+                pitches={pitches}
+                existingMatch={existingMatch}
+              />
+            )}
           </Stack>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{isEn ? "Cancel" : "Cancelar"}</Button>
+        <Button onClick={() => setOpen(false)}>{actionLabels.cancel}</Button>
 
-        {pitches.length > 0 ? (
-          <Button type="submit" form={formId} variant="contained" disabled={isSubmitting}>
-            {existingMatch
-              ? isEn
-                ? "Save changes"
-                : "Guardar alterações"
-              : isEn
-                ? "Schedule match"
-                : "Agendar Jogo"}
+        {canSubmit && (
+          <Button
+            type="submit"
+            form={formId}
+            variant="contained"
+            disabled={isSubmitting}
+          >
+            {existingMatch ? actionLabels.save : actionLabels.schedule}
           </Button>
-        ) : (
-          <>
-            <Button
-              onClick={() => {
-                handleClose();
-                onAddPitch?.();
-              }}
-              variant="contained"
-            >
-              {isEn ? "Add Pitch" : "Adicionar Campo"}
-            </Button>
-          </>
+        )}
+        {isPitchListEmpty && (
+          <Button
+            onClick={() => {
+              setOpen(false);
+              onAddPitch?.();
+            }}
+            variant="contained"
+          >
+            {actionLabels.addPitch}
+          </Button>
         )}
       </DialogActions>
     </Dialog>
