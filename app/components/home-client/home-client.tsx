@@ -10,6 +10,7 @@ import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule
 import useLocalization from "@/app/hooks/locale";
 import MatchScheduleSuggestion from "@/app/components/match-schedule-suggestion/match-schedule-suggestion";
 import CreatePitchButton from "@/app/components/create-pitch-button/create-pitch-button";
+import { useListMatchesForArea } from "@/app/hooks/matches";
 
 interface Props {
   data: LocationWithGameCount[];
@@ -19,6 +20,8 @@ interface Props {
 export default function HomeClient({ data, initialArea }: Props) {
   const [selectedArea, setSelectedArea] = useState<string>(initialArea);
   const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
+  const { matches, refresh, error, loading, hasFetched } =
+    useListMatchesForArea(selectedArea);
 
   const isEn = useLocalization() === "EN";
 
@@ -79,6 +82,7 @@ export default function HomeClient({ data, initialArea }: Props) {
             <ScheduleMatchButton
               selectedArea={selectedArea}
               onAddPitch={() => setIsCreatingPitch(true)}
+              onMatchSaved={refresh}
             />
 
             <CreatePitchButton
@@ -88,10 +92,18 @@ export default function HomeClient({ data, initialArea }: Props) {
             />
           </Stack>
         </Card>
-        <MatchScheduleSuggestion area={selectedArea} />
+        <MatchScheduleSuggestion
+          area={selectedArea}
+          onMatchSaved={refresh}
+        />
         <MatchList
           area={selectedArea}
           onAddPitch={() => setIsCreatingPitch(true)}
+          matches={matches}
+          refresh={refresh}
+          error={error}
+          loading={loading}
+          hasFetched={hasFetched}
         />
       </Stack>
     </Container>

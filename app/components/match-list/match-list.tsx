@@ -1,7 +1,7 @@
 import MatchCard from "@/app/components/match-card/match-card";
 import NoMatchesFound from "@/app/components/no-matches-found/no-matches-found";
 import useLocalization from "@/app/hooks/locale";
-import { useListMatchesForArea } from "@/app/hooks/matches";
+import { FullMatch } from "@/app/models/match";
 import { SportsSoccer } from "@mui/icons-material";
 import {
   Alert,
@@ -16,12 +16,22 @@ import {
 interface Props {
   area: string;
   onAddPitch: () => void;
+  matches: FullMatch[];
+  refresh: () => Promise<void>;
+  error: string;
+  loading: boolean;
+  hasFetched: boolean;
 }
 
-export default function MatchList({ area, onAddPitch }: Props) {
-  const { matches, refresh, error, loading, hasFetched } =
-    useListMatchesForArea(area);
-
+export default function MatchList({
+  area,
+  onAddPitch,
+  matches,
+  refresh,
+  error,
+  loading,
+  hasFetched,
+}: Props) {
   const isEn = useLocalization() === "EN";
 
   if (loading || !hasFetched) {

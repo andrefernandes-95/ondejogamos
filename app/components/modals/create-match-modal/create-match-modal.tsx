@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 interface Props {
   selectedArea: string;
@@ -30,6 +31,7 @@ interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   existingMatch?: FullMatch;
   onAddPitch?: () => void;
+  onSaved?: () => void;
   selectedPitch?: string;
 }
 
@@ -42,7 +44,9 @@ export default function CreateMatchModal({
   selectedPitch,
   existingMatch,
   onAddPitch,
+  onSaved,
 }: Props) {
+  const router = useRouter();
   const isEn = useLocalization() === "EN";
   const tErrors = useTranslations("ApiErrors");
 
@@ -114,7 +118,8 @@ export default function CreateMatchModal({
 
       reset();
       setOpen(false);
-      window.location.reload();
+      onSaved?.();
+      router.refresh();
     } catch {
       setError("root.server", {
         message: tErrors("INTERNAL_ERROR"),

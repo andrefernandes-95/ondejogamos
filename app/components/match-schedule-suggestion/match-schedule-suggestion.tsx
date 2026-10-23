@@ -8,11 +8,12 @@ import Image from "next/image";
 
 interface Props {
   area: string;
+  onMatchSaved: () => void;
 }
 
 const MAX_SUGGESTIONS = 4;
 
-export default function MatchScheduleSuggestion({ area }: Props) {
+export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
   const isEn = useLocalization() === "EN";
 
   const pitches = useSuggestPitches(area, MAX_SUGGESTIONS);
@@ -84,14 +85,24 @@ export default function MatchScheduleSuggestion({ area }: Props) {
         }}
       >
         {suggestions.map((pitch) => (
-          <MatchScheduleSuggestionItem pitch={pitch} key={pitch.id} />
+          <MatchScheduleSuggestionItem
+            pitch={pitch}
+            key={pitch.id}
+            onMatchSaved={onMatchSaved}
+          />
         ))}
       </Box>
     </Card>
   );
 }
 
-const MatchScheduleSuggestionItem = ({ pitch }: { pitch: Pitch }) => {
+const MatchScheduleSuggestionItem = ({
+  pitch,
+  onMatchSaved,
+}: {
+  pitch: Pitch;
+  onMatchSaved: () => void;
+}) => {
   return (
     <Card
       sx={{
@@ -142,6 +153,7 @@ const MatchScheduleSuggestionItem = ({ pitch }: { pitch: Pitch }) => {
             selectedArea={pitch.area}
             onAddPitch={() => {}}
             selectedPitch={pitch.id.toString()}
+            onMatchSaved={onMatchSaved}
           />
         </Stack>
       </Stack>

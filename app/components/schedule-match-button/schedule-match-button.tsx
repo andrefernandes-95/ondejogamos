@@ -6,16 +6,18 @@ import CreateMatchModal from "@/app/components/modals/create-match-modal/create-
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 import useLocalization from "@/app/hooks/locale";
-import { CallMade, OpenInFull } from "@mui/icons-material";
+import { CallMade } from "@mui/icons-material";
 
 export default function ScheduleMatchButton({
   selectedArea,
   selectedPitch,
   onAddPitch,
+  onMatchSaved,
   isSmall = false,
 }: {
   selectedArea: string;
   onAddPitch: () => void;
+  onMatchSaved?: () => void;
   isSmall?: boolean;
   selectedPitch?: string;
 }) {
@@ -55,6 +57,7 @@ export default function ScheduleMatchButton({
             setOpen={setIsCreatingGame}
             onAddPitch={onAddPitch}
             selectedPitch={selectedPitch}
+            onSaved={onMatchSaved}
           />
         </RequireAuthModal>
       )}
