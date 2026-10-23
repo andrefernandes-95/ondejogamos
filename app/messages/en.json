@@ -11,5 +11,15 @@
     "join": "Join",
     "schedule": "Schedule match",
     "missingPlayers": "{count} players needed"
+  },
+  "ApiErrors": {
+    "AUTHENTICATION_REQUIRED": "Sign in to continue.",
+    "INVALID_FORM": "The submitted form is invalid. Check the details and try again.",
+    "INVALID_MATCH_DATA": "Check the match details and try again.",
+    "MATCH_CREATE_FAILED": "Could not schedule the match. Try again.",
+    "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
+    "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
+    "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
+    "INTERNAL_ERROR": "Something went wrong. Try again."
   }
 }

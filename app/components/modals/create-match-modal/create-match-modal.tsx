@@ -7,6 +7,7 @@ import useLocalization from "@/app/hooks/locale";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
+import { readApiErrorCode } from "@/app/utils/api-error";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -16,11 +17,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Alert,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 interface Props {
   selectedArea: string;
@@ -42,8 +45,9 @@ export default function CreateMatchModal({
   onAddPitch,
 }: Props) {
   const isEn = useLocalization() === "EN";
+  const tErrors = useTranslations("ApiErrors");
 
-  const { control, handleSubmit, setError, reset, setValue, watch } =
+  const { control, handleSubmit, setError, reset, setValue, watch, formState: { errors, isSubmitting } } =
     useForm<CreateMatchFormValues>({
       resolver: zodResolver(createMatchSchema),
       defaultValues: {
@@ -95,10 +99,11 @@ export default function CreateMatchModal({
       });
 
       if (!response.ok) {
+        const payload: unknown = await response.json().catch(() => null);
+        const code = readApiErrorCode(payload);
+
         setError("root.server", {
-          message: isEn
-            ? "Could not schedule game"
-            : "Não foi possível agendar o jogo ",
+          message: tErrors(code),
         });
         return;
       }
@@ -108,9 +113,7 @@ export default function CreateMatchModal({
       window.location.reload();
     } catch {
       setError("root.server", {
-        message: isEn
-          ? "Could not schedule game"
-          : "Não foi possível agendar o jogo ",
+        message: tErrors("INTERNAL_ERROR"),
       });
     }
   };
@@ -223,6 +226,9 @@ export default function CreateMatchModal({
       <DialogContent>
         <Box component="form" id={formId} onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2} sx={{ py: 2, gap: 2 }}>
+            {errors.root?.server?.message && (
+              <Alert severity="error" role="alert">{errors.root.server.message}</Alert>
+            )}
             {pitches.length <= 0 && (
               <Typography>
                 {isEn
@@ -238,7 +244,7 @@ export default function CreateMatchModal({
         <Button onClick={handleClose}>{isEn ? "Cancel" : "Cancelar"}</Button>
 
         {pitches.length > 0 ? (
-          <Button type="submit" form={formId} variant="contained">
+          <Button type="submit" form={formId} variant="contained" disabled={isSubmitting}>
             {existingMatch
               ? isEn
                 ? "Save changes"

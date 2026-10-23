@@ -129,9 +129,10 @@ export default function AuthForm({ mode }: Props) {
         if (result.error) {
           setError("root.server", {
             message:
-              result.error.message || isEn
+              result.error.message ||
+              (isEn
                 ? "Could not create account"
-                : "Não foi possível criar a conta",
+                : "Não foi possível criar a conta"),
           });
           return;
         }

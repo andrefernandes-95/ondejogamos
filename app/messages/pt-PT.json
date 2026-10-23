@@ -11,5 +11,15 @@
     "join": "Participar",
     "schedule": "Agendar jogo",
     "missingPlayers": "Faltam {count} jogadores"
+  },
+  "ApiErrors": {
+    "AUTHENTICATION_REQUIRED": "Inicia sessão para continuar.",
+    "INVALID_FORM": "O formulário enviado é inválido. Verifica os dados e tenta novamente.",
+    "INVALID_MATCH_DATA": "Verifica os dados do jogo e tenta novamente.",
+    "MATCH_CREATE_FAILED": "Não foi possível agendar o jogo. Tenta novamente.",
+    "MATCH_UPDATE_FAILED": "Não foi possível atualizar o jogo. Tenta novamente.",
+    "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
+    "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
+    "INTERNAL_ERROR": "Ocorreu um erro. Tenta novamente."
   }
 }
