@@ -1,7 +1,6 @@
 "use client";
 
 import CreateMatchFields from "@/app/components/modals/create-match-modal/create-match-fields";
-import useLocalization from "@/app/hooks/locale";
 import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
@@ -46,8 +45,8 @@ export default function CreateMatchModal({
   onAddPitch,
   onSaved,
 }: Props) {
+  const tApp = useTranslations();
   const router = useRouter();
-  const isEn = useLocalization() === "EN";
   const tErrors = useTranslations("ApiErrors");
 
   const {
@@ -82,19 +81,12 @@ export default function CreateMatchModal({
     retry,
   } = useListPitchesForArea(selectedArea);
 
-  const actionLabels = isEn
-    ? {
-        cancel: "Cancel",
-        addPitch: "Add Pitch",
-        save: "Save changes",
-        schedule: "Schedule match",
-      }
-    : {
-        cancel: "Cancelar",
-        addPitch: "Adicionar Campo",
-        save: "Guardar alterações",
-        schedule: "Agendar Jogo",
-      };
+  const actionLabels = {
+    cancel: tApp("App.CreateMatchModal.cancel"),
+    addPitch: tApp("App.CreatePitchModal.add_pitch"),
+    save: tApp("App.CreateMatchModal.save_changes"),
+    schedule: tApp("Match.schedule"),
+  };
 
   const isPitchListEmpty = !pitchesLoading && !pitchesError && pitches.length === 0;
   const canSubmit = !pitchesLoading && !pitchesError && pitches.length > 0;
@@ -141,9 +133,7 @@ export default function CreateMatchModal({
       >
         <PlaceIcon />
         <Typography variant="h5">
-          {isEn
-            ? `Schedule match in ${selectedArea}`
-            : `Agendar jogo em ${selectedArea}`}
+          {tApp("App.CreateMatchModal.title", { area: selectedArea })}
         </Typography>
       </DialogTitle>
 
@@ -161,7 +151,7 @@ export default function CreateMatchModal({
               >
                 <CircularProgress size={20} />
                 <Typography>
-                  {isEn ? "Loading pitches…" : "A carregar campos…"}
+                  {tApp("App.CreateMatchModal.loading_pitches")}
                 </Typography>
               </Stack>
             )}
@@ -170,20 +160,16 @@ export default function CreateMatchModal({
                 severity="error"
                 action={
                   <Button color="inherit" size="small" onClick={retry}>
-                    {isEn ? "Retry" : "Tentar novamente"}
+                    {tApp("App.CreateMatchModal.retry")}
                   </Button>
                 }
               >
-                {isEn
-                  ? "Could not load pitches. Try again."
-                  : "Não foi possível carregar os campos. Tenta novamente."}
+                {tApp("App.CreateMatchModal.could_not_load_pitches_try_again")}
               </Alert>
             )}
             {isPitchListEmpty && (
               <Typography>
-                {isEn
-                  ? `Could not find pitches in ${selectedArea}.`
-                  : `Parece que ainda não existem campos em ${selectedArea}.`}
+                {tApp("App.CreateMatchModal.no_pitches", { area: selectedArea })}
               </Typography>
             )}
             {!pitchesLoading && !pitchesError && pitches.length > 0 && (

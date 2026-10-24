@@ -2,9 +2,7 @@
 
 import MunicipalitySelector from "@/app/components/municipality-selector/municipality-selector";
 import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
-import useLocalization from "@/app/hooks/locale";
 import { Pitch } from "@/app/services/pitches";
-import { REQUIRED_FIELD } from "@/app/utils/constants";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_IMAGE_SIZE,
@@ -28,6 +26,7 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
+import { useTranslations } from "next-intl";
 
 interface Props {
   selectedArea: string;
@@ -39,20 +38,29 @@ interface Props {
 
 const formId = "create-pitch-form";
 
-const getSchema = (isEn: boolean) =>
+const getSchema = (messages: {
+  requiredName: string;
+  requiredArea: string;
+  requiredMunicipality: string;
+  invalidMapsUrl: string;
+  choosePhoto: string;
+  emptyFile: string;
+  maxFileSize: (size: number) => string;
+  imageType: string;
+}) =>
   z.object({
     name: z
       .string()
       .trim()
-      .min(1, isEn ? REQUIRED_FIELD : "Nome do campo obrigatório"),
+      .min(1, messages.requiredName),
     area: z
       .string()
       .trim()
-      .min(1, isEn ? REQUIRED_FIELD : "Área obrigatória"),
+      .min(1, messages.requiredArea),
     municipality: z
       .string()
       .trim()
-      .min(1, isEn ? REQUIRED_FIELD : "Município obrigatório"),
+      .min(1, messages.requiredMunicipality),
     image_url: z.string().trim().nullable().optional(),
     maps_url: z
       .string()
@@ -67,21 +75,19 @@ const getSchema = (isEn: boolean) =>
         } catch {
           return false;
         }
-      }, "URL do mapa inválido"),
+      }, messages.invalidMapsUrl),
     photo: z
       .instanceof(File, {
-        message: isEn ? "Choose a photo" : "Escolhe uma fotografia",
+        message: messages.choosePhoto,
       })
-      .refine((file) => file.size > 0, isEn ? "Empty file" : "Ficheiro vazio")
+      .refine((file) => file.size > 0, messages.emptyFile)
       .refine(
         (file) => file.size <= MAX_IMAGE_SIZE,
-        isEn
-          ? `Maximum ${MAX_IMAGE_SIZE_IN_MB} MB`
-          : `Máximo de ${MAX_IMAGE_SIZE_IN_MB} MB`,
+        messages.maxFileSize(MAX_IMAGE_SIZE_IN_MB),
       )
       .refine(
         (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
-        isEn ? "Use JPEG or PNG" : "Usa JPEG ou PNG",
+        messages.imageType,
       )
       .nullable(),
   });
@@ -93,13 +99,11 @@ export default function CreatePitchModal({
   setOpen,
   selectedArea,
   existingPitch,
-  onUpdatePitch,
 }: Props) {
+  const tApp = useTranslations();
   const [municipalitiesForArea, setMunicipalitiesForArea] = useState<string[]>(
     [],
   );
-
-  const isEn = useLocalization() === "EN";
 
   const {
     control,
@@ -108,7 +112,18 @@ export default function CreatePitchModal({
     reset,
     formState: { isSubmitting, errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(getSchema(isEn)),
+    resolver: zodResolver(
+      getSchema({
+        requiredName: tApp("App.CreatePitchModal.required_name"),
+        requiredArea: tApp("App.CreatePitchModal.required_area"),
+        requiredMunicipality: tApp("App.CreatePitchModal.required_municipality"),
+        invalidMapsUrl: tApp("App.CreatePitchModal.invalid_maps_url"),
+        choosePhoto: tApp("App.CreatePitchModal.choose_a_photo"),
+        emptyFile: tApp("App.CreatePitchModal.empty_file"),
+        maxFileSize: (size) => tApp("App.CreatePitchModal.maximum_file_size", { size }),
+        imageType: tApp("App.CreatePitchModal.use_jpeg_or_png"),
+      }),
+    ),
     defaultValues: {
       name: existingPitch ? existingPitch.name : "",
       area: existingPitch ? existingPitch.area : selectedArea,
@@ -127,9 +142,7 @@ export default function CreatePitchModal({
 
       if (!response.ok) {
         throw new Error(
-          isEn
-            ? "Failed to load municipalities"
-            : "Falha ao carregar municípios",
+          tApp("App.CreatePitchModal.failed_to_load_municipalities"),
         );
       }
 
@@ -141,6 +154,7 @@ export default function CreatePitchModal({
   }, [
     // Run every time the area changes
     selectedArea,
+    tApp,
   ]);
 
   const handleClose = () => {
@@ -174,9 +188,7 @@ export default function CreatePitchModal({
 
       if (!response.ok) {
         setError("root.server", {
-          message: isEn
-            ? "Could not save pitch"
-            : "Não foi possível guardar o campo",
+          message: tApp("App.CreatePitchModal.could_not_save_pitch"),
         });
         return;
       }
@@ -186,9 +198,7 @@ export default function CreatePitchModal({
       window.location.reload();
     } catch {
       setError("root.server", {
-        message: isEn
-          ? "Could not save pitch"
-          : "Não foi possível guardar o campo",
+        message: tApp("App.CreatePitchModal.could_not_save_pitch"),
       });
     }
   };
@@ -203,15 +213,13 @@ export default function CreatePitchModal({
       >
         <PlaceIcon />
         <Typography variant="h5">
-          {isEn ? "Add Pitch" : "Adicionar Campo"}
+          {tApp("App.CreatePitchModal.add_pitch")}
         </Typography>
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText>
-          {isEn
-            ? `Add a new pitch to ${selectedArea}`
-            : `Adiciona um novo campo a ${selectedArea}`}
+          {tApp("App.CreatePitchModal.description", { area: selectedArea })}
         </DialogContentText>
 
         <Box
@@ -229,7 +237,7 @@ export default function CreatePitchModal({
                 <TextField
                   {...field}
                   inputRef={field.ref}
-                  label={isEn ? "Pitch Name" : "Nome do campo"}
+                  label={tApp("App.CreatePitchModal.pitch_name")}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -271,7 +279,7 @@ export default function CreatePitchModal({
                   {...field}
                   type="url"
                   inputRef={field.ref}
-                  label={isEn ? "Google Maps URL" : "URL do Google Maps"}
+                  label={tApp("App.CreatePitchModal.google_maps_url")}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 />
@@ -282,7 +290,7 @@ export default function CreatePitchModal({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          {isEn ? "Cancel" : "Cancelar"}
+          {tApp("App.CreatePitchModal.cancel")}
         </Button>
 
         <Button
@@ -292,12 +300,8 @@ export default function CreatePitchModal({
           disabled={isSubmitting}
         >
           {existingPitch
-            ? isEn
-              ? "Save Changes"
-              : "Guardar Alterações"
-            : isEn
-              ? "Add"
-              : "Adicionar"}
+            ? tApp("App.CreatePitchModal.save_changes")
+            : tApp("App.CreatePitchModal.add")}
         </Button>
       </DialogActions>
     </Dialog>

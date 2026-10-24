@@ -14,8 +14,8 @@ import {
 } from "@mui/material";
 import { DatePicker, TimeGrid } from "@mantine/dates";
 import { Match } from "@/app/models/match";
-import useLocalization from "@/app/hooks/locale";
 import { matchTimeRangesOverlap } from "@/app/utils/match-time";
+import { useTranslations } from "next-intl";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -60,7 +60,7 @@ export default function MatchDatePicker({
   current_match_pitch_id,
   current_match_duration_in_minutes,
 }: Props) {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
   const id = useId();
 
   const [loading, setLoading] = useState(false);
@@ -199,7 +199,7 @@ export default function MatchDatePicker({
         }}
       >
         <Stack spacing={1}>
-          <Typography>{isEn ? "Match Day" : "Dia do Jogo"}</Typography>
+          <Typography>{tApp("App.MatchDatePicker.match_day")}</Typography>
 
           <DatePicker
             value={day}
@@ -212,7 +212,7 @@ export default function MatchDatePicker({
         </Stack>
         <Stack spacing={1}>
           <Typography id={`${id}-time-label`}>
-            {isEn ? "Start Time" : "Hora de Início"}
+            {tApp("App.MatchDatePicker.start_time")}
           </Typography>
 
           <Box
@@ -246,12 +246,8 @@ export default function MatchDatePicker({
             onClick={() => setShowAllTimes((current) => !current)}
           >
             {showAllTimes
-              ? isEn
-                ? "See common times"
-                : "Ver horas habituais"
-              : isEn
-                ? "See all times"
-                : "Ver todas as horas"}
+              ? tApp("App.MatchDatePicker.see_common_times")
+              : tApp("App.MatchDatePicker.see_all_times")}
           </Button>
         </Stack>
       </Box>

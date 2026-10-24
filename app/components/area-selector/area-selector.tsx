@@ -1,8 +1,8 @@
 "use client";
 
-import useLocalization from "@/app/hooks/locale";
 import { LocationWithGameCount } from "@/app/services/locations";
 import { Close } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 import {
   Button,
   FormControl,
@@ -24,6 +24,7 @@ export default function AreaSelector({
   selectedArea,
   handleSelectedArea,
 }: Props) {
+  const tApp = useTranslations();
   const preparedData: Record<string, number> = {};
 
   data.forEach((entry) => {
@@ -31,17 +32,15 @@ export default function AreaSelector({
       (preparedData[entry.area] ?? 0) + entry.game_count;
   });
 
-  const isEn = useLocalization() === "EN";
-
   return (
     <Stack sx={{ flexDirection: "row", flexGrow: 1 }}>
       <FormControl fullWidth>
-        <InputLabel id="select-area">{isEn ? "Area" : "Área"}</InputLabel>
+        <InputLabel id="select-area">{tApp("App.AreaSelector.area")}</InputLabel>
         <Select
           labelId="select-area"
           id="select-area"
           value={selectedArea}
-          label={isEn ? "Area" : "Área"}
+          label={tApp("App.AreaSelector.area")}
           renderValue={(value) => value}
           onChange={({ target: { value } }) => handleSelectedArea(value)}
         >
@@ -55,14 +54,10 @@ export default function AreaSelector({
 
               <Typography color="primary">
                 {entry[1] === 1
-                  ? isEn
-                    ? `1 game scheduled`
-                    : `1 jogo agendado`
+                  ? tApp("App.AreaSelector.1_game_scheduled")
                   : ""}
                 {entry[1] > 1
-                  ? isEn
-                    ? `${entry[1]} games scheduled`
-                    : `${entry[1]} jogos agendados`
+                  ? tApp("App.AreaSelector.games_scheduled", { count: entry[1] })
                   : ""}
               </Typography>
             </MenuItem>

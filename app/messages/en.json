@@ -22,5 +22,227 @@
     "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
     "MATCH_TIME_CONFLICT": "There is already a match at this pitch during that time. Choose another time.",
     "INTERNAL_ERROR": "Something went wrong. Try again."
+  },
+  "App": {
+    "Footer": {
+      "home": "Home",
+      "player_list": "Player List",
+      "pitches_list": "Pitches List"
+    },
+    "PitchUrlButton": {
+      "open_in_google_maps": "Open in Google Maps"
+    },
+    "ParticipateButton": {
+      "join": "Join"
+    },
+    "CreatePitchButton": {
+      "select_an_area_first": "Select an area first",
+      "edit_pitch": "Edit Pitch",
+      "add_pitch": "Add Pitch"
+    },
+    "AreaSelector": {
+      "area": "Area",
+      "1_game_scheduled": "1 game scheduled",
+      "games_scheduled": "{count} games scheduled"
+    },
+    "DeleteMatchButton": {
+      "could_not_cancel_game": "Could not cancel game",
+      "an_error_occurred": "An error occurred",
+      "are_you_sure_you_want_to_cancel_this_match": "Are you sure you want to cancel this match?",
+      "this_action_is_irreversible": "This action is irreversible",
+      "cancel": "Cancel",
+      "cancel_match": "Cancel Match"
+    },
+    "MatchCard": {
+      "match_is_full_you_can_still_participate": "Match is full. You can still participate!",
+      "scheduled_by_you": "Scheduled by you",
+      "cancel_participation": "Cancel Participation",
+      "open_match_details": "Open match details",
+      "see_details": "See Details",
+      "spots_available": "{count} spots available!"
+    },
+    "UploadImageInput": {
+      "upload_image": "Upload image"
+    },
+    "NoMatchesFound": {
+      "no_matches_scheduled_be_the_first": "No matches scheduled. Be the first!",
+      "no_matches_scheduled_in_area": "No matches scheduled in {area}. Be the first!"
+    },
+    "AuthForm": {
+      "max_100_characters": "Max 100 characters",
+      "invalid_email": "Invalid email",
+      "invalid_password": "Invalid password",
+      "max_128_characters": "Max 128 characters",
+      "insert_a_name": "Insert a name",
+      "passwords_do_not_match": "Passwords do not match",
+      "could_not_create_account": "Could not create account",
+      "confirm_your_e_mail": "Confirm your e-mail",
+      "too_many_attempts_try_again_later": "Too many attempts. Try again later.",
+      "could_not_sign_in_please_try_again": "Could not sign in. Please try again.",
+      "something_went_wrong": "Something went wrong!",
+      "sign_up": "Sign Up",
+      "sign_in": "Sign In",
+      "create_an_account_to_organize_and_participate_in_games": "Create an account to organize and participate in games",
+      "sign_in_to_your_account": "Sign in to your account",
+      "name": "Name",
+      "hide_password": "Hide password",
+      "show_password": "Show password",
+      "confirm_password": "Confirm password",
+      "create_account": "Create account",
+      "already_have_an_account": "Already have an account? ",
+      "no_account_yet": "No account yet? ",
+      "minimum_password_length": "Use at least {count} characters",
+      "email": "Email",
+      "password": "Password"
+    },
+    "MatchList": {
+      "upcoming_matches": "Upcoming matches",
+      "join_a_scheduled_or_on_going_matches": "Join a scheduled or on-going matches",
+      "upcoming_matches_in_area": "Upcoming matches in {area}"
+    },
+    "MatchShareButtons": {
+      "share_this_match": "Share this match:",
+      "lets_play": "Lets play!",
+      "share_on_whatsapp": "Share on Whatsapp"
+    },
+    "Logo": {
+      "a_community_to_play_casual_football": "A community to play casual football"
+    },
+    "EditMatch": {
+      "edit_details": "Edit Details"
+    },
+    "PitchList": {
+      "pitch_list": "Pitch List",
+      "image": "Image",
+      "name": "Name",
+      "municipality": "Municipality",
+      "area": "Area",
+      "date_added": "Date Added",
+      "added_by": "Added By",
+      "games_scheduled": "Games Scheduled",
+      "actions": "Actions"
+    },
+    "ScheduleMatchButton": {
+      "select_an_area_first": "Select an area first",
+      "schedule_game": "Schedule Game"
+    },
+    "MunicipalitySelector": {
+      "municipality": "Municipality"
+    },
+    "PlayerList": {
+      "player_list": "Player List",
+      "name": "Name",
+      "joined_at": "Joined At",
+      "games_scheduled": "Games Scheduled"
+    },
+    "DeletePitchButton": {
+      "could_not_remove_pitch": "Could not remove pitch",
+      "an_error_occurred": "An error occurred",
+      "are_you_sure_you_want_to_remove_this_pitch": "Are you sure you want to remove this pitch?",
+      "this_action_is_irreversible": "This action is irreversible",
+      "cancel": "Cancel",
+      "remove_pitch": "Remove Pitch"
+    },
+    "MatchFormatInput": {
+      "match_format": "Match Format"
+    },
+    "MatchScheduleSuggestion": {
+      "schedule_a_match": "Schedule a match ",
+      "choose_a_pitch_to_start": "Choose a pitch to start",
+      "schedule_a_match_in_area": "Schedule a match in {area}"
+    },
+    "MatchDatePicker": {
+      "match_day": "Match Day",
+      "start_time": "Start Time",
+      "see_common_times": "See common times",
+      "see_all_times": "See all times"
+    },
+    "PitchSelector": {
+      "select_pitch": "Select pitch",
+      "search_for_a_pitch_or_a_place": "Search for a pitch or a place",
+      "no_results": "No results"
+    },
+    "MatchDetailsPage": {
+      "could_not_join_game": "Could not join game",
+      "go_back": "Go back",
+      "place": "Place",
+      "open_in_google_maps": "Open in Google Maps",
+      "organized_by": "Organized by",
+      "match_format": "Match Format",
+      "duration": "Duration",
+      "minutes": "Minutes",
+      "enough_players_you_can_still_join": "Enough players. You can still join!",
+      "scheduled_by_you": "Scheduled by you",
+      "cancel_participation": "Cancel Participation",
+      "player_list": "Player List",
+      "spots_available": "{count} spots available"
+    },
+    "Matches": {
+      "error": "Something went wrong"
+    },
+    "HomeClient": {
+      "description": "Want to play casual football? In <strong>Onde Jogamos</strong> you can find matches, join other players and organize games in your area."
+    },
+    "AuthNavbar": {
+      "error": "An error occurred",
+      "greeting": "Hi",
+      "profile": "Profile",
+      "exit": "Exit",
+      "login": "Login",
+      "create_account": "Create Account"
+    },
+    "CreatePitchModal": {
+      "required_name": "Pitch name is required",
+      "required_area": "Area is required",
+      "required_municipality": "Municipality is required",
+      "invalid_maps_url": "Invalid map URL",
+      "maximum_file_size": "Maximum {size} MB",
+      "description": "Add a new pitch to {area}",
+      "choose_a_photo": "Choose a photo",
+      "empty_file": "Empty file",
+      "use_jpeg_or_png": "Use JPEG or PNG",
+      "failed_to_load_municipalities": "Failed to load municipalities",
+      "could_not_save_pitch": "Could not save pitch",
+      "add_pitch": "Add Pitch",
+      "pitch_name": "Pitch Name",
+      "google_maps_url": "Google Maps URL",
+      "cancel": "Cancel",
+      "save_changes": "Save Changes",
+      "add": "Add"
+    },
+    "CreateMatchModal": {
+      "title": "Schedule match in {area}",
+      "no_pitches": "Could not find pitches in {area}.",
+      "cancel": "Cancel",
+      "save_changes": "Save Changes",
+      "loading_pitches": "Loading pitches…",
+      "retry": "Retry",
+      "could_not_load_pitches_try_again": "Could not load pitches. Try again.",
+      "duration_minutes": "Duration (Minutes)",
+      "observations": "Observations"
+    },
+    "PageTitle": {
+      "back": "Go back"
+    },
+    "LanguageSettings": {
+      "portuguese": "Português",
+      "english": "English"
+    },
+    "PlayerProfile": {
+      "name": "Joel",
+      "photo_alt": "Player photo",
+      "position": "Forward",
+      "matches": "Games",
+      "goals": "Goals",
+      "assists": "Assists",
+      "preferred_area": "Preferred area"
+    },
+    "RequireAuthModal": {
+      "account_required": "Account required",
+      "an_account_is_required_to_proceed": "An account is required to proceed",
+      "cancel": "Cancel",
+      "login": "Login",
+      "create_account": "Create account"
+    }
   }
 }

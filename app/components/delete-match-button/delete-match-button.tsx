@@ -1,4 +1,3 @@
-import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import { Cancel } from "@mui/icons-material";
@@ -14,18 +13,18 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   match: FullMatch;
 }
 
 export default function DeleteMatch({ match }: Props) {
+  const tApp = useTranslations();
   const [confirm, setConfirm] = useState(false);
   const [serverError, setServerError] = useState("");
 
   const router = useRouter();
-
-  const isEn = useLocalization() === "EN";
 
   const deleteMatch = async () => {
     setServerError("");
@@ -41,7 +40,7 @@ export default function DeleteMatch({ match }: Props) {
 
       if (!response.ok) {
         setServerError(
-          isEn ? "Could not cancel game" : "Não foi possível cancelar o jogo",
+          tApp("App.DeleteMatchButton.could_not_cancel_game"),
         );
         return;
       }
@@ -49,7 +48,7 @@ export default function DeleteMatch({ match }: Props) {
       router.replace(AppRoutes.HOME);
       router.refresh();
     } catch {
-      setServerError(isEn ? "An error occurred" : `Ocorreu um erro`);
+      setServerError(tApp("App.DeleteMatchButton.an_error_occurred"));
     }
   };
 
@@ -66,9 +65,7 @@ export default function DeleteMatch({ match }: Props) {
           }}
         >
           <Typography variant="h5">
-            {isEn
-              ? "Are you sure you want to cancel this match?"
-              : "Desejas cancelar o jogo?"}
+            {tApp("App.DeleteMatchButton.are_you_sure_you_want_to_cancel_this_match")}
           </Typography>
         </DialogTitle>
 
@@ -78,9 +75,7 @@ export default function DeleteMatch({ match }: Props) {
               <Alert severity="error">{serverError}</Alert>
             ) : (
               <Typography>
-                {isEn
-                  ? "This action is irreversible"
-                  : "Esta acção é irreversível"}
+                {tApp("App.DeleteMatchButton.this_action_is_irreversible")}
               </Typography>
             )}
           </Stack>
@@ -100,7 +95,7 @@ export default function DeleteMatch({ match }: Props) {
           }}
         >
           <Button color="error" onClick={() => setConfirm(false)}>
-            {isEn ? "Cancel" : "Cancelar"}
+            {tApp("App.DeleteMatchButton.cancel")}
           </Button>
           <Stack
             sx={{
@@ -115,7 +110,7 @@ export default function DeleteMatch({ match }: Props) {
             }}
           >
             <Button color="error" onClick={deleteMatch} variant="contained">
-              {isEn ? "Cancel Match" : "Cancelar Jogo"}
+              {tApp("App.DeleteMatchButton.cancel_match")}
             </Button>
           </Stack>
         </DialogActions>
@@ -131,7 +126,7 @@ export default function DeleteMatch({ match }: Props) {
       >
         <Cancel />
         <Typography variant="body1">
-          {isEn ? "Cancel Match" : "Cancelar Jogo"}
+          {tApp("App.DeleteMatchButton.cancel_match")}
         </Typography>
       </Button>
     </>

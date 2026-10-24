@@ -1,9 +1,9 @@
 "use client";
 
-import useLocalization from "@/app/hooks/locale";
 import { Pitch } from "@/app/services/pitches";
 import { Autocomplete, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface Props {
   selectedPitch: string;
@@ -45,13 +45,12 @@ export default function PitchSelector({
   handleSelectedPitch,
   errorMessage,
 }: Props) {
+  const tApp = useTranslations();
   const options = [
     ...new Map(data.map((pitch) => [String(pitch.id), pitch])).values(),
   ];
 
   const value = options.find((pitch) => String(pitch.id) === selectedPitch);
-
-  const isEn = useLocalization() === "EN";
 
   return (
     <Stack sx={{ flexDirection: "column" }}>
@@ -88,15 +87,13 @@ export default function PitchSelector({
         renderInput={(params) => (
           <TextField
             {...params}
-            label={isEn ? "Select pitch" : "Selecionar campo"}
+            label={tApp("App.PitchSelector.select_pitch")}
             placeholder={
-              isEn
-                ? "Search for a pitch or a place"
-                : "Pesquisar por campo ou localização"
+              tApp("App.PitchSelector.search_for_a_pitch_or_a_place")
             }
           />
         )}
-        noOptionsText={isEn ? "No results" : "Sem resultados"}
+        noOptionsText={tApp("App.PitchSelector.no_results")}
         renderValue={(value) => value && <PitchOption pitch={value} />}
       />
       {errorMessage && <Typography color="error">{errorMessage}</Typography>}

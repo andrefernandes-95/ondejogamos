@@ -1,14 +1,13 @@
-import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function useListMatchesForArea(area: string) {
+  const tApp = useTranslations();
   const [matches, setMatches] = useState<FullMatch[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const isEn = useLocalization() === "EN";
 
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     setHasFetched(true);
@@ -38,14 +37,14 @@ export function useListMatchesForArea(area: string) {
       if (typeof e === "string") {
         setError(e);
       } else {
-        setError(isEn ? "Something went wrong" : "Ocorreu um erro");
+        setError(tApp("App.Matches.error"));
       }
     } finally {
       if (!signal?.aborted) {
         setLoading(false);
       }
     }
-  }, [area, isEn]);
+  }, [area, tApp]);
 
   useEffect(() => {
     const controller = new AbortController();

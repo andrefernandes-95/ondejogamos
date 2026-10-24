@@ -7,10 +7,10 @@ import { useState } from "react";
 import { Background } from "@/app/components/background/background";
 import MatchList from "@/app/components/match-list/match-list";
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
-import useLocalization from "@/app/hooks/locale";
 import MatchScheduleSuggestion from "@/app/components/match-schedule-suggestion/match-schedule-suggestion";
 import CreatePitchButton from "@/app/components/create-pitch-button/create-pitch-button";
 import { useListMatchesForArea } from "@/app/hooks/matches";
+import { useTranslations } from "next-intl";
 
 interface Props {
   data: LocationWithGameCount[];
@@ -18,12 +18,11 @@ interface Props {
 }
 
 export default function HomeClient({ data, initialArea }: Props) {
+  const tApp = useTranslations();
   const [selectedArea, setSelectedArea] = useState<string>(initialArea);
   const [isCreatingPitch, setIsCreatingPitch] = useState<boolean>(false);
   const { matches, refresh, error, loading, hasFetched } =
     useListMatchesForArea(selectedArea);
-
-  const isEn = useLocalization() === "EN";
 
   const handleSelectedArea = (selected: string) => {
     setSelectedArea(selected);
@@ -33,20 +32,6 @@ export default function HomeClient({ data, initialArea }: Props) {
       `preferredArea=${encodeURIComponent(selected)}` +
       `; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
   };
-
-  const headerText = () =>
-    isEn ? (
-      <>
-        Want to play casual football? In <strong>Onde Jogamos</strong> you can
-        find matches, join other players and organize games in your area.
-      </>
-    ) : (
-      <>
-        Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes
-        encontrar jogos, juntar-te a outros jogadores e organizar partidas na
-        tua zona.
-      </>
-    );
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -60,7 +45,9 @@ export default function HomeClient({ data, initialArea }: Props) {
               paddingLeft: 2,
             })}
           >
-            {headerText()}
+            {tApp.rich("App.HomeClient.description", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </Typography>
         </Card>
         <Card sx={{ p: 4 }} variant="outlined">

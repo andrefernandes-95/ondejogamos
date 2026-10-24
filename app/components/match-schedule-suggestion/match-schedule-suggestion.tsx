@@ -1,10 +1,10 @@
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
-import useLocalization from "@/app/hooks/locale";
 import { useSuggestPitches } from "@/app/hooks/pitches";
 import { Pitch } from "@/app/services/pitches";
 import { CalendarToday, LocationOn } from "@mui/icons-material";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface Props {
   area: string;
@@ -14,7 +14,7 @@ interface Props {
 const MAX_SUGGESTIONS = 4;
 
 export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
 
   const pitches = useSuggestPitches(area, MAX_SUGGESTIONS);
 
@@ -59,17 +59,13 @@ export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
           />
           <Typography variant="h6">
             {area
-              ? isEn
-                ? `Schedule a match in ${area}`
-                : `Marca um jogo em ${area}`
-              : isEn
-                ? `Schedule a match `
-                : `Marca um jogo`}
+              ? tApp("App.MatchScheduleSuggestion.schedule_a_match_in_area", { area })
+              : tApp("App.MatchScheduleSuggestion.schedule_a_match")}
           </Typography>
         </Stack>
 
         <Typography variant="caption">
-          {isEn ? "Choose a pitch to start" : "Escolhe um campo para começar"}
+          {tApp("App.MatchScheduleSuggestion.choose_a_pitch_to_start")}
         </Typography>
       </Stack>
 

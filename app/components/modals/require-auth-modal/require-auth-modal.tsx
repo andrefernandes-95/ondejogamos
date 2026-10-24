@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalization from "@/app/hooks/locale";
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
 import { AccountCircle } from "@mui/icons-material";
@@ -15,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Props {
   open: boolean;
@@ -40,9 +40,8 @@ export function RequireAuthModalInner({
   open,
   setOpen,
 }: Pick<Props, "open" | "setOpen">) {
+  const tApp = useTranslations();
   const router = useRouter();
-
-  const isEn = useLocalization() === "EN";
 
   const handleClose = () => {
     setOpen(false);
@@ -73,16 +72,14 @@ export function RequireAuthModalInner({
       >
         <AccountCircle />
         <Typography variant="h5">
-          {isEn ? "Account required" : "Conta necessária"}
+          {tApp("App.RequireAuthModal.account_required")}
         </Typography>
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={2} sx={{ py: 2 }}>
           <Typography>
-            {isEn
-              ? "An account is required to proceed"
-              : "Precisas de uma conta para continuar"}
+            {tApp("App.RequireAuthModal.an_account_is_required_to_proceed")}
           </Typography>
         </Stack>
       </DialogContent>
@@ -100,7 +97,7 @@ export function RequireAuthModalInner({
           p: 2,
         }}
       >
-        <Button onClick={handleClose}>{isEn ? "Cancel" : "Cancelar"}</Button>
+        <Button onClick={handleClose}>{tApp("App.RequireAuthModal.cancel")}</Button>
         <Stack
           sx={{
             flexDirection: {
@@ -114,10 +111,10 @@ export function RequireAuthModalInner({
           }}
         >
           <Button onClick={goToSignIn} variant="contained">
-            {isEn ? "Login" : "Iniciar Sessão"}
+            {tApp("App.RequireAuthModal.login")}
           </Button>
           <Button onClick={goToSignUp} variant="contained">
-            {isEn ? "Create account" : "Criar Conta"}
+            {tApp("App.RequireAuthModal.create_account")}
           </Button>
         </Stack>
       </DialogActions>

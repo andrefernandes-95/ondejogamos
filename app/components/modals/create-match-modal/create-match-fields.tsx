@@ -3,12 +3,12 @@
 import MatchDatePicker from "@/app/components/match-date-picker/match-date-picker";
 import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
-import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues } from "@/app/schemas/match";
 import { Pitch } from "@/app/services/pitches";
 import { Stack, TextField, Typography } from "@mui/material";
 import { Control, Controller, UseFormSetValue, useWatch } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 interface Props {
   control: Control<CreateMatchFormValues>;
@@ -23,7 +23,7 @@ export default function CreateMatchFields({
   pitches,
   existingMatch,
 }: Props) {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
   const pitchId = useWatch({ control, name: "pitchId" });
   const duration = useWatch({ control, name: "durationInMinutes" });
 
@@ -57,7 +57,7 @@ export default function CreateMatchFields({
           <TextField
             {...field}
             type="number"
-            label={isEn ? "Duration (Minutes)" : "Duração (Minutos)"}
+            label={tApp("App.CreateMatchModal.duration_minutes")}
             helperText={fieldState.error?.message}
             error={!!fieldState.error}
           />
@@ -90,7 +90,7 @@ export default function CreateMatchFields({
             {...field}
             multiline
             type="text"
-            label={isEn ? "Observations" : "Observações"}
+            label={tApp("App.CreateMatchModal.observations")}
             helperText={fieldState.error?.message}
             error={!!fieldState.error}
           />

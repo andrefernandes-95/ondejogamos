@@ -22,5 +22,227 @@
     "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
     "MATCH_TIME_CONFLICT": "Já existe um jogo nesse campo durante esse horário. Escolhe outra hora.",
     "INTERNAL_ERROR": "Ocorreu um erro. Tenta novamente."
+  },
+  "App": {
+    "Footer": {
+      "home": "Início",
+      "player_list": "Lista de Jogadores",
+      "pitches_list": "Lista de Campos"
+    },
+    "PitchUrlButton": {
+      "open_in_google_maps": "Abrir localização no Google Maps"
+    },
+    "ParticipateButton": {
+      "join": "Participar"
+    },
+    "CreatePitchButton": {
+      "select_an_area_first": "Seleciona uma área primeiro",
+      "edit_pitch": "Editar Campo",
+      "add_pitch": "Adicionar Campo"
+    },
+    "AreaSelector": {
+      "area": "Área",
+      "1_game_scheduled": "1 jogo agendado",
+      "games_scheduled": "{count} jogos agendados"
+    },
+    "DeleteMatchButton": {
+      "could_not_cancel_game": "Não foi possível cancelar o jogo",
+      "an_error_occurred": "Ocorreu um erro",
+      "are_you_sure_you_want_to_cancel_this_match": "Desejas cancelar o jogo?",
+      "this_action_is_irreversible": "Esta acção é irreversível",
+      "cancel": "Cancelar",
+      "cancel_match": "Cancelar Jogo"
+    },
+    "MatchCard": {
+      "match_is_full_you_can_still_participate": "Já há jogadores suficientes",
+      "scheduled_by_you": "Agendaste este jogo",
+      "cancel_participation": "Cancelar Participação",
+      "open_match_details": "Abrir detalhes da partida",
+      "see_details": "Ver detalhes",
+      "spots_available": "Ainda faltam {count} jogadores!"
+    },
+    "UploadImageInput": {
+      "upload_image": "Carregar imagem"
+    },
+    "NoMatchesFound": {
+      "no_matches_scheduled_be_the_first": "Ainda não há jogos agendados. Sê o(a) primeiro(a)!",
+      "no_matches_scheduled_in_area": "Ainda não há jogos agendados para {area}. Sê o(a) primeiro(a)!"
+    },
+    "AuthForm": {
+      "max_100_characters": "Máximo de 100 caracteres",
+      "invalid_email": "Introduz um e-mail válido",
+      "invalid_password": "Introduz uma password",
+      "max_128_characters": "Máximo de 128 caracteres",
+      "insert_a_name": "Introduz o teu nome",
+      "passwords_do_not_match": "As passwords não coincidem",
+      "could_not_create_account": "Não foi possível criar a conta",
+      "confirm_your_e_mail": "Confirma o teu e-mail antes de iniciar sessão.",
+      "too_many_attempts_try_again_later": "Demasiadas tentativas. Tenta novamente daqui a pouco.",
+      "could_not_sign_in_please_try_again": "Não foi possível entrar. Verifica os dados e tenta novamente.",
+      "something_went_wrong": "Não foi possível contactar o servidor. Tenta novamente.",
+      "sign_up": "Criar conta",
+      "sign_in": "Entrar",
+      "create_an_account_to_organize_and_participate_in_games": "Cria uma conta para organizar e participar em jogos",
+      "sign_in_to_your_account": "Entra na tua conta para continuar",
+      "name": "Nome",
+      "hide_password": "Ocultar password",
+      "show_password": "Mostrar password",
+      "confirm_password": "Confirmar password",
+      "create_account": "Criar conta",
+      "already_have_an_account": "Já tens conta? ",
+      "no_account_yet": "Ainda não tens conta? ",
+      "minimum_password_length": "Usa pelo menos {count} caracteres",
+      "email": "E-mail",
+      "password": "Password"
+    },
+    "MatchList": {
+      "upcoming_matches": "Próximos jogos",
+      "join_a_scheduled_or_on_going_matches": "Participa num jogo agendado ou a decorrer",
+      "upcoming_matches_in_area": "Próximos jogos em {area}"
+    },
+    "MatchShareButtons": {
+      "share_this_match": "Partilhar jogo:",
+      "lets_play": "Bora jogar? Espreita este jogo: ",
+      "share_on_whatsapp": "Partilhar no WhatsApp"
+    },
+    "Logo": {
+      "a_community_to_play_casual_football": "Uma comunidade para combinar futeboladas"
+    },
+    "EditMatch": {
+      "edit_details": "Editar Detalhes"
+    },
+    "PitchList": {
+      "pitch_list": "Campos Registados",
+      "image": "Imagem",
+      "name": "Nome",
+      "municipality": "Município",
+      "area": "Área",
+      "date_added": "Data de Registo",
+      "added_by": "Adicionado Por",
+      "games_scheduled": "Jogos Criados",
+      "actions": "Ações"
+    },
+    "ScheduleMatchButton": {
+      "select_an_area_first": "Seleciona uma área primeiro",
+      "schedule_game": "Agendar Jogo"
+    },
+    "MunicipalitySelector": {
+      "municipality": "Município"
+    },
+    "PlayerList": {
+      "player_list": "Jogadores Registados",
+      "name": "Nome",
+      "joined_at": "Data de Registo",
+      "games_scheduled": "Jogos Criados"
+    },
+    "DeletePitchButton": {
+      "could_not_remove_pitch": "Não foi possível remover o campo",
+      "an_error_occurred": "Ocorreu um erro",
+      "are_you_sure_you_want_to_remove_this_pitch": "Desejas remover este campo?",
+      "this_action_is_irreversible": "Esta acção é irreversível",
+      "cancel": "Cancelar",
+      "remove_pitch": "Remover Campo"
+    },
+    "MatchFormatInput": {
+      "match_format": "Formato de Jogo"
+    },
+    "MatchScheduleSuggestion": {
+      "schedule_a_match": "Marca um jogo",
+      "choose_a_pitch_to_start": "Escolhe um campo para começar",
+      "schedule_a_match_in_area": "Marca um jogo em {area}"
+    },
+    "MatchDatePicker": {
+      "match_day": "Dia do Jogo",
+      "start_time": "Hora de Início",
+      "see_common_times": "Ver horas habituais",
+      "see_all_times": "Ver todas as horas"
+    },
+    "PitchSelector": {
+      "select_pitch": "Selecionar campo",
+      "search_for_a_pitch_or_a_place": "Pesquisar por campo ou localização",
+      "no_results": "Sem resultados"
+    },
+    "MatchDetailsPage": {
+      "could_not_join_game": "Não foi possível aderir ao jogo",
+      "go_back": "Voltar atrás",
+      "place": "Local",
+      "open_in_google_maps": "Abrir localização no Google Maps",
+      "organized_by": "Organizado por",
+      "match_format": "Formato da partida",
+      "duration": "Duração",
+      "minutes": "Minutos",
+      "enough_players_you_can_still_join": "Já há jogadores suficientes",
+      "scheduled_by_you": "Agendaste este jogo",
+      "cancel_participation": "Cancelar Participação",
+      "player_list": "Lista de Inscritos",
+      "spots_available": "Ainda faltam {count} jogadores"
+    },
+    "Matches": {
+      "error": "Ocorreu um erro"
+    },
+    "HomeClient": {
+      "description": "Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes encontrar jogos, juntar-te a outros jogadores e organizar partidas na tua zona."
+    },
+    "AuthNavbar": {
+      "error": "Ocorreu um erro",
+      "greeting": "Olá",
+      "profile": "Perfil",
+      "exit": "Sair",
+      "login": "Entrar",
+      "create_account": "Criar Conta"
+    },
+    "CreatePitchModal": {
+      "required_name": "Nome do campo obrigatório",
+      "required_area": "Área obrigatória",
+      "required_municipality": "Município obrigatório",
+      "invalid_maps_url": "URL do mapa inválido",
+      "maximum_file_size": "Máximo de {size} MB",
+      "description": "Adiciona um novo campo a {area}",
+      "choose_a_photo": "Escolhe uma fotografia",
+      "empty_file": "Ficheiro vazio",
+      "use_jpeg_or_png": "Usa JPEG ou PNG",
+      "failed_to_load_municipalities": "Falha ao carregar municípios",
+      "could_not_save_pitch": "Não foi possível guardar o campo",
+      "add_pitch": "Adicionar Campo",
+      "pitch_name": "Nome do campo",
+      "google_maps_url": "URL do Google Maps",
+      "cancel": "Cancelar",
+      "save_changes": "Guardar Alterações",
+      "add": "Adicionar"
+    },
+    "CreateMatchModal": {
+      "title": "Agendar jogo em {area}",
+      "no_pitches": "Parece que ainda não existem campos em {area}.",
+      "cancel": "Cancelar",
+      "save_changes": "Guardar Alterações",
+      "loading_pitches": "A carregar campos…",
+      "retry": "Tentar novamente",
+      "could_not_load_pitches_try_again": "Não foi possível carregar os campos. Tenta novamente.",
+      "duration_minutes": "Duração (Minutos)",
+      "observations": "Observações"
+    },
+    "PageTitle": {
+      "back": "Voltar atrás"
+    },
+    "LanguageSettings": {
+      "portuguese": "Português",
+      "english": "English"
+    },
+    "PlayerProfile": {
+      "name": "Joel",
+      "photo_alt": "Fotografia do jogador",
+      "position": "Avançado",
+      "matches": "Jogos",
+      "goals": "Golos",
+      "assists": "Assistências",
+      "preferred_area": "Zona preferida"
+    },
+    "RequireAuthModal": {
+      "account_required": "Conta necessária",
+      "an_account_is_required_to_proceed": "Precisas de uma conta para continuar",
+      "cancel": "Cancelar",
+      "login": "Iniciar Sessão",
+      "create_account": "Criar Conta"
+    }
   }
 }

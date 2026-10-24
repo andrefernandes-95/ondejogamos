@@ -1,6 +1,5 @@
 import ParticipateButton from "@/app/components/participate-button/participate-button";
 import PitchUrlButton from "@/app/components/pitch-url-button/pitch-url-button";
-import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import {
@@ -9,10 +8,10 @@ import {
   Group,
   LocationPin,
   MyLocation,
-  OpenInNew,
 } from "@mui/icons-material";
 import { Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 
 interface Props {
   match: FullMatch;
@@ -20,16 +19,17 @@ interface Props {
 }
 
 export default function MatchCard({ match, onAttendanceChanged }: Props) {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
+  const locale = useLocale();
 
-  const weekDay = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
+  const weekDay = new Intl.DateTimeFormat(locale, {
     weekday: "long",
     day: "2-digit",
     month: "long",
     timeZone: "Europe/Lisbon",
   }).format(new Date(match.starts_at));
 
-  const time = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
+  const time = new Intl.DateTimeFormat(locale, {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -168,17 +168,15 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
 
             {hasEnoughPlayers && (
               <Typography variant="body1" color="warning">
-                {isEn
-                  ? "Match is full. You can still participate!"
-                  : "Já há jogadores suficientes"}
+                {tApp("App.MatchCard.match_is_full_you_can_still_participate")}
               </Typography>
             )}
 
             {!hasEnoughPlayers && (
               <Typography variant="body1" color="success">
-                {isEn
-                  ? `${Number(match.min_attendance - 1 - match.attendances.length)} spots available!`
-                  : `Ainda faltam ${Number(match.min_attendance - 1 - match.attendances.length)} jogadores!`}
+                {tApp("App.MatchCard.spots_available", {
+                  count: Number(match.min_attendance - 1 - match.attendances.length),
+                })}
               </Typography>
             )}
           </Stack>
@@ -195,7 +193,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
         >
           {match.is_creator ? (
             <Typography variant="caption">
-              {isEn ? "Scheduled by you" : "Agendaste este jogo"}
+              {tApp("App.MatchCard.scheduled_by_you")}
             </Typography>
           ) : !match.is_attending ? (
             <ParticipateButton handleAttendance={handleAttendance} />
@@ -204,7 +202,7 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
               variant="text"
               onClick={() => handleAttendance({ isAttending: false })}
             >
-              {isEn ? "Cancel Participation" : "Cancelar Participação"}
+              {tApp("App.MatchCard.cancel_participation")}
             </Button>
           )}
 
@@ -215,10 +213,10 @@ export default function MatchCard({ match, onAttendanceChanged }: Props) {
             size="small"
             sx={{ minWidth: "unset" }}
             aria-label={
-              isEn ? "Open match details" : "Abrir detalhes da partida"
+              tApp("App.MatchCard.open_match_details")
             }
           >
-            {isEn ? "See Details" : "Ver detalhes"}
+            {tApp("App.MatchCard.see_details")}
           </Button>
         </Stack>
       </Box>

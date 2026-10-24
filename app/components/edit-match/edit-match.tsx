@@ -1,18 +1,17 @@
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
-import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
 import { Edit } from "@mui/icons-material";
 import { Button, Typography } from "@mui/material";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   match: FullMatch;
 }
 
 export default function EditMatch({ match }: Props) {
+  const tApp = useTranslations();
   const [isEditing, setIsEditing] = useState(false);
-
-  const isEn = useLocalization() === "EN";
 
   return (
     <>
@@ -32,7 +31,7 @@ export default function EditMatch({ match }: Props) {
       >
         <Edit />
         <Typography variant="body1">
-          {isEn ? "Edit Details" : "Editar Detalhes"}
+          {tApp("App.EditMatch.edit_details")}
         </Typography>
       </Button>
     </>
