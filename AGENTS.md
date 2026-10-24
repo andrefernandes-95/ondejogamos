@@ -13,3 +13,11 @@
 - Keep changes straightforward. Avoid adding abstractions or dependencies unless they remove meaningful duplication or complexity.
 
 - No over engineered solutions. useRefs and useEffects avoid first as they can bring code smells.
+
+## Model usage
+
+- For non-trivial feature work, separate thinking from implementation when agent delegation is available.
+- Use `gpt-6.1-sol` with `low` reasoning to analyse the feature, define scope, identify risks, and review the proposed approach.
+- Use `gpt-6-luna` with `medium` reasoning to implement the agreed, well-scoped change and its valuable tests.
+- Keep trivial edits in the current agent. Do not add delegation overhead when the change is already clear and small.
+- If implementation reveals concurrency, security, data migration, or architectural risk, return the problem to `gpt-6.1-sol` before continuing.
