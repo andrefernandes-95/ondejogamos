@@ -21,17 +21,13 @@ export default function AuthNavbar() {
     try {
       const result = await authClient.signOut();
       if (result.error) {
-        setLogoutError(
-          tApp("App.AuthNavbar.error"),
-        );
+        setLogoutError(tApp("App.AuthNavbar.error"));
         return;
       }
 
       window.location.reload();
     } catch {
-      setLogoutError(
-        tApp("App.AuthNavbar.error"),
-      );
+      setLogoutError(tApp("App.AuthNavbar.error"));
     } finally {
       setIsSigningOut(false);
     }
@@ -62,15 +58,14 @@ export default function AuthNavbar() {
           {tApp("App.AuthNavbar.greeting")}, {session.user.name}
         </Typography>
 
-        {/* <Button
-          onClick={handleSignOut}
-          loading={isSigningOut}
-          disabled={isSigningOut}
+        <Button
+          component="a"
+          href={AppRoutes.PROFILE}
           variant="text"
           color="inherit"
         >
           {tApp("App.AuthNavbar.profile")}
-        </Button> */}
+        </Button>
         <Button
           onClick={handleSignOut}
           loading={isSigningOut}

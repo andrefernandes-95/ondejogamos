@@ -229,13 +229,12 @@
       "english": "English"
     },
     "PlayerProfile": {
-      "name": "Joel",
-      "photo_alt": "Fotografia do jogador",
-      "position": "Avançado",
-      "matches": "Jogos",
-      "goals": "Golos",
-      "assists": "Assistências",
-      "preferred_area": "Zona preferida"
+      "title": "O meu perfil",
+      "preferred_position": "Posição preferida",
+      "preferred_area": "Zona preferida",
+      "matches": "Jogos disputados",
+      "not_set": "Não definido",
+      "unavailable": "Ainda não disponível"
     },
     "RequireAuthModal": {
       "account_required": "Conta necessária",

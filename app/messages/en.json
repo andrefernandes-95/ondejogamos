@@ -229,13 +229,12 @@
       "english": "English"
     },
     "PlayerProfile": {
-      "name": "Joel",
-      "photo_alt": "Player photo",
-      "position": "Forward",
-      "matches": "Games",
-      "goals": "Goals",
-      "assists": "Assists",
-      "preferred_area": "Preferred area"
+      "title": "My profile",
+      "preferred_position": "Preferred position",
+      "preferred_area": "Preferred area",
+      "matches": "Matches played",
+      "not_set": "Not set",
+      "unavailable": "Not available yet"
     },
     "RequireAuthModal": {
       "account_required": "Account required",

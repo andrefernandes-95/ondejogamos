@@ -31,9 +31,16 @@ flowchart TD
 | Dados | Controlados por |
 |---|---|
 | Fotografia, nome público, data de nascimento, zona e posição preferidas | Jogador |
-| Badge de fundador | Sistema |
+| Badge de fundador | Calculado pelo servidor através da data de registo |
 | Jogos disputados | Presenças confirmadas nos jogos |
 | Preferências de email | Jogador |
+
+Os dados específicos do jogador são guardados em `player_profiles`, numa relação
+um-para-um com a tabela `user` gerida pelo Better Auth. A eliminação do utilizador
+elimina também o respetivo perfil.
+
+O badge de fundador não é guardado nem enviado pelo jogador. O servidor atribui-o
+quando `user.createdAt` é anterior ou igual à data limite configurada para founders.
 
 ## Critérios de aceitação
 
