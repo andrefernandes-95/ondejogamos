@@ -49,3 +49,9 @@ npx dbmate migrate
 ```bash
 npm run seed-locations
 ```
+
+Or
+
+```bash
+/mise/shims/node ./node_modules/dbmate/dist/cli.js migrate
+```

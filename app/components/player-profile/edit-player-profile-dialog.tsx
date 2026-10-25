@@ -60,7 +60,7 @@ export function EditPlayerProfileDialog({ initialProfile, areas, onClose, onSave
   }
 
   return (
-    <Dialog open onClose={closeIfIdle} fullWidth maxWidth="sm">
+    <Dialog open onClose={closeIfIdle} fullWidth maxWidth="xs">
       <DialogTitle>{t("App.PlayerProfile.edit_profile")}</DialogTitle>
       <Box component="form" id={formId} onSubmit={handleSubmit(saveProfile)} noValidate>
         <DialogContent>
