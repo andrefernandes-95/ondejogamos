@@ -12,6 +12,7 @@ export interface PlayerProfilePublicDto {
   name: string;
   image: string | null;
   age: number | null;
+  matches_played: number;
   preferred_area: string | null;
   preferred_position: PlayerPosition | null;
 }

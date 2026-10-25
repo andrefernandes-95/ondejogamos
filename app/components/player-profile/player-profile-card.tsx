@@ -34,7 +34,7 @@ export function PlayerProfileCard({ profile, onEdit }: PlayerProfileCardProps) {
           <ProfileField label={t("App.PlayerProfile.age")} value={profile.age === null ? t("App.PlayerProfile.not_set") : t("App.PlayerProfile.years_old", { age: profile.age })} />
           <ProfileField label={t("App.PlayerProfile.preferred_position")} value={profile.preferred_position ? t(`App.PlayerProfile.positions.${profile.preferred_position}`) : t("App.PlayerProfile.not_set")} />
           <ProfileField label={t("App.PlayerProfile.preferred_area")} value={profile.preferred_area ?? t("App.PlayerProfile.not_set")} />
-          <ProfileField label={t("App.PlayerProfile.matches")} value={t("App.PlayerProfile.unavailable")} />
+          <ProfileField label={t("App.PlayerProfile.matches")} value={t("App.PlayerProfile.matches_count", { count: profile.matches_played })} />
         </Stack>
       </CardContent>
     </Card>

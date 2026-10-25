@@ -8,6 +8,7 @@ test("serializes only editable profile fields", () => {
     name: "Alex",
     image: "https://example.test/avatar.png",
     age: 31,
+    matches_played: 4,
     date_of_birth: "1995-02-03",
     preferred_area: "Lisbon",
     preferred_position: "midfielder" as const,
@@ -28,6 +29,7 @@ test("parses the owner profile response and preserves server-calculated age", ()
     name: "Alex",
     image: null,
     age: 31,
+    matches_played: 4,
     date_of_birth: "1995-02-03",
     preferred_area: null,
     preferred_position: "midfielder",
@@ -42,8 +44,22 @@ test("rejects malformed owner profile responses", () => {
     name: "Alex",
     image: null,
     age: "31",
+    matches_played: -1,
     date_of_birth: null,
     preferred_area: null,
     preferred_position: "striker",
+  }), null);
+});
+
+test("rejects negative matches played counts", () => {
+  assert.equal(parsePlayerProfileResponse({
+    id: "player-1",
+    name: "Alex",
+    image: null,
+    age: 31,
+    matches_played: -1,
+    date_of_birth: null,
+    preferred_area: null,
+    preferred_position: null,
   }), null);
 });

@@ -40,6 +40,7 @@ Consultar este documento antes de tomar decisões de implementação ou arquitet
 - Dados de jogador vivem em `player_profiles`, numa relação um-para-um com a tabela `user` do Better Auth. Não adicionar um JSON genérico de detalhes nem misturar campos de domínio na tabela de autenticação.
 - O estado de founder é calculado no servidor a partir da data de registo e de um limite configurado. Não é uma coluna editável nem uma decisão do frontend.
 - O índice parcial de `preferred_area` foi mantido para pesquisas por zona. Não implica ordenação dos jogadores.
+- Para o MVP, `preferred_area` continua como texto validado pela API contra as áreas existentes. A normalização completa de áreas foi rejeitada porque obrigava a alterar `locations`, `pitches`, seeds e consultas sem benefício proporcional nesta fase.
 - Conflitos de horário têm de ser garantidos no servidor ou na base de dados, incluindo pedidos simultâneos. A regra de sobreposição deve ser partilhada pela criação, edição e seletor do frontend, com testes de limites.
 
 ## Perfil do jogador
@@ -48,6 +49,7 @@ Consultar este documento antes de tomar decisões de implementação ou arquitet
 - Separar o cartão de leitura, o diálogo de edição e o cliente da API.
 - Data de nascimento e email são privados. O cartão recebe apenas idade calculada e restantes dados públicos.
 - Golos, assistências e respetiva verificação ficam para uma fase posterior.
+- Até existir um estado de presença confirmada, `matches_played` conta provisoriamente as inscrições em jogos não cancelados cujo fim calculado já passou. Manter a consulta isolada para a poder trocar por presenças verificadas; este valor ainda não representa uma confirmação de presença real.
 - As specs do projeto são escritas em português.
 
 ## Produto pendente

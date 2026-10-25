@@ -45,6 +45,7 @@ function toPublicProfile(profile: PlayerProfileEditingPayload | PlayerProfilePub
     name: profile.name,
     image: profile.image,
     age: profile.age,
+    matches_played: profile.matches_played,
     preferred_area: profile.preferred_area,
     preferred_position: profile.preferred_position,
   };

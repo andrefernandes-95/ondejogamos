@@ -15,7 +15,7 @@ interface ProfileRow {
   preferred_position: PlayerPosition | null;
 }
 
-function toProfileDtos(row: ProfileRow): {
+function toProfileDtos(row: ProfileRow, matchesPlayed: number): {
   publicProfile: PlayerProfilePublicDto;
   editingProfile: PlayerProfileEditingPayload;
 } {
@@ -27,6 +27,7 @@ function toProfileDtos(row: ProfileRow): {
     age: calculateAge(dob),
     preferred_area: row.preferred_area,
     preferred_position: row.preferred_position,
+    matches_played: Math.max(0, matchesPlayed),
   };
   return {
     publicProfile,
@@ -52,7 +53,21 @@ export async function getCurrentPlayerProfile(user: {
     preferred_area: null,
     preferred_position: null,
   };
-  return toProfileDtos(row);
+  const matchesPlayed = await getMatchesPlayed(user.id);
+  return toProfileDtos(row, matchesPlayed);
+}
+
+async function getMatchesPlayed(userId: string): Promise<number> {
+  const result = await pool.query<{ matches_played: string | number }>(
+    `SELECT COUNT(*) AS matches_played
+     FROM attendance a
+     JOIN matches m ON m.id = a.match_id
+     WHERE a.user_id = $1
+       AND m.cancelled_at IS NULL
+       AND m.starts_at + m.duration_in_minutes * INTERVAL '1 minute' <= NOW()`,
+    [userId],
+  );
+  return Math.max(0, Number(result.rows[0]?.matches_played) || 0);
 }
 
 export async function savePlayerProfile(input: {
@@ -89,5 +104,6 @@ export async function savePlayerProfile(input: {
      FROM "user" u LEFT JOIN player_profiles pp ON pp.user_id = u.id WHERE u.id = $1`,
     [input.userId],
   );
-  return toProfileDtos(result.rows[0]);
+  const matchesPlayed = await getMatchesPlayed(input.userId);
+  return toProfileDtos(result.rows[0], matchesPlayed);
 }

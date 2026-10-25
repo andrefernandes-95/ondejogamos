@@ -236,7 +236,7 @@
       "preferred_area": "Preferred area",
       "matches": "Matches played",
       "not_set": "Not set",
-      "unavailable": "Not available yet",
+      "matches_count": "{count, plural, =0 {0 matches} one {# match} other {# matches}}",
       "age": "Age",
       "years_old": "{age} years old",
       "edit_profile": "Edit profile",

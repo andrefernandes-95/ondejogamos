@@ -236,7 +236,7 @@
       "preferred_area": "Zona preferida",
       "matches": "Jogos disputados",
       "not_set": "Não definido",
-      "unavailable": "Ainda não disponível",
+      "matches_count": "{count, plural, =0 {0 jogos} one {# jogo} other {# jogos}}",
       "age": "Idade",
       "years_old": "{age} anos",
       "edit_profile": "Editar perfil",

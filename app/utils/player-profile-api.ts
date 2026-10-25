@@ -7,6 +7,7 @@ const ownerProfileResponseSchema = z.object({
   name: z.string(),
   image: z.string().nullable(),
   age: z.number().int().nonnegative().nullable(),
+  matches_played: z.number().int().nonnegative(),
   preferred_area: z.string().nullable(),
   preferred_position: z.enum(playerPositions).nullable(),
   date_of_birth: z.string().nullable(),
