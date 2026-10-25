@@ -7,6 +7,8 @@ export type ApiErrorCode =
   | "MATCH_DELETE_FAILED"
   | "MATCH_NOT_FOUND"
   | "MATCH_TIME_CONFLICT"
+  | "PLAYER_PROFILE_INVALID"
+  | "PLAYER_PROFILE_UPDATE_FAILED"
   | "INTERNAL_ERROR";
 
 const apiErrorCodes: ApiErrorCode[] = [
@@ -18,6 +20,8 @@ const apiErrorCodes: ApiErrorCode[] = [
   "MATCH_DELETE_FAILED",
   "MATCH_NOT_FOUND",
   "MATCH_TIME_CONFLICT",
+  "PLAYER_PROFILE_INVALID",
+  "PLAYER_PROFILE_UPDATE_FAILED",
   "INTERNAL_ERROR",
 ];
 

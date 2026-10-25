@@ -42,3 +42,11 @@ export async function listMunicipalitiesForArea(
 
   return resultingRows.flatMap((entry) => entry.municipality);
 }
+
+export async function listAreas(): Promise<string[]> {
+  const result = await pool.query<{ area: string }>(
+    `SELECT DISTINCT area FROM locations ORDER BY area`,
+  );
+
+  return result.rows.map((row) => row.area);
+}

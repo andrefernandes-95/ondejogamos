@@ -21,6 +21,8 @@
     "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
     "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
     "MATCH_TIME_CONFLICT": "Já existe um jogo nesse campo durante esse horário. Escolhe outra hora.",
+    "PLAYER_PROFILE_INVALID": "Verifica os dados do perfil e tenta novamente.",
+    "PLAYER_PROFILE_UPDATE_FAILED": "Não foi possível guardar o perfil. Tenta novamente.",
     "INTERNAL_ERROR": "Ocorreu um erro. Tenta novamente."
   },
   "App": {
@@ -234,7 +236,22 @@
       "preferred_area": "Zona preferida",
       "matches": "Jogos disputados",
       "not_set": "Não definido",
-      "unavailable": "Ainda não disponível"
+      "unavailable": "Ainda não disponível",
+      "age": "Idade",
+      "years_old": "{age} anos",
+      "edit_profile": "Editar perfil",
+      "display_name": "Nome público",
+      "invalid_display_name": "Indica um nome público válido.",
+      "date_of_birth": "Data de nascimento",
+      "invalid_date_of_birth": "Indica uma data de nascimento válida.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "positions": {
+        "goalkeeper": "Guarda-redes",
+        "defender": "Defesa",
+        "midfielder": "Médio",
+        "forward": "Avançado"
+      }
     },
     "RequireAuthModal": {
       "account_required": "Conta necessária",

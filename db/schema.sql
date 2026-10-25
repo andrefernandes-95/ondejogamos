@@ -145,6 +145,22 @@ ALTER TABLE public.pitches ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
+-- Name: player_profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.player_profiles (
+    user_id text NOT NULL,
+    date_of_birth date,
+    preferred_area text,
+    preferred_position text,
+    avatar_url text,
+    avatar_storage_key text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -255,6 +271,14 @@ ALTER TABLE ONLY public.pitches
 
 
 --
+-- Name: player_profiles player_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.player_profiles
+    ADD CONSTRAINT player_profiles_pkey PRIMARY KEY (user_id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -321,6 +345,13 @@ CREATE INDEX matches_pitch_starts_at_idx ON public.matches USING btree (pitch_id
 --
 
 CREATE INDEX matches_starts_at_idx ON public.matches USING btree (starts_at);
+
+
+--
+-- Name: player_profiles_preferred_area_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX player_profiles_preferred_area_idx ON public.player_profiles USING btree (preferred_area) WHERE (preferred_area IS NOT NULL);
 
 
 --
@@ -394,6 +425,14 @@ ALTER TABLE ONLY public.pitches
 
 
 --
+-- Name: player_profiles player_profiles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.player_profiles
+    ADD CONSTRAINT player_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id) ON DELETE CASCADE;
+
+
+--
 -- Name: session session_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -420,4 +459,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20261007071538'),
     ('20261007091531'),
     ('20261007095904'),
-    ('20261008102442');
+    ('20261008102442'),
+    ('20261024110500');
