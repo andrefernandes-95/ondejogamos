@@ -64,7 +64,9 @@
       "spots_available": "{count} spots available!"
     },
     "UploadImageInput": {
-      "upload_image": "Upload image"
+      "upload_image": "Upload image",
+      "change_image": "Change image",
+      "remove_selected_image": "Remove selection"
     },
     "NoMatchesFound": {
       "no_matches_scheduled_be_the_first": "No matches scheduled. Be the first!",

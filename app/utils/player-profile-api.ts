@@ -22,13 +22,16 @@ export type UpdatePlayerProfileResult =
   | { ok: true; profile: PlayerProfileEditingPayload }
   | { ok: false; errorCode: string };
 
-export function serializePlayerProfileUpdate(input: PlayerProfileUpdateInput): string {
-  return JSON.stringify({
-    name: input.name,
-    date_of_birth: input.date_of_birth || null,
-    preferred_area: input.preferred_area,
-    preferred_position: input.preferred_position,
-  });
+export function serializePlayerProfileUpdate(input: PlayerProfileUpdateInput, avatar: File | null = null): FormData {
+  const formData = new FormData();
+  formData.set("name", input.name);
+  formData.set("date_of_birth", input.date_of_birth || "");
+  formData.set("preferred_area", input.preferred_area ?? "");
+  formData.set("preferred_position", input.preferred_position ?? "");
+  if (avatar) {
+    formData.set("avatar", avatar);
+  }
+  return formData;
 }
 
 export function parsePlayerProfileResponse(payload: unknown): PlayerProfileEditingPayload | null {
@@ -39,12 +42,11 @@ export function parsePlayerProfileResponse(payload: unknown): PlayerProfileEditi
   return parsed.data;
 }
 
-export async function updatePlayerProfile(input: PlayerProfileUpdateInput): Promise<UpdatePlayerProfileResult> {
+export async function updatePlayerProfile(input: PlayerProfileUpdateInput, avatar: File | null = null): Promise<UpdatePlayerProfileResult> {
   try {
     const response = await fetch("/api/profile", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: serializePlayerProfileUpdate(input),
+      body: serializePlayerProfileUpdate(input, avatar),
     });
     const payload: unknown = await response.json();
     if (!response.ok) {

@@ -1,4 +1,6 @@
 import { pool } from "@/app/lib/db";
+import type { PoolClient } from "pg";
+import { deletePlayerAvatar } from "@/app/services/player-avatar-storage";
 import {
   PlayerPosition,
   PlayerProfileEditingPayload,
@@ -41,7 +43,7 @@ export async function getCurrentPlayerProfile(user: {
   image?: string | null;
 }): Promise<{ publicProfile: PlayerProfilePublicDto; editingProfile: PlayerProfileEditingPayload }> {
   const result = await pool.query<ProfileRow>(
-    `SELECT u.id, u.name, u.image, pp.date_of_birth, pp.preferred_area, pp.preferred_position
+    `SELECT u.id, u.name, COALESCE(pp.avatar_url, u.image) AS image, pp.date_of_birth, pp.preferred_area, pp.preferred_position
      FROM "user" u LEFT JOIN player_profiles pp ON pp.user_id = u.id WHERE u.id = $1`,
     [user.id],
   );
@@ -76,31 +78,54 @@ export async function savePlayerProfile(input: {
   date_of_birth: string | null;
   preferred_area: string | null;
   preferred_position: PlayerPosition | null;
+  avatar?: { url: string; storageKey: string } | null;
 }): Promise<{ publicProfile: PlayerProfilePublicDto; editingProfile: PlayerProfileEditingPayload }> {
-  const client = await pool.connect();
+  let client: PoolClient | null = null;
+  let previousAvatarKey: string | null = null;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
     await client.query(`UPDATE "user" SET name = $1, "updatedAt" = NOW() WHERE id = $2`, [input.name, input.userId]);
+    const oldAvatar = await client.query<{ avatar_storage_key: string | null }>(
+      "SELECT avatar_storage_key FROM player_profiles WHERE user_id = $1 FOR UPDATE",
+      [input.userId],
+    );
+    previousAvatarKey = oldAvatar.rows[0]?.avatar_storage_key ?? null;
     await client.query(
-      `INSERT INTO player_profiles (user_id, date_of_birth, preferred_area, preferred_position)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO player_profiles (user_id, date_of_birth, preferred_area, preferred_position, avatar_url, avatar_storage_key)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (user_id) DO UPDATE SET
          date_of_birth = EXCLUDED.date_of_birth,
          preferred_area = EXCLUDED.preferred_area,
          preferred_position = EXCLUDED.preferred_position,
+         avatar_url = COALESCE(EXCLUDED.avatar_url, player_profiles.avatar_url),
+         avatar_storage_key = COALESCE(EXCLUDED.avatar_storage_key, player_profiles.avatar_storage_key),
          updated_at = NOW()`,
-      [input.userId, input.date_of_birth, input.preferred_area, input.preferred_position],
+      [input.userId, input.date_of_birth, input.preferred_area, input.preferred_position, input.avatar?.url ?? null, input.avatar?.storageKey ?? null],
     );
     await client.query("COMMIT");
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Could not roll back player profile update", rollbackError);
+      }
+    }
+    if (input.avatar) {
+      await deletePlayerAvatar(input.avatar.storageKey);
+    }
     throw error;
   } finally {
-    client.release();
+    client?.release();
+  }
+
+  if (input.avatar && previousAvatarKey && previousAvatarKey !== input.avatar.storageKey) {
+    await deletePlayerAvatar(previousAvatarKey);
   }
 
   const result = await pool.query<ProfileRow>(
-    `SELECT u.id, u.name, u.image, pp.date_of_birth, pp.preferred_area, pp.preferred_position
+    `SELECT u.id, u.name, COALESCE(pp.avatar_url, u.image) AS image, pp.date_of_birth, pp.preferred_area, pp.preferred_position
      FROM "user" u LEFT JOIN player_profiles pp ON pp.user_id = u.id WHERE u.id = $1`,
     [input.userId],
   );

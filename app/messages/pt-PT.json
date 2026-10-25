@@ -64,7 +64,9 @@
       "spots_available": "Ainda faltam {count} jogadores!"
     },
     "UploadImageInput": {
-      "upload_image": "Carregar imagem"
+      "upload_image": "Carregar imagem",
+      "change_image": "Alterar imagem",
+      "remove_selected_image": "Remover seleção"
     },
     "NoMatchesFound": {
       "no_matches_scheduled_be_the_first": "Ainda não há jogos agendados. Sê o(a) primeiro(a)!",

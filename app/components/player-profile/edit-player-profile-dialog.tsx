@@ -8,7 +8,12 @@ import type { PlayerProfileInput } from "@/app/validations/player-profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
+import UploadImageInput from "@/app/components/upload-image-input/upload-image-input";
+
+const profileFormSchema = playerProfileSchema.extend({ avatar: z.custom<File | null>() });
+type ProfileFormValues = PlayerProfileInput & { avatar: File | null };
 
 interface EditPlayerProfileDialogProps {
   initialProfile: PlayerProfileEditingPayload;
@@ -25,24 +30,28 @@ export function EditPlayerProfileDialog({ initialProfile, areas, onClose, onSave
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<PlayerProfileInput>({
-    resolver: zodResolver(playerProfileSchema),
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       name: initialProfile.name,
       date_of_birth: initialProfile.date_of_birth,
       preferred_area: initialProfile.preferred_area,
       preferred_position: initialProfile.preferred_position,
+      avatar: null,
     },
   });
 
-  async function saveProfile(values: PlayerProfileInput) {
-    const result = await updatePlayerProfile(values);
+  async function saveProfile(values: ProfileFormValues) {
+    const { avatar, ...profileValues } = values;
+    const result = await updatePlayerProfile(profileValues, avatar);
     if (result.ok) {
       onSaved(result.profile);
       return;
     }
     setError("root.server", { type: "server", message: result.errorCode });
   }
+
+  const selectedAvatar = useWatch({ control, name: "avatar" });
 
   function closeIfIdle() {
     if (!isSubmitting) {
@@ -59,6 +68,19 @@ export function EditPlayerProfileDialog({ initialProfile, areas, onClose, onSave
             {errors.root?.server?.message && (
               <Alert severity="error">{t(`ApiErrors.${errors.root.server.message}`)}</Alert>
             )}
+            <Controller
+              name="avatar"
+              control={control}
+              render={({ field, fieldState }) => (
+                <UploadImageInput
+                  value={selectedAvatar ?? null}
+                  currentImageUrl={initialProfile.image}
+                  onChange={field.onChange}
+                  errorMessage={fieldState.error?.message}
+                  shape="circle"
+                />
+              )}
+            />
             <Controller
               name="name"
               control={control}

@@ -43,6 +43,16 @@ Consultar este documento antes de tomar decisões de implementação ou arquitet
 - Para o MVP, `preferred_area` continua como texto validado pela API contra as áreas existentes. A normalização completa de áreas foi rejeitada porque obrigava a alterar `locations`, `pitches`, seeds e consultas sem benefício proporcional nesta fase.
 - Conflitos de horário têm de ser garantidos no servidor ou na base de dados, incluindo pedidos simultâneos. A regra de sobreposição deve ser partilhada pela criação, edição e seletor do frontend, com testes de limites.
 
+## Object storage no Railway
+
+- Antes de criar proxies, mappers ou compatibilidade na app, testar o fluxo externo e corrigir a configuração na origem.
+- A app e o `s3-public-presigner` devem obter credenciais S3 através de referências ao bucket `public files`, nunca através de cópias manuais dos valores.
+- As referências protegem os serviços no Railway, mas não atualizam o `.env` local. Depois de uma rotação do bucket, sincronizar pelo menos o secret e a região antes de testar uploads localmente.
+- O presigner usa virtual-host style; o seu `S3_ENDPOINT` é `https://${{"public files".BUCKET}}.storage.railway.app`. A app usa diretamente `${{"public files".ENDPOINT}}`.
+- Um deployment `SUCCESS` ou um health check `200` não valida a integração S3. Depois de alterar bucket, credenciais ou presigner, testar um URL real e confirmar `200` e o `Content-Type` esperado.
+- O diagnóstico deve distinguir `SignatureDoesNotMatch` (credenciais/assinatura) de `NoSuchBucket` (endpoint ou URL style incorretos).
+- O runbook do incidente está em `docs/operations/railway-object-storage.md`.
+
 ## Perfil do jogador
 
 - O MVP acordado está documentado em `docs/specs/player-account-mvp.md` e `docs/specs/player-card.md`.
