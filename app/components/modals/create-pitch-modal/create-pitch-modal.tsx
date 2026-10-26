@@ -264,7 +264,6 @@ export default function CreatePitchModal({
                 <UploadImageInput
                   value={field.value}
                   onChange={(value) => field.onChange(value)}
-                  currentImageUrl={existingPitch?.image_url}
                   errorMessage={
                     fieldState.error ? fieldState.error?.message : ""
                   }

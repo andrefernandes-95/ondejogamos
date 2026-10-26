@@ -1,7 +1,5 @@
 # Project instructions
 
-- Read `docs/implementation-memory.md` before making implementation or architecture decisions. Keep it updated when a conversation establishes a reusable rule or reverses an earlier decision.
-
 - Keep functions focused and under 200 lines. Split longer work into small, named helpers that describe the intent. Testable code all the time - isolation helps tests.
 - Add unit tests with real value when justified, especially for business rules, shared helpers, edge cases, and error handling. Avoid tests that only mirror trivial implementation details.
 - Always use braces for `if` and `else` bodies, including single-line statements. Never write `if (...) return ...` or another unbraced conditional body.
@@ -15,8 +13,6 @@
 - Keep changes straightforward. Avoid adding abstractions or dependencies unless they remove meaningful duplication or complexity.
 
 - No over engineered solutions. useRefs and useEffects avoid first as they can bring code smells.
-
-- Use React Hook Form for non-trivial forms. Keep form state, submission state, and field errors inside the form abstraction instead of duplicating them with component state.
 
 ## Model usage
 

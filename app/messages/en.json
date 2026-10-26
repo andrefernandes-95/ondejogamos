@@ -21,8 +21,6 @@
     "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
     "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
     "MATCH_TIME_CONFLICT": "There is already a match at this pitch during that time. Choose another time.",
-    "PLAYER_PROFILE_INVALID": "Check your profile details and try again.",
-    "PLAYER_PROFILE_UPDATE_FAILED": "Could not save your profile. Try again.",
     "INTERNAL_ERROR": "Something went wrong. Try again."
   },
   "App": {
@@ -64,9 +62,7 @@
       "spots_available": "{count} spots available!"
     },
     "UploadImageInput": {
-      "upload_image": "Upload image",
-      "change_image": "Change image",
-      "remove_selected_image": "Remove selection"
+      "upload_image": "Upload image"
     },
     "NoMatchesFound": {
       "no_matches_scheduled_be_the_first": "No matches scheduled. Be the first!",
@@ -238,22 +234,7 @@
       "preferred_area": "Preferred area",
       "matches": "Matches played",
       "not_set": "Not set",
-      "matches_count": "{count, plural, =0 {0 matches} one {# match} other {# matches}}",
-      "age": "Age",
-      "years_old": "{age} years old",
-      "edit_profile": "Edit profile",
-      "display_name": "Display name",
-      "invalid_display_name": "Enter a valid display name.",
-      "date_of_birth": "Date of birth",
-      "invalid_date_of_birth": "Enter a valid date of birth.",
-      "cancel": "Cancel",
-      "save": "Save",
-      "positions": {
-        "goalkeeper": "Goalkeeper",
-        "defender": "Defender",
-        "midfielder": "Midfielder",
-        "forward": "Forward"
-      }
+      "unavailable": "Not available yet"
     },
     "RequireAuthModal": {
       "account_required": "Account required",
