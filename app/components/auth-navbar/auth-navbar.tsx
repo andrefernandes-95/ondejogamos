@@ -1,18 +1,19 @@
 "use client";
 
+import useLocalization from "@/app/hooks/locale";
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
 import { ExitToApp, GroupAdd } from "@mui/icons-material";
 import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 
 export default function AuthNavbar() {
-  const tApp = useTranslations();
   const { data: session, isPending, error } = authClient.useSession();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [logoutError, setLogoutError] = useState("");
+
+  const localization = useLocalization();
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -21,13 +22,17 @@ export default function AuthNavbar() {
     try {
       const result = await authClient.signOut();
       if (result.error) {
-        setLogoutError(tApp("App.AuthNavbar.error"));
+        setLogoutError(
+          localization === "EN" ? "An error occured" : "Ocorreu um erro",
+        );
         return;
       }
 
       window.location.reload();
     } catch {
-      setLogoutError(tApp("App.AuthNavbar.error"));
+      setLogoutError(
+        localization === "EN" ? "An error occured" : "Ocorreu um erro",
+      );
     } finally {
       setIsSigningOut(false);
     }
@@ -45,7 +50,7 @@ export default function AuthNavbar() {
     return (
       <Container>
         <Typography color="alert" role="alert">
-          {tApp("App.AuthNavbar.error")}
+          {localization === "EN" ? "Something went wrong" : "Um erro ocorreu"}
         </Typography>
       </Container>
     );
@@ -55,17 +60,18 @@ export default function AuthNavbar() {
     return (
       <Container>
         <Typography align="center" sx={{ color: "white", mr: 1 }}>
-          {tApp("App.AuthNavbar.greeting")}, {session.user.name}
+          {localization === "EN" ? "Hi" : "Olá"}, {session.user.name}
         </Typography>
 
-        <Button
-          component="a"
-          href={AppRoutes.PROFILE}
+        {/* <Button
+          onClick={handleSignOut}
+          loading={isSigningOut}
+          disabled={isSigningOut}
           variant="text"
           color="inherit"
         >
-          {tApp("App.AuthNavbar.profile")}
-        </Button>
+          {localization === "EN" ? "Profile" : "Perfil"}
+        </Button> */}
         <Button
           onClick={handleSignOut}
           loading={isSigningOut}
@@ -73,7 +79,7 @@ export default function AuthNavbar() {
           variant="text"
           color="inherit"
         >
-          {tApp("App.AuthNavbar.exit")}
+          {localization === "EN" ? "Exit" : "Sair"}
         </Button>
 
         {logoutError && (
@@ -95,7 +101,7 @@ export default function AuthNavbar() {
       >
         <ExitToApp />
         <Typography sx={{ color: "white" }}>
-          {tApp("App.AuthNavbar.login")}
+          {localization === "EN" ? "Login" : "Entrar"}
         </Typography>
       </Button>
       <Button
@@ -107,7 +113,7 @@ export default function AuthNavbar() {
         <GroupAdd />
 
         <Typography sx={{ color: "white" }}>
-          {tApp("App.AuthNavbar.create_account")}
+          {localization === "EN" ? "Create Account" : "Criar Conta"}
         </Typography>
       </Button>
     </Container>

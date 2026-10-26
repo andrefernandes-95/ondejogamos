@@ -1,6 +1,5 @@
 import { pool } from "@/app/lib/db";
 import { FullMatch, Match } from "@/app/models/match";
-import { ensureMatchTimeAvailable } from "@/app/services/match-availability";
 
 export async function listMatches(area: string): Promise<Match[]> {
   const result = await pool.query(
@@ -223,42 +222,25 @@ export type SaveMatchInput = {
 };
 
 export async function saveMatch(pitch: SaveMatchInput): Promise<Match> {
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-    await ensureMatchTimeAvailable(client, {
-      pitchId: pitch.pitchId,
-      startsAt: pitch.startsAt,
-      durationInMinutes: pitch.durationInMinutes,
-    });
-
-    const result = await client.query(
-      `
+  const result = await pool.query(
+    `
       INSERT INTO MATCHES(
         created_by, pitch_id, description, format, min_attendance, starts_at, duration_in_minutes
       ) values ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `,
-      [
-        pitch.createdBy,
-        pitch.pitchId,
-        pitch.description,
-        pitch.format,
-        pitch.minAttendance,
-        pitch.startsAt,
-        pitch.durationInMinutes,
-      ],
-    );
+    [
+      pitch.createdBy,
+      pitch.pitchId,
+      pitch.description,
+      pitch.format,
+      pitch.minAttendance,
+      pitch.startsAt,
+      pitch.durationInMinutes,
+    ],
+  );
 
-    await client.query("COMMIT");
-    return result.rows[0];
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
-  }
+  return result.rows[0];
 }
 
 export interface UpdateMatchInput extends SaveMatchInput {
@@ -268,31 +250,9 @@ export interface UpdateMatchInput extends SaveMatchInput {
 export async function updateMatch(
   match: UpdateMatchInput,
   userId: string,
-): Promise<Match | null> {
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-
-    const ownedMatch = await client.query(
-      `SELECT id FROM "matches" WHERE id = $1 AND created_by = $2 FOR UPDATE`,
-      [match.id, userId],
-    );
-
-    if (ownedMatch.rowCount === 0) {
-      await client.query("COMMIT");
-      return null;
-    }
-
-    await ensureMatchTimeAvailable(client, {
-      pitchId: match.pitchId,
-      startsAt: match.startsAt,
-      durationInMinutes: match.durationInMinutes,
-      ignoreMatchId: match.id,
-    });
-
-    const result = await client.query(
-      `
+): Promise<Match> {
+  const result = await pool.query(
+    `
       UPDATE MATCHES
       SET 
         pitch_id = $3,
@@ -304,26 +264,19 @@ export async function updateMatch(
       WHERE id = $1 AND created_by = $2
       RETURNING *
     `,
-      [
-        match.id,
-        userId,
-        match.pitchId,
-        match.description,
-        match.format,
-        match.minAttendance,
-        match.startsAt,
-        match.durationInMinutes,
-      ],
-    );
+    [
+      match.id,
+      userId,
+      match.pitchId,
+      match.description,
+      match.format,
+      match.minAttendance,
+      match.startsAt,
+      match.durationInMinutes,
+    ],
+  );
 
-    await client.query("COMMIT");
-    return result.rows[0] ?? null;
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
-  }
+  return result.rows[0] ?? null;
 }
 
 export async function deleteMatch(

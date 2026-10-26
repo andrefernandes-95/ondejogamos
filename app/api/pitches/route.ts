@@ -221,17 +221,13 @@ export async function PUT(request: Request) {
   const requiredPitchId = formData.get("id");
   const existingPitch = await getPitchById(Number(requiredPitchId));
 
-  if (!existingPitch) {
-    return Response.json({ error: "Campo não encontrado" }, { status: 404 });
-  }
-
   if (existingPitch.created_by !== createdBy) {
     return Response.json(
       {
         error: "Não autorizado",
       },
       {
-        status: 403,
+        status: 503,
       },
     );
   }

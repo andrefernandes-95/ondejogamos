@@ -1,18 +1,19 @@
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
+import useLocalization from "@/app/hooks/locale";
 import { authClient } from "@/app/lib/auth-client";
 import { Button } from "@mui/material";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 
 export default function ParticipateButton({
   handleAttendance,
 }: {
   handleAttendance: ({ isAttending }: { isAttending: boolean }) => void;
 }) {
-  const tApp = useTranslations();
   const [open, setOpen] = useState<boolean>(false);
 
   const session = authClient.useSession();
+
+  const isEn = useLocalization() === "EN";
 
   return (
     <>
@@ -26,7 +27,7 @@ export default function ParticipateButton({
             : setOpen(true)
         }
       >
-        {tApp("App.ParticipateButton.join")}
+        {isEn ? "Join" : "Participar"}
       </Button>
     </>
   );

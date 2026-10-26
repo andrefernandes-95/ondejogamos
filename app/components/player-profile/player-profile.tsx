@@ -1,69 +1,179 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
+import { Background } from "@/app/components/background/background";
 import {
-  Avatar,
+  Box,
   Card,
-  CardContent,
   Container,
   Divider,
   Stack,
   Typography,
 } from "@mui/material";
-import { useTranslations } from "next-intl";
+import Image from "next/image";
 
-interface PlayerProfileProps {
-  name: string;
-  image?: string | null;
-}
-
-export default function PlayerProfile({ name, image }: PlayerProfileProps) {
+export default function PlayerProfile() {
   const t = useTranslations();
 
   return (
-    <Container maxWidth="sm" sx={{ py: 5 }}>
-      <Typography component="h1" variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-        {t("App.PlayerProfile.title")}
-      </Typography>
-      <Card variant="outlined">
-        <CardContent>
-          <Stack sx={{ alignItems: "center", gap: 2 }}>
-            <Avatar
-              src={image ?? undefined}
-              alt={name}
-              sx={{ width: 112, height: 112 }}
-            >
-              {name.trim().charAt(0).toLocaleUpperCase()}
-            </Avatar>
-            <Typography component="h2" variant="h5" sx={{ fontWeight: 700 }}>
-              {name}
-            </Typography>
-          </Stack>
-          <Divider sx={{ my: 3 }} />
-          <Stack spacing={2}>
-            <ProfileField
-              label={t("App.PlayerProfile.preferred_position")}
-              value={t("App.PlayerProfile.not_set")}
-            />
-            <ProfileField
-              label={t("App.PlayerProfile.preferred_area")}
-              value={t("App.PlayerProfile.not_set")}
-            />
-            <ProfileField
-              label={t("App.PlayerProfile.matches")}
-              value={t("App.PlayerProfile.unavailable")}
-            />
-          </Stack>
-        </CardContent>
-      </Card>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+        <Box
+          sx={{
+            width: 250,
+            height: 100,
+            background: "#ada15a",
+            borderRadius: "50%",
+            transform: "translateY(50%)",
+          }}
+        >
+          <Box
+            sx={(theme) => ({
+              width: 100,
+              height: 100,
+              background: theme.palette.background.default,
+              borderRadius: "50%",
+              position: "absolute",
+              left: -50,
+              bottom: 50,
+            })}
+          />
+          <Box
+            sx={(theme) => ({
+              width: 100,
+              height: 100,
+              background: theme.palette.background.default,
+              borderRadius: "50%",
+              position: "absolute",
+              right: -50,
+              bottom: 50,
+            })}
+          />
+        </Box>
+        <Box
+          sx={{
+            position: "relative",
+            width: 260,
+            height: 500,
+            backgroundImage: `linear-gradient(to top, #766e3d, #ada15a 25%)`,
+          }}
+        >
+          <CardContent />
+        </Box>
+        <Box
+          sx={{
+            width: 250,
+            background: "#ada15a",
+            borderRadius: "50%",
+            transform: "translateY(50%)",
+          }}
+        >
+          <Box
+            sx={(theme) => ({
+              width: 300,
+              height: 100,
+              background: theme.palette.background.default,
+              borderRadius: "50%",
+              position: "absolute",
+              bottom: -65,
+              left: -125,
+            })}
+          />
+          <Box
+            sx={(theme) => ({
+              width: 300,
+              height: 100,
+              background: theme.palette.background.default,
+              borderRadius: "50%",
+              position: "absolute",
+              bottom: -65,
+              right: -125,
+            })}
+          />
+        </Box>
+      </Stack>
     </Container>
   );
 }
 
-function ProfileField({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack sx={{ flexDirection: "row", justifyContent: "space-between", gap: 2 }}>
-      <Typography sx={{ fontWeight: 600 }}>{label}</Typography>
-      <Typography color="text.secondary">{value}</Typography>
+const CardContent = () => (
+  <Stack
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      p: 1,
+      paddingTop: 0,
+      gap: 1,
+    }}
+  >
+    <Typography sx={{ fontWeight: 900, alignSelf: "center" }} variant="h5">
+      Joel
+    </Typography>
+    <Divider />
+    <Image
+      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQQtHWmlKO7HKtxl4tNQDjH_KsWXyd-HD3i0TTLQn-_D-XgdPuPiY-yGew&s=10"
+      alt="Player Photo"
+      width="150"
+      height="150"
+      style={{
+        objectFit: "contain",
+        alignSelf: "center",
+        margin: 12,
+      }}
+    />
+    <Stack
+      sx={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1,
+      }}
+    >
+      <Typography sx={{ alignSelf: "center" }} variant="h5">
+        🇵🇹
+      </Typography>
+      <Typography sx={{ fontWeight: 700 }}>Avançado</Typography>
     </Stack>
-  );
-}
+    <Divider />
+    <Stack
+      sx={{
+        p: 1,
+        flexDirection: "row",
+        justifyContent: "space-between",
+      }}
+    >
+      <RenderCol label="Jogos" value="12" />
+      <RenderCol label="Golos" value="10" />
+      <RenderCol label="Assist." value="10" />
+    </Stack>
+    <Divider />
+    <Stack
+      sx={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1,
+        p: 1,
+      }}
+    >
+      <RenderCol label="Zona Preferida" value="Santarém" />
+    </Stack>
+  </Stack>
+);
+
+const RenderCol = ({ label, value }: { label: string; value: string }) => (
+  <Stack
+    sx={{
+      flexDirection: "column",
+      gap: 0.5,
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <Typography sx={{ fontWeight: 700, fontSize: 14 }} variant="caption">
+      {label}
+    </Typography>
+    <Typography variant="body1">{value}</Typography>
+  </Stack>
+);

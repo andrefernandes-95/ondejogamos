@@ -1,6 +1,4 @@
 import auth from "@/app/lib/auth";
-import { apiError } from "@/app/utils/api-error";
-import { MatchTimeConflictError } from "@/app/services/match-availability";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
@@ -39,7 +37,14 @@ export async function POST(request: Request) {
   });
 
   if (!session) {
-    return apiError("AUTHENTICATION_REQUIRED", 401);
+    return Response.json(
+      {
+        error: "Inicia a sessão para agendar um jogo",
+      },
+      {
+        status: 401,
+      },
+    );
   }
 
   const createdBy = session.user.id;
@@ -49,12 +54,27 @@ export async function POST(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return apiError("INVALID_FORM", 400);
+    return Response.json(
+      {
+        error: "Formulário inválido",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const validation = safeParseCreateFormData(formData);
   if (!validation.success) {
-    return apiError("INVALID_MATCH_DATA", 400, validation.error.issues);
+    return Response.json(
+      {
+        error: "Dados inválidos",
+        issues: validation.error.issues,
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const {
@@ -83,11 +103,14 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(`Falha ao agendar jogo`, error);
 
-    if (error instanceof MatchTimeConflictError) {
-      return apiError("MATCH_TIME_CONFLICT", 409);
-    }
-
-    return apiError("MATCH_CREATE_FAILED", 500);
+    return Response.json(
+      {
+        error: `Não foi possível agendar o jogo`,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 
   return Response.json(result, { status: 200 });
@@ -99,7 +122,14 @@ export async function PUT(request: Request) {
   });
 
   if (!session) {
-    return apiError("AUTHENTICATION_REQUIRED", 401);
+    return Response.json(
+      {
+        error: "Inicia a sessão para alterar um jogo",
+      },
+      {
+        status: 401,
+      },
+    );
   }
 
   const createdBy = session.user.id;
@@ -109,13 +139,30 @@ export async function PUT(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return apiError("INVALID_FORM", 400);
+    return Response.json(
+      {
+        error: "Formulário inválido",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const validation = safeParseUpdateFormData(formData);
   if (!validation.success) {
-    return apiError("INVALID_MATCH_DATA", 400, validation.error.issues);
+    return Response.json(
+      {
+        error: "Dados inválidos",
+        issues: validation.error.issues,
+      },
+      {
+        status: 400,
+      },
+    );
   }
+
+  console.log("validation:", validation.data);
 
   const {
     id,
@@ -145,15 +192,25 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error(`Falha ao atualizar jogo`, error);
 
-    if (error instanceof MatchTimeConflictError) {
-      return apiError("MATCH_TIME_CONFLICT", 409);
-    }
-
-    return apiError("MATCH_UPDATE_FAILED", 500);
+    return Response.json(
+      {
+        error: `Não foi possível atualizar o jogo`,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 
   if (!result) {
-    return apiError("MATCH_NOT_FOUND", 404);
+    return Response.json(
+      {
+        error: "Jogo não encontrado ou sem permissão para o alterar",
+      },
+      {
+        status: 404,
+      },
+    );
   }
 
   return Response.json(result, { status: 201 });
@@ -165,7 +222,14 @@ export async function DELETE(request: Request) {
   });
 
   if (!session) {
-    return apiError("AUTHENTICATION_REQUIRED", 401);
+    return Response.json(
+      {
+        error: "Inicia a sessão para remover um jogo",
+      },
+      {
+        status: 401,
+      },
+    );
   }
 
   let formData: FormData;
@@ -173,11 +237,25 @@ export async function DELETE(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return apiError("INVALID_FORM", 400);
+    return Response.json(
+      {
+        error: "Formulário inválido",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   if (!formData.has("id")) {
-    return apiError("INVALID_FORM", 400);
+    return Response.json(
+      {
+        error: "Formulário inválido",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   try {
@@ -185,7 +263,14 @@ export async function DELETE(request: Request) {
   } catch (error) {
     console.error(`Falha ao remover jogo`, error);
 
-    return apiError("MATCH_DELETE_FAILED", 500);
+    return Response.json(
+      {
+        error: `Não foi possível remover o jogo`,
+      },
+      {
+        status: 500,
+      },
+    );
   }
 
   return Response.json(true, { status: 201 });

@@ -14,8 +14,7 @@ import {
 } from "@mui/material";
 import { DatePicker, TimeGrid } from "@mantine/dates";
 import { Match } from "@/app/models/match";
-import { matchTimeRangesOverlap } from "@/app/utils/match-time";
-import { useTranslations } from "next-intl";
+import useLocalization from "@/app/hooks/locale";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -60,7 +59,7 @@ export default function MatchDatePicker({
   current_match_pitch_id,
   current_match_duration_in_minutes,
 }: Props) {
-  const tApp = useTranslations();
+  const isEn = useLocalization() === "EN";
   const id = useId();
 
   const [loading, setLoading] = useState(false);
@@ -98,7 +97,7 @@ export default function MatchDatePicker({
     onChange(date.toISOString());
   };
 
-  const fetchAvailability = useCallback((signal: AbortSignal) => {
+  const fetchAvailability = useCallback(() => {
     if (!current_match_pitch_id || !day) {
       setLoading(false);
       return;
@@ -111,10 +110,7 @@ export default function MatchDatePicker({
         const date = dayjs(day).format("YYYY-MM-DD");
         const nextDate = dayjs(day).add(1, "day").format("YYYY-MM-DD");
         const from = dayjs.tz(date, "Europe/Lisbon").toISOString();
-        const until = dayjs
-          .tz(nextDate, TIMEZONE)
-          .add(current_match_duration_in_minutes, "minute")
-          .toISOString();
+        const until = dayjs.tz(nextDate, "Europe/Lisbon").toISOString();
 
         const params = new URLSearchParams({
           pitch_id: current_match_pitch_id,
@@ -122,50 +118,55 @@ export default function MatchDatePicker({
           until,
         });
 
-        const response = await fetch(`/api/matches/availability?${params}`, {
-          signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Falha ao consultar disponibilidade");
-        }
+        const response = await fetch(`/api/matches/availability?${params}`);
 
         const matches: Match[] = await response.json();
 
-        const otherMatches = matches.filter(
-          (match) => String(match.id) !== String(current_match_id),
-        );
-        const unavailableTimes = ALL_TIMES.filter((slot) => {
-          const candidateStart = dayjs.tz(`${day} ${slot}`, TIMEZONE);
-          if (!candidateStart.isValid()) {
-            return false;
+        const unavailableTimes = matches.flatMap((existingMatch) => {
+          if (current_match_id === existingMatch.id) {
+            return [];
+          }
+          const existingMatchStart = dayjs(existingMatch.starts_at).tz(
+            TIMEZONE,
+          );
+
+          const slots = [];
+
+          for (
+            let offset = 0;
+            offset < existingMatch.duration_in_minutes;
+            offset += 30
+          ) {
+            slots.push(
+              existingMatchStart.add(offset, "minute").format("HH:mm"),
+            );
           }
 
-          return otherMatches.some((match) =>
-            matchTimeRangesOverlap(
-              {
-                startsAt: candidateStart.toISOString(),
-                durationInMinutes: current_match_duration_in_minutes,
-              },
-              {
-                startsAt: match.starts_at,
-                durationInMinutes: match.duration_in_minutes,
-              },
-            ),
-          );
+          // Existing Match: 20.00
+          // We want to unavailable the slots prior according to our match duration
+          // So we for a 60 minute match we block:
+          // 19.30
+          // And allow 19.00
+          // For a 120 m match we block:
+          // 19.30, 19.00, 18.30 And we allo 18.00
+          for (
+            let offset = 0;
+            offset < current_match_duration_in_minutes; // While offset is greater than zero
+            offset += 30
+          ) {
+            slots.push(
+              existingMatchStart.subtract(offset, "minute").format("HH:mm"),
+            );
+          }
+
+          return slots;
         });
 
-        if (!signal.aborted) {
-          setUnavailableTimes(unavailableTimes);
-        }
+        setUnavailableTimes(unavailableTimes);
       } catch (e) {
-        if (!signal.aborted) {
-          console.error("Erro ao consultar disponibilidade:", e);
-        }
+        console.error("Erro ao consultar disponibilidade:", e);
       } finally {
-        if (!signal.aborted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
@@ -178,12 +179,9 @@ export default function MatchDatePicker({
   ]);
 
   useEffect(() => {
-    const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchAvailability(controller.signal);
-
-    return () => controller.abort();
-  }, [fetchAvailability]);
+    return fetchAvailability();
+  }, [fetchAvailability, current_match_pitch_id]);
 
   return (
     <Stack spacing={2}>
@@ -199,7 +197,7 @@ export default function MatchDatePicker({
         }}
       >
         <Stack spacing={1}>
-          <Typography>{tApp("App.MatchDatePicker.match_day")}</Typography>
+          <Typography>{isEn ? "Match Day" : "Dia do Jogo"}</Typography>
 
           <DatePicker
             value={day}
@@ -212,7 +210,7 @@ export default function MatchDatePicker({
         </Stack>
         <Stack spacing={1}>
           <Typography id={`${id}-time-label`}>
-            {tApp("App.MatchDatePicker.start_time")}
+            {isEn ? "Start Time" : "Hora de Início"}
           </Typography>
 
           <Box
@@ -246,8 +244,12 @@ export default function MatchDatePicker({
             onClick={() => setShowAllTimes((current) => !current)}
           >
             {showAllTimes
-              ? tApp("App.MatchDatePicker.see_common_times")
-              : tApp("App.MatchDatePicker.see_all_times")}
+              ? isEn
+                ? "See common times"
+                : "Ver horas habituais"
+              : isEn
+                ? "See all times"
+                : "Ver todas as horas"}
           </Button>
         </Stack>
       </Box>

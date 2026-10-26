@@ -138,7 +138,7 @@ export async function updatePitch(
   return result.rows?.[0] ?? null;
 }
 
-export async function getPitchById(id: number): Promise<Pitch | null> {
+export async function getPitchById(id: number): Promise<Pitch> {
   const result = await pool.query(
     `
       SELECT * FROM "pitches"

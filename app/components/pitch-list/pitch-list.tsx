@@ -2,6 +2,7 @@ import CreatePitchButton from "@/app/components/create-pitch-button/create-pitch
 import DeletePitch from "@/app/components/delete-pitch-button/delete-pitch-button";
 import PageTitle from "@/app/components/page-title/page-title";
 import PitchUrlButton from "@/app/components/pitch-url-button/pitch-url-button";
+import useLocalization from "@/app/hooks/locale";
 import { PitchFull } from "@/app/services/pitches";
 import {
   Box,
@@ -18,35 +19,32 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
 
 export default function PitchList({ data }: { data: PitchFull[] }) {
-  const tApp = useTranslations();
-  const locale = useLocale();
+  const isEn = useLocalization() === "EN";
 
   return (
     <Container maxWidth="lg" sx={{ p: 2 }}>
-      <PageTitle title={tApp("App.PitchList.pitch_list")} />
+      <PageTitle title={isEn ? "Pitch List" : "Campos Registados"} />
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{tApp("App.PitchList.image")}</TableCell>
-              <TableCell>{tApp("App.PitchList.name")}</TableCell>
-              <TableCell>{tApp("App.PitchList.municipality")}</TableCell>
-              <TableCell>{tApp("App.PitchList.area")}</TableCell>
-              <TableCell>{tApp("App.PitchList.date_added")}</TableCell>
-              <TableCell>{tApp("App.PitchList.added_by")}</TableCell>{" "}
+              <TableCell>{isEn ? "Image" : "Imagem"}</TableCell>
+              <TableCell>{isEn ? "Name" : "Nome"}</TableCell>
+              <TableCell>{isEn ? "Municipality" : "Município"}</TableCell>
+              <TableCell>{isEn ? "Area" : "Área"}</TableCell>
+              <TableCell>{isEn ? "Date Added" : "Data de Registo"}</TableCell>
+              <TableCell>{isEn ? "Added By" : "Adicionado Por"}</TableCell>{" "}
               <TableCell>
-                {tApp("App.PitchList.games_scheduled")}
+                {isEn ? "Games Scheduled" : "Jogos Criados"}
               </TableCell>
-              <TableCell>{tApp("App.PitchList.actions")}</TableCell>
+              <TableCell>{isEn ? "Actions" : "Ações"}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((pitch) => {
-              const weekDay = new Intl.DateTimeFormat(locale, {
+              const weekDay = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",

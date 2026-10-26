@@ -22,7 +22,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import NextLink from "next/link";
 import { AppRoutes } from "@/app/utils/routes";
-import { useTranslations } from "next-intl";
+import useLocalization from "@/app/hooks/locale";
 
 type Mode = "login" | "signup";
 
@@ -32,29 +32,18 @@ interface Props {
 
 const MIN_PASSWORD_LENGTH = 10;
 
-function createSchema(
-  mode: Mode,
-  messages: {
-    maxName: string;
-    invalidEmail: string;
-    invalidPassword: string;
-    maxPassword: string;
-    insertName: string;
-    minPassword: (count: number) => string;
-    passwordsMismatch: string;
-  },
-) {
+function createSchema(mode: Mode, isEn: boolean) {
   return z
     .object({
       name: z
         .string()
         .trim()
-        .max(100, messages.maxName),
-      email: z.email(messages.invalidEmail),
+        .max(100, isEn ? `Max 100 characters` : "Máximo de 100 caracteres"),
+      email: z.email(isEn ? "Invalid email" : "Introduz um e-mail válido"),
       password: z
         .string()
-        .min(1, messages.invalidPassword)
-        .max(128, messages.maxPassword),
+        .min(1, isEn ? "Invalid password" : "Introduz uma password")
+        .max(128, isEn ? "Max 128 characters" : "Máximo de 128 caracteres"),
       confirmPassword: z.string(),
     })
     .superRefine((values, ctx) => {
@@ -66,7 +55,7 @@ function createSchema(
         ctx.addIssue({
           code: "custom",
           path: ["name"],
-          message: messages.insertName,
+          message: isEn ? "Insert a name" : "Introduz o teu nome",
         });
       }
 
@@ -74,7 +63,9 @@ function createSchema(
         ctx.addIssue({
           code: "custom",
           path: ["password"],
-          message: messages.minPassword(MIN_PASSWORD_LENGTH),
+          message: isEn
+            ? `Use at least ${MIN_PASSWORD_LENGTH} characters`
+            : `Usa pelo menos ${MIN_PASSWORD_LENGTH} caracteres`,
         });
       }
 
@@ -82,7 +73,9 @@ function createSchema(
         ctx.addIssue({
           code: "custom",
           path: ["confirmPassword"],
-          message: messages.passwordsMismatch,
+          message: isEn
+            ? "Passwords do not match"
+            : `As passwords não coincidem`,
         });
       }
     });
@@ -91,12 +84,12 @@ function createSchema(
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
 export default function AuthForm({ mode }: Props) {
-  const tApp = useTranslations();
   const router = useRouter();
   const isSignup = mode === "signup";
 
   const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState("");
+  const isEn = useLocalization() === "EN";
   const {
     control,
     handleSubmit,
@@ -105,17 +98,7 @@ export default function AuthForm({ mode }: Props) {
     resetField,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(
-      createSchema(mode, {
-        maxName: tApp("App.AuthForm.max_100_characters"),
-        invalidEmail: tApp("App.AuthForm.invalid_email"),
-        invalidPassword: tApp("App.AuthForm.invalid_password"),
-        maxPassword: tApp("App.AuthForm.max_128_characters"),
-        insertName: tApp("App.AuthForm.insert_a_name"),
-        minPassword: (count) => tApp("App.AuthForm.minimum_password_length", { count }),
-        passwordsMismatch: tApp("App.AuthForm.passwords_do_not_match"),
-      }),
-    ),
+    resolver: zodResolver(createSchema(mode, isEn)),
     defaultValues: {
       name: "",
       email: "",
@@ -146,8 +129,9 @@ export default function AuthForm({ mode }: Props) {
         if (result.error) {
           setError("root.server", {
             message:
-              result.error.message ||
-              (tApp("App.AuthForm.could_not_create_account")),
+              result.error.message || isEn
+                ? "Could not create account"
+                : "Não foi possível criar a conta",
           });
           return;
         }
@@ -174,11 +158,17 @@ export default function AuthForm({ mode }: Props) {
       if (result.error) {
         let message = "";
         if (result.error.code === "EMAIL_NOT_VERIFIED") {
-          message = tApp("App.AuthForm.confirm_your_e_mail");
+          message = isEn
+            ? "Confirm your e-mail"
+            : "Confirma o teu e-mail antes de iniciar sessão.";
         } else if (result.error.status === 429) {
-          message = tApp("App.AuthForm.too_many_attempts_try_again_later");
+          message = isEn
+            ? "Too many attempts. Try again later."
+            : "Demasiadas tentativas. Tenta novamente daqui a pouco.";
         } else {
-          message = tApp("App.AuthForm.could_not_sign_in_please_try_again");
+          message = isEn
+            ? "Could not sign in. Please try again."
+            : "Não foi possível entrar. Verifica os dados e tenta novamente.";
         }
 
         setError("root.server", { message });
@@ -188,7 +178,9 @@ export default function AuthForm({ mode }: Props) {
       goHome();
     } catch {
       setError("root.server", {
-        message: tApp("App.AuthForm.something_went_wrong"),
+        message: isEn
+          ? "Something went wrong!"
+          : "Não foi possível contactar o servidor. Tenta novamente.",
       });
     }
   };
@@ -200,14 +192,22 @@ export default function AuthForm({ mode }: Props) {
           <Box>
             <Typography component="h1" variant="h5">
               {isSignup
-                ? tApp("App.AuthForm.sign_up")
-                : tApp("App.AuthForm.sign_in")}
+                ? isEn
+                  ? "Sign Up"
+                  : "Criar conta"
+                : isEn
+                  ? "Sign In"
+                  : "Entrar"}
             </Typography>
 
             <Typography color="text.secondary" sx={{ mt: 1 }}>
               {isSignup
-                ? tApp("App.AuthForm.create_an_account_to_organize_and_participate_in_games")
-                : tApp("App.AuthForm.sign_in_to_your_account")}
+                ? isEn
+                  ? "Create an account to organize and participate in games"
+                  : "Cria uma conta para organizar e participar em jogos"
+                : isEn
+                  ? "Sign in to your account"
+                  : "Entra na tua conta para continuar"}
             </Typography>
           </Box>
 
@@ -234,7 +234,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label={tApp("App.AuthForm.name")}
+                      label={isEn ? "Name" : "Nome"}
                       autoComplete="name"
                       required
                       fullWidth
@@ -256,7 +256,7 @@ export default function AuthForm({ mode }: Props) {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     inputRef={field.ref}
-                    label={tApp("App.AuthForm.email")}
+                    label="Email"
                     type="email"
                     autoComplete="email"
                     required
@@ -278,7 +278,7 @@ export default function AuthForm({ mode }: Props) {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     inputRef={field.ref}
-                    label={tApp("App.AuthForm.password")}
+                    label="Password"
                     type={showPassword ? "text" : "password"}
                     autoComplete={
                       isSignup ? "new-password" : "current-password"
@@ -298,8 +298,12 @@ export default function AuthForm({ mode }: Props) {
                               disabled={isSubmitting}
                               aria-label={
                                 showPassword
-                                  ? tApp("App.AuthForm.hide_password")
-                                  : tApp("App.AuthForm.show_password")
+                                  ? isEn
+                                    ? "Hide password"
+                                    : "Ocultar password"
+                                  : isEn
+                                    ? "Show password"
+                                    : "Mostrar password"
                               }
                               aria-pressed={showPassword}
                               onClick={() => setShowPassword((value) => !value)}
@@ -329,7 +333,7 @@ export default function AuthForm({ mode }: Props) {
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       inputRef={field.ref}
-                      label={tApp("App.AuthForm.confirm_password")}
+                      label={isEn ? "Confirm password" : "Confirmar password"}
                       type={showPassword ? "text" : "password"}
                       autoComplete={"new-password"}
                       required
@@ -350,24 +354,36 @@ export default function AuthForm({ mode }: Props) {
                 disabled={isSubmitting}
               >
                 {isSignup
-                  ? tApp("App.AuthForm.create_account")
-                  : tApp("App.AuthForm.sign_in")}
+                  ? isEn
+                    ? "Create account"
+                    : "Criar conta"
+                  : isEn
+                    ? "Sign In"
+                    : "Entrar"}
               </Button>
             </Stack>
           </Box>
 
           <Typography variant="body2">
             {isSignup
-              ? tApp("App.AuthForm.already_have_an_account")
-              : tApp("App.AuthForm.no_account_yet")}
+              ? isEn
+                ? "Already have an account? "
+                : "Já tens conta? "
+              : isEn
+                ? "No account yet? "
+                : "Ainda não tens conta? "}
 
             <Link
               component={NextLink}
               href={isSignup ? AppRoutes.LOGIN : AppRoutes.SIGN_UP}
             >
               {isSignup
-                ? tApp("App.AuthForm.sign_in")
-                : tApp("App.AuthForm.create_account")}
+                ? isEn
+                  ? "Sign In"
+                  : "Entrar"
+                : isEn
+                  ? "Create account"
+                  : "Criar conta"}
             </Link>
           </Typography>
         </Stack>

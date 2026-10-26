@@ -1,6 +1,6 @@
+import useLocalization from "@/app/hooks/locale";
 import { OpenInNew } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { useTranslations } from "next-intl";
 
 export default function PitchUrlButton({
   maps_url,
@@ -9,7 +9,7 @@ export default function PitchUrlButton({
   maps_url: string;
   isSmall?: boolean;
 }) {
-  const tApp = useTranslations();
+  const isEn = useLocalization() === "EN";
   return (
     <>
       {maps_url && (
@@ -21,7 +21,7 @@ export default function PitchUrlButton({
           target="_blank"
           rel="noopener noreferrer"
           aria-label={
-            tApp("App.PitchUrlButton.open_in_google_maps")
+            isEn ? "Open in Google Maps" : "Abrir localização no Google Maps"
           }
         >
           <OpenInNew sx={{ fontSize: isSmall ? 14 : 18 }} />

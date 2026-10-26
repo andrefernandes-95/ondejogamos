@@ -1,7 +1,6 @@
 import PageTitle from "@/app/components/page-title/page-title";
+import useLocalization from "@/app/hooks/locale";
 import { Player } from "@/app/services/user";
-import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
 import {
   Container,
   Paper,
@@ -15,25 +14,24 @@ import {
 } from "@mui/material";
 
 export default function PlayerList({ data }: { data: Player[] }) {
-  const tApp = useTranslations();
-  const locale = useLocale();
+  const isEn = useLocalization() === "EN";
   return (
     <Container maxWidth="lg" sx={{ p: 2 }}>
-      <PageTitle title={tApp("App.PlayerList.player_list")} />
+      <PageTitle title={isEn ? "Player List" : "Jogadores Registados"} />
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{tApp("App.PlayerList.name")}</TableCell>
-              <TableCell>{tApp("App.PlayerList.joined_at")}</TableCell>
+              <TableCell>{isEn ? "Name" : "Nome"}</TableCell>
+              <TableCell>{isEn ? "Joined At" : "Data de Registo"}</TableCell>
               <TableCell>
-                {tApp("App.PlayerList.games_scheduled")}
+                {isEn ? "Games Scheduled" : "Jogos Criados"}
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((player) => {
-              const weekDay = new Intl.DateTimeFormat(locale, {
+              const weekDay = new Intl.DateTimeFormat(isEn ? "en" : "pt-PT", {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",

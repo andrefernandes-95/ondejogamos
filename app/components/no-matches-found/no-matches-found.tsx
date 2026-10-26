@@ -1,6 +1,6 @@
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
+import useLocalization from "@/app/hooks/locale";
 import { Card, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
 
 export default function NoMatchesFound({
   area,
@@ -9,7 +9,7 @@ export default function NoMatchesFound({
   area: string;
   onAddPitch: () => void;
 }) {
-  const tApp = useTranslations();
+  const isEn = useLocalization() === "EN";
 
   return (
     <Card
@@ -24,11 +24,15 @@ export default function NoMatchesFound({
     >
       {area ? (
         <Typography>
-          {tApp("App.NoMatchesFound.no_matches_scheduled_in_area", { area })}
+          {isEn
+            ? `No matches scheduled in ${area}. Be the first!`
+            : `Ainda não há jogos agendados para ${area}. Sê o(a) primeiro(a)!`}
         </Typography>
       ) : (
         <Typography>
-          {tApp("App.NoMatchesFound.no_matches_scheduled_be_the_first")}
+          {isEn
+            ? `No matches scheduled. Be the first!`
+            : `Ainda não há jogos agendados. Sê o(a) primeiro(a)!`}
         </Typography>
       )}
       <ScheduleMatchButton selectedArea={area} onAddPitch={onAddPitch} />

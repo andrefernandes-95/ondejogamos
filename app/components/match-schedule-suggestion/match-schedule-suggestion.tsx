@@ -1,20 +1,19 @@
 import ScheduleMatchButton from "@/app/components/schedule-match-button/schedule-match-button";
+import useLocalization from "@/app/hooks/locale";
 import { useSuggestPitches } from "@/app/hooks/pitches";
 import { Pitch } from "@/app/services/pitches";
 import { CalendarToday, LocationOn } from "@mui/icons-material";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 
 interface Props {
   area: string;
-  onMatchSaved: () => void;
 }
 
 const MAX_SUGGESTIONS = 4;
 
-export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
-  const tApp = useTranslations();
+export default function MatchScheduleSuggestion({ area }: Props) {
+  const isEn = useLocalization() === "EN";
 
   const pitches = useSuggestPitches(area, MAX_SUGGESTIONS);
 
@@ -59,13 +58,17 @@ export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
           />
           <Typography variant="h6">
             {area
-              ? tApp("App.MatchScheduleSuggestion.schedule_a_match_in_area", { area })
-              : tApp("App.MatchScheduleSuggestion.schedule_a_match")}
+              ? isEn
+                ? `Schedule a match in ${area}`
+                : `Marca um jogo em ${area}`
+              : isEn
+                ? `Schedule a match `
+                : `Marca um jogo`}
           </Typography>
         </Stack>
 
         <Typography variant="caption">
-          {tApp("App.MatchScheduleSuggestion.choose_a_pitch_to_start")}
+          {isEn ? "Choose a pitch to start" : "Escolhe um campo para começar"}
         </Typography>
       </Stack>
 
@@ -81,24 +84,14 @@ export default function MatchScheduleSuggestion({ area, onMatchSaved }: Props) {
         }}
       >
         {suggestions.map((pitch) => (
-          <MatchScheduleSuggestionItem
-            pitch={pitch}
-            key={pitch.id}
-            onMatchSaved={onMatchSaved}
-          />
+          <MatchScheduleSuggestionItem pitch={pitch} key={pitch.id} />
         ))}
       </Box>
     </Card>
   );
 }
 
-const MatchScheduleSuggestionItem = ({
-  pitch,
-  onMatchSaved,
-}: {
-  pitch: Pitch;
-  onMatchSaved: () => void;
-}) => {
+const MatchScheduleSuggestionItem = ({ pitch }: { pitch: Pitch }) => {
   return (
     <Card
       sx={{
@@ -149,7 +142,6 @@ const MatchScheduleSuggestionItem = ({
             selectedArea={pitch.area}
             onAddPitch={() => {}}
             selectedPitch={pitch.id.toString()}
-            onMatchSaved={onMatchSaved}
           />
         </Stack>
       </Stack>

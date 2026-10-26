@@ -1,4 +1,6 @@
+import useLocalization from "@/app/hooks/locale";
 import { PitchFull } from "@/app/services/pitches";
+import { AppRoutes } from "@/app/utils/routes";
 import { Cancel } from "@mui/icons-material";
 import {
   Alert,
@@ -10,17 +12,20 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 
 interface Props {
   pitch: PitchFull;
 }
 
 export default function DeletePitch({ pitch }: Props) {
-  const tApp = useTranslations();
   const [confirm, setConfirm] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  const router = useRouter();
+
+  const isEn = useLocalization() === "EN";
 
   const handleDelete = async () => {
     setServerError("");
@@ -36,14 +41,14 @@ export default function DeletePitch({ pitch }: Props) {
 
       if (!response.ok) {
         setServerError(
-          tApp("App.DeletePitchButton.could_not_remove_pitch"),
+          isEn ? "Could not remove pitch" : "Não foi possível remover o campo",
         );
         return;
       }
 
       window.location.reload();
     } catch {
-      setServerError(tApp("App.DeletePitchButton.an_error_occurred"));
+      setServerError(isEn ? "An error occurred" : `Ocorreu um erro`);
     }
   };
 
@@ -60,7 +65,9 @@ export default function DeletePitch({ pitch }: Props) {
           }}
         >
           <Typography variant="h5">
-            {tApp("App.DeletePitchButton.are_you_sure_you_want_to_remove_this_pitch")}
+            {isEn
+              ? "Are you sure you want to remove this pitch?"
+              : "Desejas remover este campo?"}
           </Typography>
         </DialogTitle>
 
@@ -70,7 +77,9 @@ export default function DeletePitch({ pitch }: Props) {
               <Alert severity="error">{serverError}</Alert>
             ) : (
               <Typography>
-                {tApp("App.DeletePitchButton.this_action_is_irreversible")}
+                {isEn
+                  ? "This action is irreversible"
+                  : "Esta acção é irreversível"}
               </Typography>
             )}
           </Stack>
@@ -90,7 +99,7 @@ export default function DeletePitch({ pitch }: Props) {
           }}
         >
           <Button color="error" onClick={() => setConfirm(false)}>
-            {tApp("App.DeletePitchButton.cancel")}
+            {isEn ? "Cancel" : "Cancelar"}
           </Button>
           <Stack
             sx={{
@@ -105,7 +114,7 @@ export default function DeletePitch({ pitch }: Props) {
             }}
           >
             <Button color="error" onClick={handleDelete} variant="contained">
-              {tApp("App.DeletePitchButton.remove_pitch")}
+              {isEn ? "Remove Pitch" : "Remover Campo"}
             </Button>
           </Stack>
         </DialogActions>
@@ -122,7 +131,7 @@ export default function DeletePitch({ pitch }: Props) {
       >
         <Cancel sx={{ fontSize: 18 }} />
         <Typography variant="button">
-          {tApp("App.DeletePitchButton.remove_pitch")}
+          {isEn ? "Remove Pitch" : "Remover Campo"}
         </Typography>
       </Button>
     </>

@@ -5,24 +5,23 @@ import { useState } from "react";
 import CreateMatchModal from "@/app/components/modals/create-match-modal/create-match-modal";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
-import { CallMade } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
+import useLocalization from "@/app/hooks/locale";
+import { CallMade, OpenInFull } from "@mui/icons-material";
 
 export default function ScheduleMatchButton({
   selectedArea,
   selectedPitch,
   onAddPitch,
-  onMatchSaved,
   isSmall = false,
 }: {
   selectedArea: string;
   onAddPitch: () => void;
-  onMatchSaved?: () => void;
   isSmall?: boolean;
   selectedPitch?: string;
 }) {
-  const tApp = useTranslations();
   const [isCreatingGame, setIsCreatingGame] = useState<boolean>(false);
+
+  const isEn = useLocalization() === "EN";
 
   return (
     <>
@@ -30,7 +29,9 @@ export default function ScheduleMatchButton({
         title={
           selectedArea?.length
             ? ""
-            : tApp("App.ScheduleMatchButton.select_an_area_first")
+            : isEn
+              ? "Select an area first"
+              : "Seleciona uma área primeiro"
         }
       >
         <span style={{ display: "inline-flex", flexShrink: 0 }}>
@@ -41,7 +42,7 @@ export default function ScheduleMatchButton({
             size={isSmall ? "small" : "medium"}
           >
             {!isSmall && <SportsSoccerIcon />}
-            {tApp("App.ScheduleMatchButton.schedule_game")}
+            {isEn ? "Schedule Game" : "Agendar Jogo"}
             {isSmall && <CallMade sx={{ fontSize: 12 }} />}
           </Button>
         </span>
@@ -54,7 +55,6 @@ export default function ScheduleMatchButton({
             setOpen={setIsCreatingGame}
             onAddPitch={onAddPitch}
             selectedPitch={selectedPitch}
-            onSaved={onMatchSaved}
           />
         </RequireAuthModal>
       )}

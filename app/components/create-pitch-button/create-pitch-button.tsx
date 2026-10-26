@@ -7,8 +7,8 @@ import PlaceIcon from "@mui/icons-material/Place";
 import CreatePitchModal from "@/app/components/modals/create-pitch-modal/create-pitch-modal";
 import RequireAuthModal from "@/app/components/modals/require-auth-modal/require-auth-modal";
 import { Button } from "@mui/material";
+import useLocalization from "@/app/hooks/locale";
 import { PitchFull } from "@/app/services/pitches";
-import { useTranslations } from "next-intl";
 
 export default function CreatePitchButton({
   selectedArea,
@@ -23,7 +23,7 @@ export default function CreatePitchButton({
   existingPitch?: PitchFull;
   onUpdatePitch?: () => void;
 }) {
-  const tApp = useTranslations();
+  const isEn = useLocalization() === "EN";
 
   return (
     <>
@@ -43,7 +43,9 @@ export default function CreatePitchButton({
         title={
           selectedArea?.length
             ? ""
-            : tApp("App.CreatePitchButton.select_an_area_first")
+            : isEn
+              ? "Select an area first"
+              : "Seleciona uma área primeiro"
         }
       >
         <span style={{ display: "inline-flex", flexShrink: 0 }}>
@@ -54,8 +56,12 @@ export default function CreatePitchButton({
           >
             <PlaceIcon />
             {existingPitch
-              ? tApp("App.CreatePitchButton.edit_pitch")
-              : tApp("App.CreatePitchButton.add_pitch")}
+              ? isEn
+                ? "Edit Pitch"
+                : "Editar Campo"
+              : isEn
+                ? "Add Pitch"
+                : "Adicionar Campo"}
           </Button>
         </span>
       </Tooltip>

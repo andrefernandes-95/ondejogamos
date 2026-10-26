@@ -1,53 +1,27 @@
 import { Pitch } from "@/app/services/pitches";
 import { useEffect, useState } from "react";
 
-export function useListPitchesForArea(area: string) {
+export function useListPitchesForArea(area: string): Pitch[] {
   const [pitches, setPitches] = useState<Pitch[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    const controller = new AbortController();
-
     const fetchPitchesForArea = async () => {
-      setLoading(true);
-      setError(false);
+      const response = await fetch(
+        `/api/pitches?area=${encodeURIComponent(area)}`,
+      );
 
-      try {
-        const response = await fetch(
-          `/api/pitches?area=${encodeURIComponent(area)}`,
-          { signal: controller.signal },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to load pitches");
-        }
-
-        const pitchesForArea: Pitch[] = await response.json();
-        setPitches(pitchesForArea);
-      } catch {
-        if (!controller.signal.aborted) {
-          setPitches([]);
-          setError(true);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+      if (!response.ok) {
+        throw new Error("Falha ao carregar campos");
       }
+
+      const pitchesForArea = await response.json();
+
+      setPitches(pitchesForArea);
     };
+    fetchPitchesForArea();
+  }, [area]);
 
-    void fetchPitchesForArea();
-    return () => controller.abort();
-  }, [area, reloadKey]);
-
-  return {
-    pitches,
-    loading,
-    error,
-    retry: () => setReloadKey((key) => key + 1),
-  };
+  return pitches;
 }
 
 export function useSuggestPitches(area: string, limit: number): Pitch[] {

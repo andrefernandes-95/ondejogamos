@@ -1,15 +1,16 @@
+import useLocalization from "@/app/hooks/locale";
 import { FullMatch } from "@/app/models/match";
-import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 export function useListMatchesForArea(area: string) {
-  const tApp = useTranslations();
   const [matches, setMatches] = useState<FullMatch[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchData = useCallback(async (signal?: AbortSignal) => {
+  const isEn = useLocalization() === "EN";
+
+  const fetchData = async () => {
     setHasFetched(true);
     setLoading(true);
     setError("");
@@ -17,7 +18,6 @@ export function useListMatchesForArea(area: string) {
     try {
       const response = await fetch(
         `/api/matches?area=${encodeURIComponent(area)}`,
-        { signal },
       );
 
       if (!response.ok) {
@@ -26,33 +26,25 @@ export function useListMatchesForArea(area: string) {
 
       const data = await response.json();
 
-      if (!signal?.aborted) {
-        setMatches(data);
-      }
+      setMatches(data);
     } catch (e) {
-      if (signal?.aborted) {
-        return;
-      }
+      console.error(e);
 
       if (typeof e === "string") {
         setError(e);
       } else {
-        setError(tApp("App.Matches.error"));
+        setError(isEn ? "Something went wrong" : "Ocorreu um erro");
       }
     } finally {
-      if (!signal?.aborted) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
-  }, [area, tApp]);
+  };
 
   useEffect(() => {
-    const controller = new AbortController();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchData(controller.signal);
-
-    return () => controller.abort();
-  }, [fetchData]);
+    (() => {
+      fetchData();
+    })();
+  }, [area]);
 
   return { matches, refresh: fetchData, loading, error, hasFetched };
 }
