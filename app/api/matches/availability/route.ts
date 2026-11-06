@@ -1,4 +1,5 @@
 import { getPitchMatchesForDateInterval } from "@/app/services/matches";
+import { apiError } from "@/app/utils/api-error";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,14 +9,7 @@ export async function GET(request: Request) {
   const until = searchParams.get("until");
 
   if (!pitch_id || !from || !until) {
-    return Response.json(
-      {
-        error: "Parâmetros inválidos",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_QUERY", 400);
   }
 
   try {
@@ -23,13 +17,6 @@ export async function GET(request: Request) {
     return Response.json(matches, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Falha ao consultar disponibilidade: ", error);
-    return Response.json(
-      {
-        error: "Não foi possível consultar a disponibilidade",
-      },
-      {
-        status: 500,
-      },
-    );
+    return apiError("AVAILABILITY_READ_FAILED", 500);
   }
 }

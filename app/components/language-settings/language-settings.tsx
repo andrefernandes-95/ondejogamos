@@ -1,16 +1,16 @@
 "use client";
 
-import useLocalization from "@/app/hooks/locale";
 import { IconButton, Stack } from "@mui/material";
 import React from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function LanguageSettings() {
+  const locale = useLocale();
+  const tApp = useTranslations();
   const change = (nextLocale: string) => {
     document.cookie = `locale=${nextLocale}; Path=/; Max-Age:31536000; Same-Site=Lax`;
     window.location.reload();
   };
-
-  const iEn = useLocalization() === "EN";
 
   return (
     <Stack
@@ -22,18 +22,18 @@ export default function LanguageSettings() {
       }}
     >
       <RenderFlagButton
-        isActive={iEn === false}
+        isActive={locale === "pt-PT"}
         change={change}
         code="pt-PT"
-        ariaLabel="Português"
+        ariaLabel={tApp("App.LanguageSettings.portuguese")}
       >
         <>🇵🇹</>
       </RenderFlagButton>
       <RenderFlagButton
-        isActive={iEn}
+        isActive={locale === "en"}
         change={change}
         code="en"
-        ariaLabel="English"
+        ariaLabel={tApp("App.LanguageSettings.english")}
       >
         <>🇬🇧</>
       </RenderFlagButton>
@@ -60,8 +60,10 @@ const RenderFlagButton = ({
       color: "white",
       width: 35,
       height: 35,
+      border: isActive ? "1px solid currentColor" : "1px solid transparent",
     }}
     aria-label={ariaLabel}
+    aria-pressed={isActive}
   >
     {children}
   </IconButton>

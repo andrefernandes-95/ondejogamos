@@ -11,7 +11,10 @@ export const createMatchSchema = z.object({
   format: z.enum(["5x5", "7x7", "11x11"], {
     message: "Formato inválido",
   }),
-  minAttendance: z.number().min(10, "Introduz um número mínimo de jogadores"),
+  minAttendance: z
+    .number()
+    .int("O número de jogadores deve ser inteiro")
+    .min(10, "Introduz um número mínimo de jogadores"),
   durationInMinutes: z.coerce
     .number()
     .int("A duração deve ser um número inteiro")

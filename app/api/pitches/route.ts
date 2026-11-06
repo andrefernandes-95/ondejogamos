@@ -13,6 +13,7 @@ import {
   safeParseFormData,
   safeUpdateParseFormData,
 } from "@/app/validations/pitch";
+import { apiError } from "@/app/utils/api-error";
 import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 export async function GET(request: Request) {
@@ -20,11 +21,16 @@ export async function GET(request: Request) {
   const area = url.searchParams.get("area");
 
   if (!area) {
-    return Response.json({ error: "A área é obrigatória" }, { status: 400 });
+    return apiError("AREA_REQUIRED", 400);
   }
 
-  const pitches = await listPitchesForArea(area);
-  return Response.json(pitches);
+  try {
+    const pitches = await listPitchesForArea(area);
+    return Response.json(pitches);
+  } catch (error) {
+    console.error("Falha ao carregar campos", error);
+    return apiError("PITCH_READ_FAILED", 500);
+  }
 }
 
 export async function POST(request: Request) {
@@ -33,14 +39,7 @@ export async function POST(request: Request) {
   });
 
   if (!session) {
-    return Response.json(
-      {
-        error: "Inicia a sessão para criar um campo",
-      },
-      {
-        status: 401,
-      },
-    );
+    return apiError("AUTHENTICATION_REQUIRED", 401);
   }
 
   const createdBy = session.user.id;
@@ -50,27 +49,12 @@ export async function POST(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return Response.json(
-      {
-        error: "Formulário inválido",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_FORM", 400);
   }
 
   const validation = safeParseFormData(formData);
   if (!validation.success) {
-    return Response.json(
-      {
-        error: "Dados inválidos",
-        issues: validation.error.issues,
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_PITCH_DATA", 400, validation.error.issues);
   }
 
   const { name, area, municipality, maps_url, image } = validation.data;
@@ -82,15 +66,7 @@ export async function POST(request: Request) {
   const publicBucketUrl = process.env.PUBLIC_BUCKET_URL;
   if (!bucket || !publicBucketUrl) {
     console.error(`Configuração S3 incompleta`);
-
-    return Response.json(
-      {
-        error: "Serviço indisponível",
-      },
-      {
-        status: 503,
-      },
-    );
+    return apiError("STORAGE_NOT_CONFIGURED", 503);
   }
 
   try {
@@ -105,14 +81,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(`Falha no upload da imagem`, error);
 
-    return Response.json(
-      {
-        error: "Não foi possível enviar a imagem",
-      },
-      {
-        status: 502,
-      },
-    );
+    return apiError("IMAGE_UPLOAD_FAILED", 502);
   }
 
   const imageUrl = `${process.env.PUBLIC_BUCKET_URL}/${key}`;
@@ -131,6 +100,7 @@ export async function POST(request: Request) {
   try {
     result = await savePitch(pitch);
   } catch (error) {
+    console.error("Falha ao guardar o campo", error);
     try {
       await s3.send(
         new DeleteObjectCommand({
@@ -145,17 +115,10 @@ export async function POST(request: Request) {
       });
     }
 
-    return Response.json(
-      {
-        error: `Não foi possível guardar o campo`,
-      },
-      {
-        status: 500,
-      },
-    );
+    return apiError("PITCH_CREATE_FAILED", 500);
   }
 
-  return Response.json(result, { status: 200 });
+  return Response.json(result, { status: 201 });
 }
 
 export async function PUT(request: Request) {
@@ -164,14 +127,7 @@ export async function PUT(request: Request) {
   });
 
   if (!session) {
-    return Response.json(
-      {
-        error: "Inicia a sessão para editar um campo",
-      },
-      {
-        status: 401,
-      },
-    );
+    return apiError("AUTHENTICATION_REQUIRED", 401);
   }
 
   const createdBy = session.user.id;
@@ -181,39 +137,17 @@ export async function PUT(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return Response.json(
-      {
-        error: "Formulário inválido",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_FORM", 400);
   }
 
   const existingPitchId = Number(formData.get("id"));
   if (!existingPitchId) {
-    return Response.json(
-      {
-        error: "Dados inválidos",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_PITCH_DATA", 400);
   }
 
   const validation = safeUpdateParseFormData(formData);
   if (!validation.success) {
-    return Response.json(
-      {
-        error: "Dados inválidos",
-        issues: validation.error.issues,
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_PITCH_DATA", 400, validation.error.issues);
   }
 
   const { name, area, municipality, maps_url, image } = validation.data;
@@ -221,15 +155,12 @@ export async function PUT(request: Request) {
   const requiredPitchId = formData.get("id");
   const existingPitch = await getPitchById(Number(requiredPitchId));
 
+  if (!existingPitch) {
+    return apiError("PITCH_NOT_FOUND", 404);
+  }
+
   if (existingPitch.created_by !== createdBy) {
-    return Response.json(
-      {
-        error: "Não autorizado",
-      },
-      {
-        status: 503,
-      },
-    );
+    return apiError("FORBIDDEN", 403);
   }
 
   let imageUrl = existingPitch.image_url;
@@ -245,15 +176,7 @@ export async function PUT(request: Request) {
     const publicBucketUrl = process.env.PUBLIC_BUCKET_URL;
     if (!bucket || !publicBucketUrl) {
       console.error(`Configuração S3 incompleta`);
-
-      return Response.json(
-        {
-          error: "Serviço indisponível",
-        },
-        {
-          status: 503,
-        },
-      );
+      return apiError("STORAGE_NOT_CONFIGURED", 503);
     }
 
     try {
@@ -268,14 +191,7 @@ export async function PUT(request: Request) {
     } catch (error) {
       console.error(`Falha no upload da imagem`, error);
 
-      return Response.json(
-        {
-          error: "Não foi possível enviar a imagem",
-        },
-        {
-          status: 502,
-        },
-      );
+      return apiError("IMAGE_UPLOAD_FAILED", 502);
     }
 
     imageUrl = `${process.env.PUBLIC_BUCKET_URL}/${key}`;
@@ -313,14 +229,7 @@ export async function PUT(request: Request) {
       }
     }
 
-    return Response.json(
-      {
-        error: `Não foi possível guardar o campo`,
-      },
-      {
-        status: 500,
-      },
-    );
+    return apiError("PITCH_UPDATE_FAILED", 500);
   }
 
   return Response.json(result, { status: 200 });
@@ -332,14 +241,7 @@ export async function DELETE(request: Request) {
   });
 
   if (!session) {
-    return Response.json(
-      {
-        error: "Inicia a sessão para remover um campo",
-      },
-      {
-        status: 401,
-      },
-    );
+    return apiError("AUTHENTICATION_REQUIRED", 401);
   }
 
   const loggedUser = session.user.id;
@@ -349,51 +251,23 @@ export async function DELETE(request: Request) {
   try {
     formData = await request.formData();
   } catch {
-    return Response.json(
-      {
-        error: "Formulário inválido",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_FORM", 400);
   }
 
   const existingPitchId = Number(formData.get("id"));
   if (!existingPitchId) {
-    return Response.json(
-      {
-        error: "Dados inválidos",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("INVALID_PITCH_DATA", 400);
   }
 
   const requiredPitchId = formData.get("id");
 
   const existingPitch = await getPitchById(Number(requiredPitchId));
   if (!existingPitch) {
-    return Response.json(
-      {
-        error: "Campo não encontrado",
-      },
-      {
-        status: 400,
-      },
-    );
+    return apiError("PITCH_NOT_FOUND", 404);
   }
 
   if (existingPitch.created_by !== loggedUser) {
-    return Response.json(
-      {
-        error: "Não autorizado",
-      },
-      {
-        status: 503,
-      },
-    );
+    return apiError("FORBIDDEN", 403);
   }
 
   try {
@@ -424,24 +298,10 @@ export async function DELETE(request: Request) {
       error instanceof Error &&
       error.message === "PITCH_HAS_ACTIVE_MATCHES"
     ) {
-      return Response.json(
-        {
-          error: `Não podes remover um campo com jogos futuros ou em curso`,
-        },
-        {
-          status: 409,
-        },
-      );
+      return apiError("PITCH_HAS_ACTIVE_MATCHES", 409);
     }
 
-    return Response.json(
-      {
-        error: `Não foi possível remover o campo`,
-      },
-      {
-        status: 500,
-      },
-    );
+    return apiError("PITCH_DELETE_FAILED", 500);
   }
 
   return Response.json(true, { status: 200 });

@@ -2,10 +2,8 @@
 
 import { useTranslations } from "next-intl";
 
-import { Background } from "@/app/components/background/background";
 import {
   Box,
-  Card,
   Container,
   Divider,
   Stack,
@@ -14,8 +12,6 @@ import {
 import Image from "next/image";
 
 export default function PlayerProfile() {
-  const t = useTranslations();
-
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
@@ -97,7 +93,10 @@ export default function PlayerProfile() {
   );
 }
 
-const CardContent = () => (
+const CardContent = () => {
+  const t = useTranslations();
+
+  return (
   <Stack
     sx={{
       display: "flex",
@@ -108,12 +107,12 @@ const CardContent = () => (
     }}
   >
     <Typography sx={{ fontWeight: 900, alignSelf: "center" }} variant="h5">
-      Joel
+      {t("App.PlayerProfile.name")}
     </Typography>
     <Divider />
     <Image
       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQQtHWmlKO7HKtxl4tNQDjH_KsWXyd-HD3i0TTLQn-_D-XgdPuPiY-yGew&s=10"
-      alt="Player Photo"
+      alt={t("App.PlayerProfile.photo_alt")}
       width="150"
       height="150"
       style={{
@@ -133,7 +132,7 @@ const CardContent = () => (
       <Typography sx={{ alignSelf: "center" }} variant="h5">
         🇵🇹
       </Typography>
-      <Typography sx={{ fontWeight: 700 }}>Avançado</Typography>
+      <Typography sx={{ fontWeight: 700 }}>{t("App.PlayerProfile.position")}</Typography>
     </Stack>
     <Divider />
     <Stack
@@ -143,9 +142,9 @@ const CardContent = () => (
         justifyContent: "space-between",
       }}
     >
-      <RenderCol label="Jogos" value="12" />
-      <RenderCol label="Golos" value="10" />
-      <RenderCol label="Assist." value="10" />
+      <RenderCol label={t("App.PlayerProfile.matches")} value="12" />
+      <RenderCol label={t("App.PlayerProfile.goals")} value="10" />
+      <RenderCol label={t("App.PlayerProfile.assists")} value="10" />
     </Stack>
     <Divider />
     <Stack
@@ -157,10 +156,11 @@ const CardContent = () => (
         p: 1,
       }}
     >
-      <RenderCol label="Zona Preferida" value="Santarém" />
+      <RenderCol label={t("App.PlayerProfile.preferred_area")} value="Santarém" />
     </Stack>
   </Stack>
-);
+  );
+};
 
 const RenderCol = ({ label, value }: { label: string; value: string }) => (
   <Stack

@@ -1,19 +1,18 @@
 "use client";
 import ProfileForm from "@/app/components/profile-form/profile-form";
-import useLocalization from "@/app/hooks/locale";
 import { UserProfile } from "@/app/models/user-profile";
-import { getErrorMessage } from "@/app/utils/error";
-import { Card, CircularProgress, Container } from "@mui/material";
-import { useEffect, useState } from "react";
+import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
+import { Alert, Card, CircularProgress, Container } from "@mui/material";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ProfilePage() {
-  const [data, setData] = useState<UserProfile | null>();
+  const tErrors = useTranslations("ApiErrors");
+  const [data, setData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
-  const isEn = useLocalization() === "EN";
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -21,27 +20,25 @@ export default function ProfilePage() {
       const response = await fetch(`/api/profile`);
 
       if (!response.ok) {
-        throw new Error("Falha ao carregar jogos");
+        const code = await readApiErrorCodeFromResponse(response);
+        throw new Error(tErrors(code));
       }
 
-      const data = await response.json();
-      setData(data);
+      const profile: UserProfile = await response.json();
+      setData(profile);
     } catch (e) {
       console.error(e);
-
-      if (typeof e === "string") {
-        setError(getErrorMessage(e, isEn));
-      }
+      setError(e instanceof Error ? e.message : tErrors("INTERNAL_ERROR"));
     } finally {
       setLoading(false);
     }
-  };
+  }, [tErrors]);
 
   useEffect(() => {
     (() => {
-      fetchData();
+      void fetchData();
     })();
-  }, []);
+  }, [fetchData]);
 
   if (loading) {
     return <CircularProgress />;
@@ -50,7 +47,8 @@ export default function ProfilePage() {
   return (
     <Container maxWidth="xs" sx={{ py: 8 }}>
       <Card variant="outlined" sx={{ p: { xs: 3, sm: 4 } }}>
-        <ProfileForm profile={data!} />
+        {error && <Alert severity="error">{error}</Alert>}
+        {data && <ProfileForm profile={data} />}
       </Card>
     </Container>
   );

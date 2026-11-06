@@ -1,8 +1,8 @@
 import MatchCard from "@/app/components/match-card/match-card";
 import NoMatchesFound from "@/app/components/no-matches-found/no-matches-found";
-import useLocalization from "@/app/hooks/locale";
 import { useListMatchesForArea } from "@/app/hooks/matches";
 import { SportsSoccer } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 import {
   Alert,
   Box,
@@ -21,8 +21,7 @@ interface Props {
 export default function MatchList({ area, onAddPitch }: Props) {
   const { matches, refresh, error, loading, hasFetched } =
     useListMatchesForArea(area);
-
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
 
   if (loading || !hasFetched) {
     return (
@@ -85,19 +84,13 @@ export default function MatchList({ area, onAddPitch }: Props) {
           />
           <Typography variant="h6">
             {area
-              ? isEn
-                ? `Upcoming matches in ${area}`
-                : `Próximos jogos em ${area}`
-              : isEn
-                ? `Upcoming matches`
-                : `Próximos jogos`}
+              ? tApp("App.MatchList.upcoming_matches_in_area", { area })
+              : tApp("App.MatchList.upcoming_matches")}
           </Typography>
         </Stack>
 
         <Typography variant="caption">
-          {isEn
-            ? "Join a scheduled or on-going matches"
-            : "Participa num jogo agendado ou a decorrer"}
+          {tApp("App.MatchList.join_a_scheduled_or_on_going_matches")}
         </Typography>
       </Stack>
       <Box

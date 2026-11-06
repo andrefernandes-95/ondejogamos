@@ -1,9 +1,9 @@
 "use client";
 
 import LanguageSettings from "@/app/components/language-settings/language-settings";
-import useLocalization from "@/app/hooks/locale";
 import { AppRoutes } from "@/app/utils/routes";
 import { Instagram, WhatsApp } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 import {
   Box,
   Container,
@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 export default function Footer() {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
 
   return (
     <Box
@@ -61,13 +61,13 @@ export default function Footer() {
 
           <Stack sx={{ alignItems: "center" }}>
             <Link href={AppRoutes.HOME} variant="body2">
-              {isEn ? "Home" : "Início"}
+              {tApp("App.Footer.home")}
             </Link>
             <Link href={AppRoutes.PLAYERS} variant="body2">
-              {isEn ? "Player List" : "Lista de Jogadores"}
+              {tApp("App.Footer.player_list")}
             </Link>
             <Link href={AppRoutes.PITCHES} variant="body2">
-              {isEn ? "Pitches List" : "Lista de Campos"}
+              {tApp("App.Footer.pitches_list")}
             </Link>
           </Stack>
 

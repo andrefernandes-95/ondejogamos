@@ -1,6 +1,5 @@
 "use client";
 
-import useLocalization from "@/app/hooks/locale";
 import {
   FormControl,
   InputLabel,
@@ -9,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   selectedMunicipality: string;
@@ -23,18 +23,18 @@ export default function MunicipalitySelector({
   onMunicipalitySelected,
   errorMessage,
 }: Props) {
-  const isEn = useLocalization() === "EN";
+  const tApp = useTranslations();
 
   return (
     <FormControl fullWidth>
       <InputLabel id="select-municipality">
-        {isEn ? "Municipality" : "Município"}
+        {tApp("App.MunicipalitySelector.municipality")}
       </InputLabel>
       <Select
         labelId="select-municipality"
         id="select-municipality"
         value={selectedMunicipality}
-        label={isEn ? "Municipality" : "Município"}
+        label={tApp("App.MunicipalitySelector.municipality")}
         onChange={({ target: { value } }) => onMunicipalitySelected(value)}
         error={!!errorMessage?.length}
       >
