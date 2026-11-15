@@ -1,5 +1,5 @@
 export interface PlayerIdentity {
   name: string;
-  publicUsername: string | null;
+  publicSlug: string;
   hasPublicPhoto: boolean;
 }

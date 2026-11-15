@@ -15,13 +15,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { publicId } = await params;
   const result = await readCard(publicId);
   if (!result) notFound();
-  const { card, username } = result;
+  const { card, slug } = result;
 
   const title = `${card.name} · Onde Jogamos`;
   const origin = process.env.BETTER_AUTH_URL ?? (
     process.env.NODE_ENV === "production" ? "https://ondejogamos.com" : "http://localhost:3000"
   );
-  const url = new URL(playerCardPath(username), origin);
+  const url = new URL(playerCardPath(slug), origin);
   const image = new URL(`${url.pathname}/image`, origin);
   return {
     title,
@@ -36,7 +36,7 @@ export default async function PublicPlayerCard({ params }: Props) {
   const { publicId } = await params;
   const result = await readCard(publicId);
   if (!result) notFound();
-  if (result.username !== publicId) redirect(playerCardPath(result.username));
+  if (result.slug !== publicId) redirect(playerCardPath(result.slug));
   const t = await getTranslations("App.PlayerCard");
 
   return (

@@ -11,7 +11,6 @@ import CardDisplayOptions from "./card-display-options";
 import CardEditorSection from "./card-editor-section";
 import CardPhotoField from "./card-photo-field";
 import CardStyleOptions from "./card-style-options";
-import CardUsernameField from "./card-username-field";
 import { useCardDraft } from "./use-card-draft";
 
 interface Props {
@@ -56,7 +55,7 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
                 <CardPhotoField portrait={portrait} choosePhoto={choosePhoto} />
                 {pendingPhoto && (
                   <Typography variant="caption" color="text.secondary" role="status">
-                    {t(settings.published && settings.visible.includes("photo") ? "photo_pending_public" : "photo_pending")}
+                    {t(settings.visible.includes("photo") ? "photo_pending_public" : "photo_pending")}
                   </Typography>
                 )}
               </CardEditorSection>
@@ -64,8 +63,6 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
                 <TextField fullWidth required label={t("name")} value={settings.name}
                   slotProps={{ htmlInput: { maxLength: 100 } }}
                   onChange={(event) => setSettings({ ...settings, name: event.target.value })} />
-                <CardUsernameField value={settings.username} onChange={(username) =>
-                  setSettings({ ...settings, username })} />
                 <TextField select fullWidth label={t("area")} value={settings.area ?? ""}
                   slotProps={{ inputLabel: { shrink: true }, select: { displayEmpty: true } }}
                   onChange={(event) => setSettings({ ...settings, area: event.target.value || null })}>

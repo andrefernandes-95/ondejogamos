@@ -1,7 +1,7 @@
 import { pool } from "@/app/lib/db";
 import { defaultCardFields } from "@/app/models/player-card";
 import type { CardBadge, CardField } from "@/app/models/player-card";
-import { playerUsername, publicCardId } from "@/app/schemas/player-card";
+import { playerSlug, publicCardId } from "@/app/schemas/player-card";
 import { visibleCard, playerCardPath, selectedCardBadges } from "@/app/utils/player-card";
 import { getCardStats } from "./card-stats";
 import { earnedCardBadges, founderEligibility } from "./player-card-badges";
@@ -9,21 +9,20 @@ import { earnedCardBadges, founderEligibility } from "./player-card-badges";
 interface CardRow {
   user_id: string;
   name: string;
-  username: string | null;
+  public_slug: string;
   preferred_area: string | null;
   preferred_position: string | null;
   avatar_storage_key: string | null;
   visible_fields: CardField[] | null;
   selected_badges: CardBadge[] | null;
-  published: boolean | null;
   is_founder: boolean;
 }
 
 const selectCard = `
-  SELECT u.id AS user_id, u.name, p.username, p.preferred_area, p.preferred_position,
-         p.avatar_storage_key, p.visible_fields, p.selected_badges, p.published,
+  SELECT u.id AS user_id, u.name, p.public_slug, p.preferred_area, p.preferred_position,
+         p.avatar_storage_key, p.visible_fields, p.selected_badges,
          ${founderEligibility} AS is_founder
-  FROM "user" u LEFT JOIN player_profiles p ON p.user_id = u.id`;
+  FROM "user" u JOIN player_profiles p ON p.user_id = u.id`;
 
 export async function findOwnerCard(userId: string) {
   const { rows } = await pool.query<CardRow>(`${selectCard} WHERE u.id = $1`, [userId]);
@@ -32,12 +31,14 @@ export async function findOwnerCard(userId: string) {
 
 export async function findPublicCard(identifier: string) {
   const legacyId = publicCardId.safeParse(identifier);
-  const username = playerUsername.safeParse(identifier);
-  if (!legacyId.success && !username.success) return null;
-  const column = legacyId.success ? "p.public_id" : "p.username";
+  const slug = playerSlug.safeParse(identifier);
+  if (!legacyId.success && !slug.success) return null;
+  const condition = legacyId.success ? "p.public_id = $1" : `p.user_id = (
+    SELECT user_id FROM player_username_claims WHERE username = $1 AND redirect_enabled
+  )`;
   const { rows } = await pool.query<CardRow>(
-    `${selectCard} WHERE ${column} = $1 AND p.published`,
-    [legacyId.success ? legacyId.data : username.data],
+    `${selectCard} WHERE ${condition}`,
+    [legacyId.success ? legacyId.data : slug.data],
   );
   return rows[0] ?? null;
 }
@@ -45,24 +46,23 @@ export async function findPublicCard(identifier: string) {
 export async function cardData(row: CardRow, portrait: string | null) {
   const earned = earnedCardBadges(row.is_founder);
   return {
+    slug: row.public_slug,
     earned,
     portrait,
     ...(await getCardStats(row.user_id)),
     settings: {
       name: row.name,
-      username: row.username ?? "",
       area: row.preferred_area,
       position: row.preferred_position,
       visible: row.visible_fields ?? defaultCardFields,
       badges: selectedCardBadges(row.selected_badges, earned),
-      published: row.published ?? false,
     },
   };
 }
 
 export async function getPublicCard(identifier: string) {
   const row = await findPublicCard(identifier);
-  if (!row?.username) return null;
-  const portrait = row.avatar_storage_key ? `${playerCardPath(row.username)}/portrait` : null;
-  return { username: row.username, card: visibleCard(await cardData(row, portrait)) };
+  if (!row) return null;
+  const portrait = row.avatar_storage_key ? `${playerCardPath(row.public_slug)}/portrait` : null;
+  return { slug: row.public_slug, card: visibleCard(await cardData(row, portrait)) };
 }

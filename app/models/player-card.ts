@@ -7,12 +7,10 @@ export type CardBadge = (typeof cardBadges)[number];
 
 export interface CardSettings {
   name: string;
-  username: string;
   area: string | null;
   position: string | null;
   visible: CardField[];
   badges: CardBadge[];
-  published: boolean;
 }
 
 export interface CardContent {
@@ -27,6 +25,7 @@ export interface CardContent {
 
 export interface PlayerCardEditorData {
   settings: CardSettings;
+  slug: string;
   portrait: string | null;
   earned: CardBadge[];
   played: number;

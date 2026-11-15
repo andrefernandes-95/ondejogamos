@@ -20,7 +20,7 @@ export async function listUsers(): Promise<Player[]> {
             SELECT
                 u.id,
                 ${publicPlayerIdentity("u", "p")} AS identity,
-                CASE WHEN p.published THEN p.selected_badges END AS "selectedBadges",
+                p.selected_badges AS "selectedBadges",
                 ${founderEligibility} AS "isFounder",
                 u."createdAt",
                 COUNT(m.id)::int AS games_created

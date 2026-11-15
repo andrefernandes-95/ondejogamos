@@ -2,7 +2,7 @@ import PlayerProfile from "@/app/components/player-profile/player-profile";
 import type { CardBadge } from "@/app/models/player-card";
 import type { PlayerIdentity as Player } from "@/app/models/player-identity";
 import { playerCardPath } from "@/app/utils/player-card";
-import { Avatar, Box, Link, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Link, Typography } from "@mui/material";
 
 interface Props {
   player: Player;
@@ -11,11 +11,11 @@ interface Props {
 }
 
 export default function PlayerIdentity({ player, label, preview }: Props) {
-  const href = player.publicUsername ? playerCardPath(player.publicUsername) : undefined;
-  const photo = href && player.hasPublicPhoto ? `${href}/portrait` : undefined;
+  const href = playerCardPath(player.publicSlug);
+  const photo = player.hasPublicPhoto ? `${href}/portrait` : undefined;
   const content = (
     <>
-      {preview && href ? (
+      {preview ? (
         <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
           <PlayerProfile card={{ name: player.name, photo, badges: preview.badges }}
             labels={{ founder: preview.founderLabel, played: "", created: "" }} size={64} />
@@ -32,7 +32,7 @@ export default function PlayerIdentity({ player, label, preview }: Props) {
         <Typography component="span" variant="body2" sx={{ fontWeight: 600 }}>
           {player.name}
         </Typography>
-        {href && preview?.badges.includes("founder") && (
+        {preview?.badges.includes("founder") && (
           <Typography component="span" variant="caption" color="text.secondary"
             sx={{ display: "block" }}>{preview.founderLabel}</Typography>
         )}
@@ -41,9 +41,7 @@ export default function PlayerIdentity({ player, label, preview }: Props) {
   );
   const layout = { width: "fit-content", maxWidth: "100%", alignItems: "center", gap: 1 };
 
-  return href ? (
+  return (
     <Link href={href} underline="hover" sx={{ display: "inline-flex", ...layout }}>{content}</Link>
-  ) : (
-    <Stack direction="row" sx={layout}>{content}</Stack>
   );
 }

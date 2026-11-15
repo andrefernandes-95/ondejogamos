@@ -20,6 +20,6 @@ export function visibleCard(data: Pick<
   };
 }
 
-export function playerCardPath(username: string) {
-  return `/players/${encodeURIComponent(username)}`;
+export function playerCardPath(slug: string) {
+  return `/players/${encodeURIComponent(slug)}`;
 }
