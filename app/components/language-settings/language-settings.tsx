@@ -1,70 +1,40 @@
 "use client";
 
-import { IconButton, Stack } from "@mui/material";
-import React from "react";
+import { Button, Stack } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
+
+const languages = [
+  { code: "pt-PT", label: "PT", name: "portuguese" },
+  { code: "en", label: "EN", name: "english" },
+] as const;
+
+function changeLanguage(code: (typeof languages)[number]["code"]) {
+  document.cookie = `locale=${code}; Path=/; Max-Age:31536000; SameSite=Lax`;
+  window.location.reload();
+}
 
 export default function LanguageSettings() {
   const locale = useLocale();
-  const tApp = useTranslations();
-  const change = (nextLocale: string) => {
-    document.cookie = `locale=${nextLocale}; Path=/; Max-Age:31536000; Same-Site=Lax`;
-    window.location.reload();
-  };
+  const t = useTranslations("App.LanguageSettings");
 
   return (
-    <Stack
-      direction="row"
-      sx={{
-        alignItems: "center",
-        p: 1,
-        gap: 0.5,
-      }}
-    >
-      <RenderFlagButton
-        isActive={locale === "pt-PT"}
-        change={change}
-        code="pt-PT"
-        ariaLabel={tApp("App.LanguageSettings.portuguese")}
-      >
-        <>🇵🇹</>
-      </RenderFlagButton>
-      <RenderFlagButton
-        isActive={locale === "en"}
-        change={change}
-        code="en"
-        ariaLabel={tApp("App.LanguageSettings.english")}
-      >
-        <>🇬🇧</>
-      </RenderFlagButton>
+    <Stack direction="row" spacing={0.5}>
+      {languages.map(({ code, label, name }) => {
+        const active = code === locale;
+        return (
+          <Button
+            key={code}
+            onClick={() => { if (!active) changeLanguage(code); }}
+            variant={active ? "contained" : "text"}
+            aria-label={t(name)}
+            aria-pressed={active}
+            size="small"
+            sx={{ minWidth: 44, minHeight: 44 }}
+          >
+            {label}
+          </Button>
+        );
+      })}
     </Stack>
   );
 }
-
-const RenderFlagButton = ({
-  code,
-  children,
-  change,
-  ariaLabel,
-  isActive,
-}: {
-  children: React.ReactNode;
-  code: string;
-  change: (value: string) => void;
-  ariaLabel: string;
-  isActive: boolean;
-}) => (
-  <IconButton
-    onClick={() => change(code)}
-    sx={{
-      color: "white",
-      width: 35,
-      height: 35,
-      border: isActive ? "1px solid currentColor" : "1px solid transparent",
-    }}
-    aria-label={ariaLabel}
-    aria-pressed={isActive}
-  >
-    {children}
-  </IconButton>
-);

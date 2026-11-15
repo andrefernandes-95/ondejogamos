@@ -38,12 +38,13 @@ export default function Footer() {
             textAlign: "center",
           }}
         >
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+          <Stack direction="row" sx={{ alignItems: "center", justifyContent: "center", gap: 1 }}>
             <IconButton
               component="a"
               rel="noopener noreferrer"
               target="_blank"
-              size="small"
+              aria-label="WhatsApp"
+              color="primary"
               href="https://chat.whatsapp.com/GfmyVK1nYxe22XqrhTmpiT"
             >
               <WhatsApp />
@@ -52,8 +53,9 @@ export default function Footer() {
               component="a"
               rel="noopener noreferrer"
               target="_blank"
-              size="small"
-              href="http://instagram.com/ondejogamos"
+              aria-label="Instagram"
+              color="primary"
+              href="https://instagram.com/ondejogamos"
             >
               <Instagram />
             </IconButton>
