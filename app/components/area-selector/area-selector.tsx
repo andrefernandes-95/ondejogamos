@@ -1,17 +1,8 @@
 "use client";
 
-import { LocationWithGameCount } from "@/app/services/locations";
-import { Close } from "@mui/icons-material";
+import type { LocationWithGameCount } from "@/app/services/locations";
+import { MenuItem, TextField, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
 
 interface Props {
   selectedArea: string;
@@ -19,59 +10,30 @@ interface Props {
   data: LocationWithGameCount[];
 }
 
-export default function AreaSelector({
-  data,
-  selectedArea,
-  handleSelectedArea,
-}: Props) {
-  const tApp = useTranslations();
-  const preparedData: Record<string, number> = {};
-
-  data.forEach((entry) => {
-    preparedData[entry.area] =
-      (preparedData[entry.area] ?? 0) + entry.game_count;
-  });
+export default function AreaSelector({ data, selectedArea, handleSelectedArea }: Props) {
+  const t = useTranslations("App.HomeClient");
+  const counts = new Map<string, number>();
+  for (const entry of data) {
+    counts.set(entry.area, (counts.get(entry.area) ?? 0) + entry.game_count);
+  }
 
   return (
-    <Stack sx={{ flexDirection: "row", flexGrow: 1 }}>
-      <FormControl fullWidth>
-        <InputLabel id="select-area">{tApp("App.AreaSelector.area")}</InputLabel>
-        <Select
-          labelId="select-area"
-          id="select-area"
-          value={selectedArea}
-          label={tApp("App.AreaSelector.area")}
-          renderValue={(value) => value}
-          onChange={({ target: { value } }) => handleSelectedArea(value)}
-        >
-          {Object.entries(preparedData).map((entry) => (
-            <MenuItem
-              key={entry[0]}
-              value={entry[0]}
-              sx={{ justifyContent: "space-between" }}
-            >
-              {entry[0]}
-
-              <Typography color="primary">
-                {entry[1] === 1
-                  ? tApp("App.AreaSelector.1_game_scheduled")
-                  : ""}
-                {entry[1] > 1
-                  ? tApp("App.AreaSelector.games_scheduled", { count: entry[1] })
-                  : ""}
-              </Typography>
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      {selectedArea && (
-        <Button
-          sx={{ flexShrink: 0, flexGrow: 1 }}
-          onClick={() => handleSelectedArea("")}
-        >
-          <Close />
-        </Button>
-      )}
-    </Stack>
+    <TextField
+      select fullWidth label={t("district")} value={selectedArea}
+      onChange={(event) => handleSelectedArea(event.target.value)}
+      slotProps={{
+        inputLabel: { shrink: true },
+        select: { displayEmpty: true, renderValue: (value) => value ? String(value) : t("all_districts") },
+      }}
+      sx={{ "& .MuiOutlinedInput-root": { bgcolor: "background.paper" } }}
+    >
+      <MenuItem value="">{t("all_districts")}</MenuItem>
+      {[...counts].map(([area, count]) => (
+        <MenuItem key={area} value={area} sx={{ justifyContent: "space-between", gap: 2 }}>
+          {area}
+          {count > 0 && <Typography variant="caption" color="primary">{t("match_count", { count })}</Typography>}
+        </MenuItem>
+      ))}
+    </TextField>
   );
 }
