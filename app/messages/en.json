@@ -131,9 +131,6 @@
       "upload_image": "Upload image"
     },
     "NoMatchesFound": {
-      "no_matches_yet": "No games scheduled yet.",
-      "try_another_area": "Try another area or organise a game here.",
-      "start_first_match": "Pick where you want to play and organise the first game.",
       "no_matches_scheduled_be_the_first": "No matches scheduled. Be the first!",
       "no_matches_scheduled_in_area": "No matches scheduled in {area}. Be the first!"
     },
@@ -250,20 +247,6 @@
       "error": "Something went wrong"
     },
     "HomeClient": {
-      "title": "Find a game near you",
-      "intro": "Join a casual football game, even if you don’t know anyone yet.",
-      "district": "District or island",
-      "all_districts": "All districts and islands",
-      "municipality": "Municipality",
-      "all_municipalities": "All municipalities",
-      "match_count": "{count, plural, one {# game} other {# games}}",
-      "upcoming": "Upcoming games",
-      "create_match": "Organise a game",
-      "choose_area": "Where do you want to play?",
-      "cancel": "Cancel",
-      "continue": "Continue",
-      "explore_pitches": "Explore football pitches",
-      "see_all_pitches": "View all pitches",
       "description": "Want to play casual football? In <strong>Onde Jogamos</strong> you can find matches, join other players and organize games in your area."
     },
     "AuthNavbar": {

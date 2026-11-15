@@ -131,9 +131,6 @@
       "upload_image": "Carregar imagem"
     },
     "NoMatchesFound": {
-      "no_matches_yet": "Ainda não há jogos agendados.",
-      "try_another_area": "Experimenta outra zona ou cria uma futebolada aqui.",
-      "start_first_match": "Escolhe onde queres jogar e marca a primeira futebolada.",
       "no_matches_scheduled_be_the_first": "Ainda não há jogos agendados. Sê o(a) primeiro(a)!",
       "no_matches_scheduled_in_area": "Ainda não há jogos agendados para {area}. Sê o(a) primeiro(a)!"
     },
@@ -250,20 +247,6 @@
       "error": "Ocorreu um erro"
     },
     "HomeClient": {
-      "title": "Futeboladas perto de ti",
-      "intro": "Junta-te a um jogo na tua zona, mesmo que ainda não conheças a malta.",
-      "district": "Distrito ou ilha",
-      "all_districts": "Todos os distritos e ilhas",
-      "municipality": "Município",
-      "all_municipalities": "Todos os municípios",
-      "match_count": "{count, plural, one {# jogo} other {# jogos}}",
-      "upcoming": "Próximas futeboladas",
-      "create_match": "Criar uma futebolada",
-      "choose_area": "Onde queres jogar?",
-      "cancel": "Cancelar",
-      "continue": "Continuar",
-      "explore_pitches": "Explorar campos de futebol",
-      "see_all_pitches": "Ver todos os campos",
       "description": "Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes encontrar jogos, juntar-te a outros jogadores e organizar partidas na tua zona."
     },
     "AuthNavbar": {

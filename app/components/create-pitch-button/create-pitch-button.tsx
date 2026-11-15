@@ -16,14 +16,12 @@ export default function CreatePitchButton({
   setIsCreatingPitch,
   existingPitch,
   onUpdatePitch,
-  hideTrigger = false,
 }: {
   selectedArea: string;
   isCreatingPitch: boolean;
   setIsCreatingPitch: React.Dispatch<React.SetStateAction<boolean>>;
   existingPitch?: PitchFull;
   onUpdatePitch?: () => void;
-  hideTrigger?: boolean;
 }) {
   const tApp = useTranslations();
 
@@ -41,7 +39,7 @@ export default function CreatePitchButton({
         </RequireAuthModal>
       )}
 
-      {!hideTrigger && <Tooltip
+      <Tooltip
         title={
           selectedArea?.length
             ? ""
@@ -60,7 +58,7 @@ export default function CreatePitchButton({
               : tApp("App.CreatePitchButton.add_pitch")}
           </Button>
         </span>
-      </Tooltip>}
+      </Tooltip>
     </>
   );
 }
