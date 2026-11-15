@@ -3,6 +3,7 @@ import { cardFrameFilename } from "@/app/components/player-profile/card-finish";
 import { brandBlueLight } from "@/app/design/brand-colors";
 import { readPortrait } from "@/app/lib/portrait-storage";
 import type { CardContent } from "@/app/models/player-card";
+import { renderRoundPortrait } from "@/app/utils/round-portrait";
 import { getTranslations } from "next-intl/server";
 import { ImageResponse } from "next/og";
 import { join } from "node:path";
@@ -16,6 +17,7 @@ export function missingCardMedia() {
 
 export async function portraitResponse(key: string) {
   const bytes = await readPortrait(key);
+  if (!bytes) return missingCardMedia();
   return new Response(new Uint8Array(bytes), {
     headers: { ...noCache, "Content-Type": "image/webp", "X-Content-Type-Options": "nosniff" },
   });
@@ -26,8 +28,9 @@ export async function playerCardPng(card: CardContent, key: string | null, story
   const labels = {
     founder: t("founder"), played: t("played"), created: t("created"),
   };
-  const portrait = card.photo && key
-    ? `data:image/png;base64,${(await sharp(await readPortrait(key)).png().toBuffer()).toString("base64")}`
+  const portraitBytes = card.photo && key ? await readPortrait(key) : null;
+  const portrait = portraitBytes
+    ? `data:image/png;base64,${(await renderRoundPortrait(portraitBytes)).toString("base64")}`
     : undefined;
   const framePath = join(process.cwd(), "public", "card-frames", cardFrameFilename(card.badges[0] === "founder"));
   const frameUrl = `data:image/png;base64,${(await sharp(framePath).png().toBuffer()).toString("base64")}`;

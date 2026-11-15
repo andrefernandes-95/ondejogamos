@@ -1,7 +1,10 @@
 import { pool } from "@/app/lib/db";
+import { isDatabasePortrait } from "@/app/lib/portrait-storage";
 import type { CardUpdate } from "@/app/schemas/player-card";
 
-export async function savePlayerCard(userId: string, data: CardUpdate, uploadedKey: string | null) {
+export async function savePlayerCard(
+  userId: string, data: CardUpdate, uploadedKey: string | null, databasePortrait: Buffer | null,
+) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -19,13 +22,15 @@ export async function savePlayerCard(userId: string, data: CardUpdate, uploadedK
       `UPDATE player_profiles SET preferred_area = $2, preferred_position = $3,
        visible_fields = $4, selected_badges = $5, published = $6,
        avatar_storage_key = $7,
+       avatar_bytes = CASE WHEN $8 THEN avatar_bytes ELSE $9::bytea END,
        avatar_url = CASE WHEN $8 THEN avatar_url ELSE NULL END, updated_at = now()
        WHERE user_id = $1`,
       [userId, data.area, data.position, data.visible, data.badges, data.published,
-        nextKey, data.photoAction === "keep"],
+        nextKey, data.photoAction === "keep", databasePortrait],
     );
 
-    if (previousKey && previousKey !== nextKey && previousKey.startsWith("player-portraits/")) {
+    if (previousKey && previousKey !== nextKey && previousKey.startsWith("player-portraits/") &&
+      !isDatabasePortrait(previousKey)) {
       await client.query(
         "INSERT INTO player_portrait_cleanup (storage_key) VALUES ($1) ON CONFLICT DO NOTHING",
         [previousKey],

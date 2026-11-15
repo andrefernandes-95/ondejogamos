@@ -63,5 +63,5 @@ Deliver PC-01 to PC-03 as the first reviewable slice, then add badges, photos an
 
 1. Start the local database with `docker compose up -d db`.
 2. Apply the schema with `npx dbmate --no-dump-schema migrate`. Run `npm run seed-locations` if the local database has no locations.
-3. In production, set `PLAYER_PORTRAIT_BUCKET` to a private bucket available to the existing S3 client. Local development uses the ignored `.local/player-portraits` directory when this setting is absent.
-4. Schedule `node --env-file=.env --import tsx scripts/clean-player-portraits.ts` in the application environment to retry pending file cleanup.
+3. Portraits use PostgreSQL by default. Set `PLAYER_PORTRAIT_BUCKET` to an accessible private S3 bucket to store new uploads there. Existing database portraits remain readable. Legacy local files remain readable in development.
+4. If using S3, schedule `node --env-file=.env --import tsx scripts/clean-player-portraits.ts` in the application environment to retry pending file cleanup.

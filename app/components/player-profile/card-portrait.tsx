@@ -27,7 +27,8 @@ export default function CardPortrait({ size, finish, photo, name }: Props) {
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- shared with ImageResponse
           <img src={photo} alt="" style={{
-            width: "100%", height: "100%", objectFit: "contain", borderRadius: "50%",
+            display: "block", width: "100%", height: "100%", objectFit: "cover",
+            objectPosition: "center", borderRadius: "50%",
           }} />
         ) : <span>{initials.toUpperCase()}</span>}
       </div>
