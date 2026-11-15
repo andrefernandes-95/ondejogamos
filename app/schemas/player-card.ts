@@ -2,10 +2,12 @@ import { cardBadges, cardFields } from "@/app/models/player-card";
 import { z } from "zod";
 
 export const publicCardId = z.uuid();
+export const playerName = z.string().trim().min(1).max(100);
 export const playerUsername = z.string().trim().toLowerCase()
   .regex(/^[a-z0-9][a-z0-9_-]{1,28}[a-z0-9]$/);
 
 export const cardSettingsSchema = z.object({
+  name: playerName.optional(),
   username: playerUsername.optional(),
   area: z.string().trim().min(1).max(100).nullable(),
   position: z.string().trim().min(1).max(60).nullable(),

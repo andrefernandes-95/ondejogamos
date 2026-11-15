@@ -36,8 +36,11 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
       <DialogTitle id="card-editor-title" sx={{ fontWeight: 700, color: "primary.main" }}>
         {t("edit")}
       </DialogTitle>
+      {error && <Alert severity="error" sx={{ mx: { xs: 2, sm: 3 }, mb: 2, flexShrink: 0 }}>
+        {errors(error)}
+      </Alert>}
       <DialogContent dividers sx={{ p: 0 }}>
-        <Box component="form" id="player-card-form" onSubmit={async (event) => {
+        <Box component="form" id="player-card-form" noValidate onSubmit={async (event) => {
           event.preventDefault();
           const saved = await save();
           if (saved) onSave(saved);
@@ -58,6 +61,9 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
                 )}
               </CardEditorSection>
               <CardEditorSection title={t("player_details")}>
+                <TextField fullWidth required label={t("name")} value={settings.name}
+                  slotProps={{ htmlInput: { maxLength: 100 } }}
+                  onChange={(event) => setSettings({ ...settings, name: event.target.value })} />
                 <CardUsernameField value={settings.username} onChange={(username) =>
                   setSettings({ ...settings, username })} />
                 <TextField select fullWidth label={t("area")} value={settings.area ?? ""}
@@ -75,7 +81,6 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
                   onChange={(founder) => setSettings({ ...settings, badges: founder ? ["founder"] : [] })} />
               )}
               <CardDisplayOptions settings={settings} onChange={setSettings} />
-              {error && <Alert severity="error">{errors(error)}</Alert>}
             </Stack>
           </Box>
         </Box>

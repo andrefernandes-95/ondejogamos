@@ -1,4 +1,4 @@
-import { Attendance } from "@/app/models/attendance";
+import type { PlayerIdentity } from "@/app/models/player-identity";
 import { Pitch } from "@/app/services/pitches";
 import { User } from "better-auth";
 
@@ -21,8 +21,9 @@ export interface FullMatch extends Match {
     user_id: string;
     user_name: string;
     created_at: string;
+    player: PlayerIdentity;
   }>;
   is_attending: boolean;
   is_creator: boolean;
-  creator: { id: string; name: string };
+  creator: PlayerIdentity & { id?: string };
 }

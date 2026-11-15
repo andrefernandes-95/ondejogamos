@@ -9,6 +9,13 @@ export async function savePlayerCard(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    const { rows: [user] } = await client.query<{ name: string }>(
+      'SELECT name FROM "user" WHERE id = $1 FOR NO KEY UPDATE', [userId],
+    );
+    const name = data.name ?? user.name;
+    if (name !== user.name) {
+      await client.query('UPDATE "user" SET name = $2, "updatedAt" = now() WHERE id = $1', [userId, name]);
+    }
     await client.query(
       "INSERT INTO player_profiles (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING",
       [userId],
@@ -43,7 +50,7 @@ export async function savePlayerCard(
     }
 
     await client.query("COMMIT");
-    return { publicId: updated.public_id, username: updated.username };
+    return { publicId: updated.public_id, username: updated.username, name };
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;

@@ -6,6 +6,7 @@ export const cardBadges = ["founder"] as const;
 export type CardBadge = (typeof cardBadges)[number];
 
 export interface CardSettings {
+  name: string;
   username: string;
   area: string | null;
   position: string | null;
@@ -26,7 +27,6 @@ export interface CardContent {
 
 export interface PlayerCardEditorData {
   settings: CardSettings;
-  name: string;
   portrait: string | null;
   earned: CardBadge[];
   played: number;

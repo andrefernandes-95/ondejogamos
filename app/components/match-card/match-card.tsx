@@ -1,19 +1,13 @@
-import ParticipateButton from "@/app/components/participate-button/participate-button";
 import PitchUrlButton from "@/app/components/pitch-url-button/pitch-url-button";
-import { FullMatch } from "@/app/models/match";
-import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
+import type { FullMatch } from "@/app/models/match";
+import { formatMatchDate } from "@/app/utils/match-date";
 import { AppRoutes } from "@/app/utils/routes";
-import {
-  AccessTime,
-  CalendarMonth,
-  Group,
-  LocationPin,
-  MyLocation,
-} from "@mui/icons-material";
-import { Alert, Box, Button, Card, Divider, Stack, Typography } from "@mui/material";
-import Image from "next/image";
+import { AccessTime, CalendarMonth, Group, LocationPin, MyLocation } from "@mui/icons-material";
+import { Alert, Button, Card, Divider, Stack, Typography } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { MatchAttendanceAction, MatchAttendanceStatus, useMatchAttendance } from "./match-attendance";
+import MatchOrganizer from "./match-organizer";
+import MatchPitchPhoto from "./match-pitch-photo";
 
 interface Props {
   match: FullMatch;
@@ -21,215 +15,56 @@ interface Props {
 }
 
 export default function MatchCard({ match, onAttendanceChanged }: Props) {
-  const tApp = useTranslations();
-  const tErrors = useTranslations("ApiErrors");
-  const locale = useLocale();
-  const [serverError, setServerError] = useState("");
-
-  const weekDay = new Intl.DateTimeFormat(locale, {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    timeZone: "Europe/Lisbon",
-  }).format(new Date(match.starts_at));
-
-  const time = new Intl.DateTimeFormat(locale, {
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Lisbon",
-  }).format(new Date(match.starts_at));
-
-  const handleAttendance = async ({
-    isAttending,
-  }: {
-    isAttending: boolean;
-  }) => {
-    setServerError("");
-    const body = new FormData();
-
-    body.append("match_id", match.id);
-
-    try {
-      const response = await fetch(`/api/attendance`, {
-        method: isAttending ? "POST" : "DELETE",
-        body,
-      });
-
-      if (!response.ok) {
-        const code = await readApiErrorCodeFromResponse(response);
-        setServerError(tErrors(code));
-        return;
-      }
-
-      onAttendanceChanged?.();
-    } catch {
-      setServerError(tErrors("INTERNAL_ERROR"));
-    }
-  };
-
-  const hasEnoughPlayers = match.attendances.length + 1 >= match.min_attendance;
+  const t = useTranslations("App.MatchCard");
+  const { day, time } = formatMatchDate(match.starts_at, useLocale());
+  const { error, handleAttendance } = useMatchAttendance(match.id, onAttendanceChanged);
+  const row = { alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 0.5 };
+  const item = { alignItems: "center", gap: 0.5 };
 
   return (
-    <Card
-      sx={() => ({
-        flexDirection: "column",
-        borderRadius: 6,
-        p: 1,
-      })}
-      variant="outlined"
-    >
-      {serverError && <Alert severity="error">{serverError}</Alert>}
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          aspectRatio: "2.5 /1",
-          borderRadius: 6,
-          overflow: "hidden",
-        }}
-      >
-        <Image
-          src={match.pitch.image_url!}
-          alt={match.pitch.image_url!}
-          fill
-          sizes="(max-width: 600px) 100vw 50vw"
-          style={{
-            objectFit: "cover",
-          }}
-        />
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            background: `linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent 25%)`,
-            pointerEvents: "none",
-          }}
-        />
-      </Box>
-      <Box sx={{ p: 2 }}>
-        <Stack
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
+    <Card sx={{ borderRadius: 6, p: 1 }} variant="outlined">
+      {error && <Alert severity="error">{error}</Alert>}
+      <MatchPitchPhoto src={match.pitch.image_url!} />
+      <Stack spacing={1} sx={{ p: 2 }}>
+        <Stack direction="row" sx={row}>
+          <Stack direction="row" sx={item}>
             <CalendarMonth sx={{ fontSize: 18 }} />
-            <Typography
-              variant="body1"
-              color="textPrimary"
-              sx={{ textTransform: "capitalize" }}
-            >
-              {weekDay}
-            </Typography>
+            <Typography sx={{ textTransform: "capitalize" }}>{day}</Typography>
           </Stack>
-
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
+          <Stack direction="row" sx={item}>
             <AccessTime sx={{ fontSize: 18 }} />
-            <Typography variant="body1" color="textSecondary">
-              {time}
-            </Typography>
+            <Typography color="text.secondary">{time}</Typography>
           </Stack>
         </Stack>
-        <Divider sx={{ mb: 1, mt: 1, opacity: 0.5 }} />
-        <Stack
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
+        <Divider />
+        <Stack direction="row" sx={row}>
+          <Stack direction="row" sx={item}>
             <MyLocation />
-            <Typography variant="body1" color="textPrimary">
-              {match.pitch.name}
-            </Typography>
-
-            {match.pitch.maps_url && (
-              <PitchUrlButton maps_url={match.pitch.maps_url} />
-            )}
+            <Typography>{match.pitch.name}</Typography>
+            {match.pitch.maps_url && <PitchUrlButton maps_url={match.pitch.maps_url} />}
           </Stack>
-
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
+          <Stack direction="row" sx={item}>
             <LocationPin />
-            <Typography variant="body1" color="textSecondary">
-              {match.pitch.municipality}, {match.pitch.area}
-            </Typography>
+            <Typography color="text.secondary">{match.pitch.municipality}, {match.pitch.area}</Typography>
           </Stack>
         </Stack>
-        <Divider sx={{ mb: 1, mt: 1, opacity: 0.5 }} />
-        <Stack
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
+        <Divider />
+        <Stack direction="row" sx={row}>
+          <Stack direction="row" sx={item}>
             <Group />
-            <Typography variant="body1" color="textPrimary">
-              {match.format}
-            </Typography>
+            <Typography>{match.format}</Typography>
           </Stack>
-          <Stack sx={{ flexDirection: "row", alignItems: "center", gap: 0.5 }}>
-            <Group color={hasEnoughPlayers ? "warning" : "success"} />
-
-            {hasEnoughPlayers && (
-              <Typography variant="body1" color="warning">
-                {tApp("App.MatchCard.match_is_full_you_can_still_participate")}
-              </Typography>
-            )}
-
-            {!hasEnoughPlayers && (
-              <Typography variant="body1" color="success">
-                {tApp("App.MatchCard.spots_available", {
-                  count: Number(match.min_attendance - 1 - match.attendances.length),
-                })}
-              </Typography>
-            )}
-          </Stack>
+          <MatchAttendanceStatus match={match} />
         </Stack>
-
-        <Divider sx={{ mb: 1, mt: 1, opacity: 0 }} />
-
-        <Stack
-          sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          {match.is_creator ? (
-            <Typography variant="caption">
-              {tApp("App.MatchCard.scheduled_by_you")}
-            </Typography>
-          ) : !match.is_attending ? (
-            <ParticipateButton handleAttendance={handleAttendance} />
-          ) : (
-            <Button
-              variant="text"
-              onClick={() => handleAttendance({ isAttending: false })}
-            >
-              {tApp("App.MatchCard.cancel_participation")}
-            </Button>
-          )}
-
-          <Button
-            variant="text"
-            component="a"
-            href={AppRoutes.MATCH_DETAILS(String(match.id))}
-            size="small"
-            sx={{ minWidth: "unset" }}
-            aria-label={
-              tApp("App.MatchCard.open_match_details")
-            }
-          >
-            {tApp("App.MatchCard.see_details")}
+        <MatchOrganizer player={match.creator} />
+        <Stack direction="row" sx={row}>
+          <MatchAttendanceAction match={match} handleAttendance={handleAttendance} />
+          <Button href={AppRoutes.MATCH_DETAILS(String(match.id))} size="small"
+            sx={{ minWidth: "unset" }} aria-label={t("open_match_details")}>
+            {t("see_details")}
           </Button>
         </Stack>
-      </Box>
+      </Stack>
     </Card>
   );
 }

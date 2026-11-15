@@ -13,6 +13,7 @@
     "missingPlayers": "{count} players needed"
   },
   "ApiErrors": {
+    "INVALID_PLAYER_NAME": "Enter a card name with up to 100 characters.",
     "INVALID_USERNAME": "Choose a username with 3–30 letters, numbers, hyphens or underscores. Start and end with a letter or number.",
     "USERNAME_TAKEN": "This username is already taken. Choose another.",
     "INVALID_PLAYER_PORTRAIT": "Choose a valid JPEG, PNG or WebP image up to 5 MB.",
@@ -52,6 +53,7 @@
       "username_hint": "Used in your public link. If you change your username, the link with the old name stops working.",
       "founder_hint": "Founder is available to players who joined Onde Jogamos by 31 December 2026.",
       "player_details": "Player details",
+      "name": "Name on card",
       "photo_pending": "Photo selected. Save the card to keep it.",
       "photo_pending_public": "Save the card to show this photo on your public link. You can hide it under Show on the card.",
       "publication": "Publication",
@@ -76,7 +78,7 @@
       "standard": "Standard",
       "visibility": "Show on the card",
       "publish": "Publish my card",
-      "publish_note": "Anyone with the link can see the card shown in the preview.",
+      "publish_note": "Your card is accessible by link, from the player directory and from matches you join.",
       "upload_photo": "Choose a photo (JPEG, PNG or WebP, up to 5 MB)",
       "remove_photo": "Remove photo",
       "no_preference": "No preference",

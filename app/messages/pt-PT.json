@@ -13,7 +13,8 @@
     "missingPlayers": "Faltam {count} jogadores"
   },
   "ApiErrors": {
-    "INVALID_USERNAME": "Escolhe um nome com 3 a 30 letras, números, hífenes ou underscores. Começa e acaba com uma letra ou número.",
+    "INVALID_PLAYER_NAME": "Indica um nome para a carta com até 100 caracteres.",
+    "INVALID_USERNAME": "Escolhe um nome de utilizador com 3 a 30 letras, números, hífenes ou underscores. Começa e acaba com uma letra ou número.",
     "USERNAME_TAKEN": "Este nome de utilizador já está em uso. Escolhe outro.",
     "INVALID_PLAYER_PORTRAIT": "Escolhe uma imagem JPEG, PNG ou WebP válida até 5 MB.",
     "AUTHENTICATION_REQUIRED": "Inicia sessão para continuar.",
@@ -52,6 +53,7 @@
       "username_hint": "Aparece no link público. Se mudares o nome, o link com o nome anterior deixa de apontar para ti.",
       "founder_hint": "O estilo Fundador é para quem se juntou ao Onde Jogamos até 31 de dezembro de 2026.",
       "player_details": "Dados do jogador",
+      "name": "Nome na carta",
       "photo_pending": "Foto selecionada. Guarda a carta para a manteres.",
       "photo_pending_public": "Ao guardar, a foto aparece na carta pública. Podes ocultá-la em Mostrar na carta.",
       "publication": "Publicação",
@@ -76,7 +78,7 @@
       "standard": "Normal",
       "visibility": "Mostrar na carta",
       "publish": "Publicar a minha carta",
-      "publish_note": "Qualquer pessoa com o link pode ver a carta apresentada na pré-visualização.",
+      "publish_note": "A carta fica acessível pelo link, pela lista de jogadores e pelos jogos em que participas.",
       "upload_photo": "Escolher foto (JPEG, PNG ou WebP, até 5 MB)",
       "remove_photo": "Remover foto",
       "no_preference": "Sem preferência",

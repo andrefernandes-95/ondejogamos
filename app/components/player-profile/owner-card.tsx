@@ -1,6 +1,7 @@
 "use client";
 
 import ProfileForm from "@/app/components/profile-form/profile-form";
+import { authClient } from "@/app/lib/auth-client";
 import type { PlayerCardEditorData } from "@/app/models/player-card";
 import { visibleCard } from "@/app/utils/player-card";
 import { EditOutlined, LockOutlined, Public } from "@mui/icons-material";
@@ -14,6 +15,7 @@ import PlayerProfile from "./player-profile";
 
 export default function OwnerCard({ initial }: { initial: PlayerCardEditorData }) {
   const t = useTranslations("App.PlayerCard");
+  const { refetch } = authClient.useSession();
   const [data, setData] = useState(initial);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -39,6 +41,7 @@ export default function OwnerCard({ initial }: { initial: PlayerCardEditorData }
       </Stack>
       {saved && <Alert severity="success">{t("saved")}</Alert>}
       {editing && <ProfileForm data={data} labels={labels} onCancel={() => setEditing(false)} onSave={(updated) => {
+        if (updated.settings.name !== data.settings.name) void refetch();
         setData(updated);
         setSaved(true);
         setEditing(false);

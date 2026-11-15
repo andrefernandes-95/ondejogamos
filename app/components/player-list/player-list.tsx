@@ -1,4 +1,5 @@
 import PageTitle from "@/app/components/page-title/page-title";
+import PlayerIdentity from "@/app/components/player-identity/player-identity";
 import { Player } from "@/app/services/user";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
@@ -43,7 +44,8 @@ export default function PlayerList({ data }: { data: Player[] }) {
               return (
                 <TableRow key={player.id}>
                   <TableCell>
-                    <Typography>{player.name}</Typography>
+                    <PlayerIdentity player={player.identity}
+                      preview={{ badges: player.badges, founderLabel: tApp("App.PlayerCard.founder") }} />
                   </TableCell>
                   <TableCell>
                     <Typography>{weekDay}</Typography>

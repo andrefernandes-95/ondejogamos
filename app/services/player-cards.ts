@@ -2,8 +2,9 @@ import { pool } from "@/app/lib/db";
 import { defaultCardFields } from "@/app/models/player-card";
 import type { CardBadge, CardField } from "@/app/models/player-card";
 import { playerUsername, publicCardId } from "@/app/schemas/player-card";
-import { visibleCard, playerCardPath } from "@/app/utils/player-card";
+import { visibleCard, playerCardPath, selectedCardBadges } from "@/app/utils/player-card";
 import { getCardStats } from "./card-stats";
+import { earnedCardBadges, founderEligibility } from "./player-card-badges";
 
 interface CardRow {
   user_id: string;
@@ -21,7 +22,7 @@ interface CardRow {
 const selectCard = `
   SELECT u.id AS user_id, u.name, p.username, p.preferred_area, p.preferred_position,
          p.avatar_storage_key, p.visible_fields, p.selected_badges, p.published,
-         u."createdAt" < TIMESTAMPTZ '2027-01-01 00:00:00 Europe/Lisbon' AS is_founder
+         ${founderEligibility} AS is_founder
   FROM "user" u LEFT JOIN player_profiles p ON p.user_id = u.id`;
 
 export async function findOwnerCard(userId: string) {
@@ -42,18 +43,18 @@ export async function findPublicCard(identifier: string) {
 }
 
 export async function cardData(row: CardRow, portrait: string | null) {
-  const earned: CardBadge[] = row.is_founder ? ["founder"] : [];
+  const earned = earnedCardBadges(row.is_founder);
   return {
-    name: row.name,
     earned,
     portrait,
     ...(await getCardStats(row.user_id)),
     settings: {
+      name: row.name,
       username: row.username ?? "",
       area: row.preferred_area,
       position: row.preferred_position,
       visible: row.visible_fields ?? defaultCardFields,
-      badges: row.selected_badges?.filter((badge) => earned.includes(badge)) ?? [],
+      badges: selectedCardBadges(row.selected_badges, earned),
       published: row.published ?? false,
     },
   };
