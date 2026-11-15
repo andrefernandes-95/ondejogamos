@@ -3,17 +3,16 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { MantineProvider } from "@mantine/core";
 import { DatesProvider } from "@mantine/dates";
+import { brandBlue, brandBlueDark, brandBlueLight, brandGreen } from "@/app/design/brand-colors";
 import "dayjs/locale/pt";
-
-const MAIN_COLOR = "#175CD3";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: MAIN_COLOR,
+      main: brandBlue,
     },
     success: {
-      main: "#167647",
+      main: brandGreen,
     },
   },
   shape: {
@@ -76,14 +75,14 @@ export default function AppThemeProvider({
         defaultRadius: "md",
         colors: {
           blue: [
-            "#EFF5FF",
+            brandBlueLight,
             "#DBE8FE",
             "#BED5FD",
             "#91B8FA",
             "#6095F3",
             "#3677E5",
-            "#175CD3",
-            "#124BAE",
+            brandBlue,
+            brandBlueDark,
             "#103E8C",
             "#103571",
           ],

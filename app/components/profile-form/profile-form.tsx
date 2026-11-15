@@ -1,79 +1,88 @@
 "use client";
 
-import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
-import { Alert, Button, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import CardStage from "@/app/components/player-profile/card-stage";
+import type { CardLabels } from "@/app/components/player-profile/player-profile";
+import type { PlayerCardEditorData } from "@/app/models/player-card";
+import { visibleCard } from "@/app/utils/player-card";
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider,
+  MenuItem, Stack, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import CardDisplayOptions from "./card-display-options";
+import CardEditorSection from "./card-editor-section";
+import CardPhotoField from "./card-photo-field";
+import CardStyleOptions from "./card-style-options";
+import { useCardDraft } from "./use-card-draft";
 
 interface Props {
-  name: string;
-  areas: string[];
-  preferredArea: string;
-  preferredPosition: string;
+  data: PlayerCardEditorData;
+  labels: CardLabels;
+  onCancel: () => void;
+  onSave: (data: PlayerCardEditorData) => void;
 }
 
-export default function ProfileForm({ name, areas, preferredArea, preferredPosition }: Props) {
-  const t = useTranslations("App.ProfileForm");
-  const tErrors = useTranslations("ApiErrors");
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
-  const options = preferredArea && !areas.includes(preferredArea)
-    ? [preferredArea, ...areas]
-    : areas;
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const fields = new FormData(event.currentTarget);
-    setSaving(true);
-    setSaved(false);
-    setError("");
-
-    try {
-      const response = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          preferred_area: fields.get("area") || null,
-          preferred_position: String(fields.get("position") ?? "").trim() || null,
-        }),
-      });
-
-      if (response.ok) setSaved(true);
-      else setError(tErrors(await readApiErrorCodeFromResponse(response)));
-    } catch {
-      setError(tErrors("PROFILE_UPDATE_FAILED"));
-    } finally {
-      setSaving(false);
-    }
-  }
+export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
+  const t = useTranslations("App.PlayerCard");
+  const errors = useTranslations("ApiErrors");
+  const theme = useTheme();
+  const mobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { settings, setSettings, portrait, choosePhoto, pendingPhoto, save, busy, error } = useCardDraft(data);
+  const areas = data.settings.area && !data.areas.includes(data.settings.area)
+    ? [data.settings.area, ...data.areas] : data.areas;
 
   return (
-    <Stack component="form" spacing={2} onSubmit={submit} onChange={() => setSaved(false)}>
-      <Typography component="h1" variant="h5">{t("title")}</Typography>
-      <Typography>{name}</Typography>
-      <TextField
-        select
-        label={t("area")}
-        name="area"
-        defaultValue={preferredArea}
-        disabled={saving}
-        slotProps={{ inputLabel: { shrink: true } }}
-      >
-        <MenuItem value="">{t("no_preference")}</MenuItem>
-        {options.map((area) => <MenuItem key={area} value={area}>{area}</MenuItem>)}
-      </TextField>
-      <TextField
-        label={t("position")}
-        name="position"
-        defaultValue={preferredPosition}
-        placeholder={t("position_example")}
-        slotProps={{ htmlInput: { maxLength: 60 } }}
-        disabled={saving}
-      />
-      <Button type="submit" variant="contained" loading={saving}>{t("save")}</Button>
-      {saved && <Alert severity="success" role="status">{t("saved")}</Alert>}
-      {error && <Alert severity="error">{error}</Alert>}
-    </Stack>
+    <Dialog open onClose={busy ? undefined : onCancel} fullWidth maxWidth="md" fullScreen={mobile}
+      aria-labelledby="card-editor-title" slotProps={{ paper: { sx: { p: 0 } } }}>
+      <DialogTitle id="card-editor-title" sx={{ fontWeight: 700, color: "primary.main" }}>
+        {t("edit")}
+      </DialogTitle>
+      <DialogContent dividers sx={{ p: 0 }}>
+        <Box component="form" id="player-card-form" onSubmit={async (event) => {
+          event.preventDefault();
+          const saved = await save();
+          if (saved) onSave(saved);
+        }} sx={{ display: "grid", gridTemplateColumns: { md: "minmax(230px, 2fr) minmax(0, 3fr)" } }}>
+          <CardStage card={visibleCard({ ...data, settings, portrait })} labels={labels} preview={t("preview")} />
+          <Box component="fieldset" disabled={busy} sx={(theme) => ({
+            border: 0, m: 0, minWidth: 0, p: { xs: 2, sm: 3 },
+            borderTop: { xs: `1px solid ${theme.palette.divider}`, md: 0 },
+            borderLeft: { md: `1px solid ${theme.palette.divider}` },
+          })}>
+            <Stack spacing={2.25} divider={<Divider />}>
+              <CardEditorSection title={t("photo")}>
+                <CardPhotoField portrait={portrait} choosePhoto={choosePhoto} />
+                {pendingPhoto && (
+                  <Typography variant="caption" color="text.secondary" role="status">
+                    {t(settings.published && settings.visible.includes("photo") ? "photo_pending_public" : "photo_pending")}
+                  </Typography>
+                )}
+              </CardEditorSection>
+              <CardEditorSection title={t("player_details")}>
+                <TextField select fullWidth label={t("area")} value={settings.area ?? ""}
+                  slotProps={{ inputLabel: { shrink: true }, select: { displayEmpty: true } }}
+                  onChange={(event) => setSettings({ ...settings, area: event.target.value || null })}>
+                  <MenuItem value="">{t("no_preference")}</MenuItem>
+                  {areas.map((area) => <MenuItem key={area} value={area}>{area}</MenuItem>)}
+                </TextField>
+                <TextField fullWidth label={t("position")} value={settings.position ?? ""}
+                  slotProps={{ htmlInput: { maxLength: 60 } }}
+                  onChange={(event) => setSettings({ ...settings, position: event.target.value || null })} />
+              </CardEditorSection>
+              {data.earned.includes("founder") && (
+                <CardStyleOptions founder={settings.badges[0] === "founder"}
+                  onChange={(founder) => setSettings({ ...settings, badges: founder ? ["founder"] : [] })} />
+              )}
+              <CardDisplayOptions settings={settings} onChange={setSettings} />
+              {error && <Alert severity="error">{errors(error)}</Alert>}
+            </Stack>
+          </Box>
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={onCancel} disabled={busy}>{t("cancel")}</Button>
+        <Button type="submit" form="player-card-form" variant="contained" loading={busy}>
+          {t("save")}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

@@ -1,9 +1,9 @@
-import ProfileForm from "@/app/components/profile-form/profile-form";
+import OwnerCard from "@/app/components/player-profile/owner-card";
 import auth from "@/app/lib/auth";
 import { listAreas } from "@/app/services/locations";
-import { getProfile } from "@/app/services/profile";
+import { cardData, findOwnerCard } from "@/app/services/player-cards";
 import { AppRoutes } from "@/app/utils/routes";
-import { Card, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -11,21 +11,14 @@ export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect(AppRoutes.LOGIN);
 
-  const [areas, profile] = await Promise.all([
-    listAreas(),
-    getProfile(session.user.id),
-  ]);
+  const [areas, row] = await Promise.all([listAreas(), findOwnerCard(session.user.id)]);
+  if (!row) redirect(AppRoutes.LOGIN);
+  const portrait = row.avatar_storage_key ? "/api/player-card/portrait" : null;
+  const data = await cardData(row, portrait);
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
-      <Card variant="outlined" sx={{ p: { xs: 3, sm: 4 } }}>
-        <ProfileForm
-          name={session.user.name}
-          areas={areas}
-          preferredArea={profile?.preferred_area ?? ""}
-          preferredPosition={profile?.preferred_position ?? ""}
-        />
-      </Card>
+    <Container component="main" maxWidth="md" sx={{ py: { xs: 3, sm: 5 } }}>
+      <OwnerCard initial={{ ...data, areas }} />
     </Container>
   );
 }
