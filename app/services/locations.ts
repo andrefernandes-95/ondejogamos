@@ -9,6 +9,13 @@ export interface LocationWithGameCount extends Location {
   game_count: number;
 }
 
+export async function listAreas(): Promise<string[]> {
+  const result = await pool.query<{ area: string }>(
+    "SELECT DISTINCT area FROM locations ORDER BY area",
+  );
+  return result.rows.map(({ area }) => area);
+}
+
 export async function listLocationsWithGameCount(): Promise<
   LocationWithGameCount[]
 > {

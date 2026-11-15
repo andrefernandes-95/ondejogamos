@@ -21,17 +21,13 @@ export default function AuthNavbar() {
     try {
       const result = await authClient.signOut();
       if (result.error) {
-        setLogoutError(
-          tApp("App.AuthNavbar.error"),
-        );
+        setLogoutError(tApp("App.AuthNavbar.error"));
         return;
       }
 
       window.location.reload();
     } catch {
-      setLogoutError(
-        tApp("App.AuthNavbar.error"),
-      );
+      setLogoutError(tApp("App.AuthNavbar.error"));
     } finally {
       setIsSigningOut(false);
     }
@@ -62,15 +58,9 @@ export default function AuthNavbar() {
           {tApp("App.AuthNavbar.greeting")}, {session.user.name}
         </Typography>
 
-        {/* <Button
-          onClick={handleSignOut}
-          loading={isSigningOut}
-          disabled={isSigningOut}
-          variant="text"
-          color="inherit"
-        >
+        <Button href={AppRoutes.PROFILE} color="inherit">
           {tApp("App.AuthNavbar.profile")}
-        </Button> */}
+        </Button>
         <Button
           onClick={handleSignOut}
           loading={isSigningOut}
@@ -92,28 +82,11 @@ export default function AuthNavbar() {
 
   return (
     <Container>
-      <Button
-        component="a"
-        href={AppRoutes.LOGIN}
-        color="inherit"
-        sx={{ gap: 1 }}
-      >
-        <ExitToApp />
-        <Typography sx={{ color: "white" }}>
-          {tApp("App.AuthNavbar.login")}
-        </Typography>
+      <Button href={AppRoutes.LOGIN} color="inherit" startIcon={<ExitToApp />}>
+        {tApp("App.AuthNavbar.login")}
       </Button>
-      <Button
-        sx={{ gap: 1 }}
-        component="a"
-        href={AppRoutes.SIGN_UP}
-        color="inherit"
-      >
-        <GroupAdd />
-
-        <Typography sx={{ color: "white" }}>
-          {tApp("App.AuthNavbar.create_account")}
-        </Typography>
+      <Button href={AppRoutes.SIGN_UP} color="inherit" startIcon={<GroupAdd />}>
+        {tApp("App.AuthNavbar.create_account")}
       </Button>
     </Container>
   );
