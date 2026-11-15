@@ -11,6 +11,7 @@ import CardDisplayOptions from "./card-display-options";
 import CardEditorSection from "./card-editor-section";
 import CardPhotoField from "./card-photo-field";
 import CardStyleOptions from "./card-style-options";
+import CardUsernameField from "./card-username-field";
 import { useCardDraft } from "./use-card-draft";
 
 interface Props {
@@ -57,6 +58,8 @@ export default function ProfileForm({ data, labels, onCancel, onSave }: Props) {
                 )}
               </CardEditorSection>
               <CardEditorSection title={t("player_details")}>
+                <CardUsernameField value={settings.username} onChange={(username) =>
+                  setSettings({ ...settings, username })} />
                 <TextField select fullWidth label={t("area")} value={settings.area ?? ""}
                   slotProps={{ inputLabel: { shrink: true }, select: { displayEmpty: true } }}
                   onChange={(event) => setSettings({ ...settings, area: event.target.value || null })}>

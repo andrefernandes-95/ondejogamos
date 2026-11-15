@@ -2,6 +2,7 @@ import auth from "@/app/lib/auth";
 import { createPortraitKey, isDatabasePortrait, storeExternalPortrait } from "@/app/lib/portrait-storage";
 import { listAreas } from "@/app/services/locations";
 import { findOwnerCard } from "@/app/services/player-cards";
+import { ensurePlayerUsername, UsernameTakenError } from "@/app/services/player-username";
 import { drainPortraitCleanup, queuePortraitCleanup } from "@/app/services/portrait-cleanup";
 import { savePlayerCard } from "@/app/services/save-player-card";
 import { apiError } from "@/app/utils/api-error";
@@ -36,13 +37,15 @@ export async function PUT(request: Request) {
       else await storeExternalPortrait(uploadedKey, bytes);
     }
 
-    const publicId = await savePlayerCard(session.user.id, settings, uploadedKey, databasePortrait);
+    if (!current.username && !settings.username) await ensurePlayerUsername(session.user.id);
+    const saved = await savePlayerCard(session.user.id, settings, uploadedKey, databasePortrait);
     await drainPortraitCleanup().catch(console.error);
-    return Response.json({ publicId });
+    return Response.json(saved);
   } catch (error) {
     if (uploadedKey && !isDatabasePortrait(uploadedKey)) {
       await queuePortraitCleanup(uploadedKey).catch(console.error);
     }
+    if (error instanceof UsernameTakenError) return apiError("USERNAME_TAKEN", 409);
     console.error("Failed to save player card", error);
     return apiError("PROFILE_UPDATE_FAILED", 500);
   }

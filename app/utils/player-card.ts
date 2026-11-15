@@ -16,6 +16,6 @@ export function visibleCard(data: Pick<
   };
 }
 
-export function playerCardPath(id: string) {
-  return `/players/${id}`;
+export function playerCardPath(username: string) {
+  return `/players/${encodeURIComponent(username)}`;
 }

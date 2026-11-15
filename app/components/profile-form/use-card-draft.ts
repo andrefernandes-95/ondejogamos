@@ -1,6 +1,7 @@
 "use client";
 
 import type { CardSettings, PlayerCardEditorData } from "@/app/models/player-card";
+import { playerUsername } from "@/app/schemas/player-card";
 import { readApiErrorCodeFromResponse, type ApiErrorCode } from "@/app/utils/api-error";
 import { useEffect, useState } from "react";
 
@@ -28,10 +29,16 @@ export function useCardDraft(data: PlayerCardEditorData) {
   }
 
   async function save(): Promise<PlayerCardEditorData | null> {
+    const username = playerUsername.safeParse(settings.username);
+    if (!username.success) {
+      setError("INVALID_USERNAME");
+      return null;
+    }
     setBusy(true);
     setError(null);
     const normalized: CardSettings = {
       ...settings,
+      username: username.data,
       area: settings.area?.trim() || null,
       position: settings.position?.trim() || null,
     };
@@ -46,11 +53,10 @@ export function useCardDraft(data: PlayerCardEditorData) {
         setError(await readApiErrorCodeFromResponse(response));
         return null;
       }
-      const { publicId } = await response.json();
+      const { username: savedUsername } = await response.json();
       return {
         ...data,
-        publicId,
-        settings: normalized,
+        settings: { ...normalized, username: savedUsername },
         portrait: photo ? `/api/player-card/portrait?v=${Date.now()}` : removed ? null : data.portrait,
       };
     } catch {

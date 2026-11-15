@@ -13,6 +13,8 @@
     "missingPlayers": "{count} players needed"
   },
   "ApiErrors": {
+    "INVALID_USERNAME": "Choose a username with 3–30 letters, numbers, hyphens or underscores. Start and end with a letter or number.",
+    "USERNAME_TAKEN": "This username is already taken. Choose another.",
     "INVALID_PLAYER_PORTRAIT": "Choose a valid JPEG, PNG or WebP image up to 5 MB.",
     "AUTHENTICATION_REQUIRED": "Sign in to continue.",
     "FORBIDDEN": "You do not have permission to perform this action.",
@@ -46,6 +48,8 @@
   },
   "App": {
     "PlayerCard": {
+      "username": "Username",
+      "username_hint": "Used in your public link. If you change your username, the link with the old name stops working.",
       "founder_hint": "Founder is available to players who joined Onde Jogamos by 31 December 2026.",
       "player_details": "Player details",
       "photo_pending": "Photo selected. Save the card to keep it.",

@@ -2,6 +2,7 @@ import OwnerCard from "@/app/components/player-profile/owner-card";
 import auth from "@/app/lib/auth";
 import { listAreas } from "@/app/services/locations";
 import { cardData, findOwnerCard } from "@/app/services/player-cards";
+import { ensurePlayerUsername } from "@/app/services/player-username";
 import { AppRoutes } from "@/app/utils/routes";
 import { Container } from "@mui/material";
 import { headers } from "next/headers";
@@ -11,7 +12,12 @@ export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect(AppRoutes.LOGIN);
 
-  const [areas, row] = await Promise.all([listAreas(), findOwnerCard(session.user.id)]);
+  const [areas, initialRow] = await Promise.all([listAreas(), findOwnerCard(session.user.id)]);
+  let row = initialRow;
+  if (row && !row.username) {
+    await ensurePlayerUsername(session.user.id);
+    row = await findOwnerCard(session.user.id);
+  }
   if (!row) redirect(AppRoutes.LOGIN);
   const portrait = row.avatar_storage_key ? "/api/player-card/portrait" : null;
   const data = await cardData(row, portrait);

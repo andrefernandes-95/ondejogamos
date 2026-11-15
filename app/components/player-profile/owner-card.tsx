@@ -35,7 +35,7 @@ export default function OwnerCard({ initial }: { initial: PlayerCardEditorData }
         <Chip size="small" icon={published ? <Public /> : <LockOutlined />}
           color={published ? "success" : "default"} variant={published ? "filled" : "outlined"}
           label={published ? t("public") : t("private")} />
-        {published && data.publicId && <CardLinkDialog publicId={data.publicId} />}
+        {published && <CardLinkDialog username={data.settings.username} />}
       </Stack>
       {saved && <Alert severity="success">{t("saved")}</Alert>}
       {editing && <ProfileForm data={data} labels={labels} onCancel={() => setEditing(false)} onSave={(updated) => {

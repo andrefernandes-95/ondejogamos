@@ -6,7 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-export default function CardLinkDialog({ publicId }: { publicId: string }) {
+export default function CardLinkDialog({ username }: { username: string }) {
   const t = useTranslations("App.PlayerCard");
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState("");
@@ -24,7 +24,7 @@ export default function CardLinkDialog({ publicId }: { publicId: string }) {
     <>
       <Button startIcon={<LinkIcon />} onClick={() => {
         setStatus("");
-        setUrl(new URL(playerCardPath(publicId), location.origin).href);
+        setUrl(new URL(playerCardPath(username), location.origin).href);
       }}>
         {t("get_link")}
       </Button>
