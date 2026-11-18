@@ -1,77 +1,60 @@
-"use client";
-
-import { LocationWithGameCount } from "@/app/services/locations";
-import { Close } from "@mui/icons-material";
+import type { LocationWithGameCount } from "@/app/services/locations";
+import { FormControl, InputLabel, MenuItem, Select, Stack, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
-import {
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
 
 interface Props {
-  selectedArea: string;
-  handleSelectedArea: (value: string) => void;
   data: LocationWithGameCount[];
+  area: string;
+  municipality: string;
+  districtOpen: boolean;
+  setDistrictOpen: (open: boolean) => void;
+  onAreaChange: (area: string) => void;
+  onMunicipalityChange: (municipality: string) => void;
 }
 
 export default function AreaSelector({
-  data,
-  selectedArea,
-  handleSelectedArea,
+  data, area, municipality, districtOpen, setDistrictOpen, onAreaChange, onMunicipalityChange,
 }: Props) {
-  const tApp = useTranslations();
-  const preparedData: Record<string, number> = {};
-
-  data.forEach((entry) => {
-    preparedData[entry.area] =
-      (preparedData[entry.area] ?? 0) + entry.game_count;
-  });
+  const t = useTranslations("App.Agenda");
+  const counts = new Map<string, number>();
+  for (const location of data) {
+    counts.set(location.area, (counts.get(location.area) ?? 0) + location.game_count);
+  }
+  const municipalities = data.filter((location) => location.area === area);
 
   return (
-    <Stack sx={{ flexDirection: "row", flexGrow: 1 }}>
-      <FormControl fullWidth>
-        <InputLabel id="select-area">{tApp("App.AreaSelector.area")}</InputLabel>
-        <Select
-          labelId="select-area"
-          id="select-area"
-          value={selectedArea}
-          label={tApp("App.AreaSelector.area")}
-          renderValue={(value) => value}
-          onChange={({ target: { value } }) => handleSelectedArea(value)}
-        >
-          {Object.entries(preparedData).map((entry) => (
-            <MenuItem
-              key={entry[0]}
-              value={entry[0]}
-              sx={{ justifyContent: "space-between" }}
-            >
-              {entry[0]}
-
-              <Typography color="primary">
-                {entry[1] === 1
-                  ? tApp("App.AreaSelector.1_game_scheduled")
-                  : ""}
-                {entry[1] > 1
-                  ? tApp("App.AreaSelector.games_scheduled", { count: entry[1] })
-                  : ""}
-              </Typography>
+    <Stack direction="row" spacing={1} sx={{ gridArea: "filters", minWidth: 0 }}>
+      <FormControl fullWidth size="small" sx={{ minWidth: 0 }}>
+        <InputLabel id="agenda-area-label" shrink>{t("district")}</InputLabel>
+        <Select value={area} labelId="agenda-area-label" id="agenda-area"
+          label={t("district")} displayEmpty renderValue={(value) => value || t("all")}
+          open={districtOpen} onOpen={() => setDistrictOpen(true)} onClose={() => setDistrictOpen(false)}
+          onChange={(event) => onAreaChange(event.target.value)}
+          sx={{ minHeight: 48 }}>
+          <MenuItem value="">{t("all")}</MenuItem>
+          {[...counts].map(([name, count]) => (
+            <MenuItem key={name} value={name} sx={{ justifyContent: "space-between", gap: 2 }}>
+              {name}
+              {count > 0 && <Typography variant="caption" color="text.secondary">
+                {t("game_count", { count })}
+              </Typography>}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
-      {selectedArea && (
-        <Button
-          sx={{ flexShrink: 0, flexGrow: 1 }}
-          onClick={() => handleSelectedArea("")}
-        >
-          <Close />
-        </Button>
-      )}
+      <FormControl fullWidth size="small" sx={{ minWidth: 0 }} disabled={!municipalities.length}>
+        <InputLabel id="agenda-municipality-label" shrink>{t("municipality")}</InputLabel>
+        <Select value={municipality} labelId="agenda-municipality-label" id="agenda-municipality"
+          label={t("municipality")} displayEmpty renderValue={(value) => value || t("all")}
+          onChange={(event) => onMunicipalityChange(event.target.value)} sx={{ minHeight: 48 }}>
+          <MenuItem value="">{t("all")}</MenuItem>
+          {municipalities.map((location) => (
+            <MenuItem key={location.municipality} value={location.municipality}>
+              {location.municipality}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
     </Stack>
   );
 }

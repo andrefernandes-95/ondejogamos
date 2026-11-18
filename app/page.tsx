@@ -1,5 +1,6 @@
 import HomeClient from "@/app/components/home-client/home-client";
 import { listLocationsWithGameCount } from "@/app/services/locations";
+import { agendaDay } from "@/app/utils/agenda-date";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
@@ -22,5 +23,5 @@ export default async function Home() {
     ? preferredArea
     : "";
 
-  return <HomeClient data={data} initialArea={initialArea} />;
+  return <HomeClient data={data} initialArea={initialArea} today={agendaDay(new Date())} />;
 }

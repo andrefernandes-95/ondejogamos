@@ -244,6 +244,27 @@
     "Matches": {
       "error": "Ocorreu um erro"
     },
+    "Agenda": {
+      "nav_matches": "Jogos",
+      "nav_pitches": "Campos",
+      "title": "Agenda de jogos",
+      "schedule": "Agendar jogo",
+      "district": "Distrito",
+      "municipality": "Município",
+      "all": "Todos",
+      "game_count": "{count, plural, one {# jogo} other {# jogos}}",
+      "days": "Dias da semana",
+      "previous_week": "Semana anterior",
+      "next_week": "Semana seguinte",
+      "day_with_matches": "{date}, com jogos",
+      "loading": "A carregar jogos…",
+      "retry": "Tentar novamente",
+      "empty_day": "Não há jogos agendados para este dia.",
+      "show_upcoming_date": "Ver o próximo dia com jogos",
+      "show_all_areas": "Ver jogos de todas as zonas",
+      "format": "Futebol {count}",
+      "players_needed": "{count, plural, one {Falta # jogador} other {Faltam # jogadores}}"
+    },
     "HomeClient": {
       "description": "Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes encontrar jogos, juntar-te a outros jogadores e organizar partidas na tua zona."
     },

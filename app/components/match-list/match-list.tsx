@@ -1,117 +1,89 @@
 import MatchCard from "@/app/components/match-card/match-card";
-import NoMatchesFound from "@/app/components/no-matches-found/no-matches-found";
 import { useListMatchesForArea } from "@/app/hooks/matches";
-import { SportsSoccer } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
-import {
-  Alert,
-  Box,
-  Card,
-  CircularProgress,
-  Container,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { agendaDay, agendaWeek, formatAgendaDay, shiftAgendaDay, validAgendaDay } from "@/app/utils/agenda-date";
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { useLocale, useTranslations } from "next-intl";
+import WeekCalendar from "./week-calendar";
 
 interface Props {
   area: string;
-  onAddPitch: () => void;
+  municipality: string;
+  today: string;
+  requestedDay: string | null;
+  onDayChange: (day: string) => void;
+  onClearLocation: () => void;
 }
 
-export default function MatchList({ area, onAddPitch }: Props) {
-  const { matches, refresh, error, loading, hasFetched } =
-    useListMatchesForArea(area);
-  const tApp = useTranslations();
+export default function MatchList({
+  area, municipality, today, requestedDay, onDayChange, onClearLocation,
+}: Props) {
+  const { matches, refresh, error, loading } = useListMatchesForArea(area);
+  const t = useTranslations("App.Agenda");
+  const locale = useLocale();
+  const localMatches = matches
+    .filter((match) => !municipality || match.pitch.municipality === municipality)
+    .map((match) => ({ match, day: agendaDay(match.starts_at) }));
+  const matchDays = new Set(localMatches.map((entry) => entry.day));
+  const firstDay = localMatches[0]?.day ?? today;
+  const day = validAgendaDay(requestedDay) && requestedDay >= today ? requestedDay : firstDay;
+  const dailyMatches = localMatches.filter((entry) => entry.day === day);
+  const nextDay = localMatches.find((entry) => entry.day > day)?.day ?? firstDay;
 
-  if (loading || !hasFetched) {
-    return (
-      <Container
-        sx={{
-          p: 1,
-          display: "flex",
-          flex: 1,
-          height: 200,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        maxWidth="lg"
-      >
-        <CircularProgress />
-      </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="filled" severity="error">
-        {error}
-      </Alert>
-    );
-  }
-
-  if (!matches.length) {
-    return <NoMatchesFound area={area} onAddPitch={onAddPitch} />;
+  function changeWeek(direction: -1 | 1) {
+    const monday = shiftAgendaDay(agendaWeek(day)[0], 7 * direction);
+    const weekStart = monday >= today ? monday : today;
+    const nextMatchDay = agendaWeek(monday).find((date) => date >= today && matchDays.has(date));
+    onDayChange(nextMatchDay ?? weekStart);
   }
 
   return (
-    <Card variant="outlined" sx={{ p: 2 }}>
-      <Stack
-        sx={{
-          justifyContent: "space-between",
-          flexDirection: {
-            xs: "column",
-            sm: "row",
-          },
-        }}
-      >
-        <Stack
-          sx={() => ({
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 0.5,
-            justifyContent: "flex-start",
-          })}
-        >
-          <SportsSoccer
-            color="primary"
-            sx={{
-              display: {
-                xs: "none",
-                sm: "flex",
-              },
-              marginRight: 0.5,
-            }}
-          />
-          <Typography variant="h6">
-            {area
-              ? tApp("App.MatchList.upcoming_matches_in_area", { area })
-              : tApp("App.MatchList.upcoming_matches")}
-          </Typography>
-        </Stack>
-
-        <Typography variant="caption">
-          {tApp("App.MatchList.join_a_scheduled_or_on_going_matches")}
+    <Stack spacing={{ xs: 2.5, md: 3 }}>
+      <WeekCalendar day={day} today={today} matchDays={matchDays}
+        onDayChange={onDayChange} onWeekChange={changeWeek} />
+      <Box component="section" aria-labelledby="agenda-results-heading" aria-busy={loading}>
+        <Typography id="agenda-results-heading" component="h2" aria-live="polite"
+          sx={{
+            fontSize: { xs: "1.25rem", sm: "1.625rem", md: "2rem" }, fontWeight: 750,
+            "&::first-letter": { textTransform: "uppercase" },
+          }}>
+          {formatAgendaDay(day, locale, { weekday: "long", day: "numeric", month: "long" })}
         </Typography>
-      </Stack>
-      <Box
-        sx={{
-          marginTop: 2,
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            md: "repeat(2, minmax(0, 1fr))",
-          },
-          gap: 3,
-        }}
-      >
-        {matches.map((match) => (
-          <MatchCard
-            match={match}
-            key={match.id}
-            onAttendanceChanged={refresh}
-          />
-        ))}
+        {loading ? (
+          <Stack direction="row" spacing={1.5} sx={{ py: 4, alignItems: "center" }} role="status">
+            <CircularProgress size={24} aria-label={t("loading")} />
+            <Typography>{t("loading")}</Typography>
+          </Stack>
+        ) : error ? (
+          <Alert severity="error" sx={{ mt: 2 }}
+            action={<Button color="inherit" onClick={refresh}>{t("retry")}</Button>}>
+            {error}
+          </Alert>
+        ) : dailyMatches.length ? (
+          <Box component="ul" sx={{
+            listStyle: "none", p: 0, m: 0, position: "relative",
+            "&::before": {
+              content: '""', display: { xs: "none", md: "block" }, position: "absolute",
+              insetInlineStart: 5, top: "calc(var(--row-height) / 2)",
+              bottom: "calc(var(--row-height) / 2)", width: 2, bgcolor: "primary.main",
+            },
+            "--row-height": "130px",
+          }}>
+            {dailyMatches.map(({ match }) => (
+              <MatchCard match={match} key={match.id} onAttendanceChanged={refresh} />
+            ))}
+          </Box>
+        ) : (
+          <Stack spacing={1} sx={{ py: 2, alignItems: "flex-start" }} aria-live="polite">
+            <Typography color="text.secondary">{t("empty_day")}</Typography>
+            {localMatches.length > 0 && (
+              <Button onClick={() => onDayChange(nextDay)}>{t("show_upcoming_date")}</Button>
+            )}
+            {(area || municipality) && (
+              <Button onClick={onClearLocation}>{t("show_all_areas")}</Button>
+            )}
+          </Stack>
+        )}
       </Box>
-    </Card>
+    </Stack>
   );
 }

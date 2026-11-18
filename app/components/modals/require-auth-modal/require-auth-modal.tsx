@@ -71,7 +71,7 @@ export function RequireAuthModalInner({
         }}
       >
         <AccountCircle />
-        <Typography variant="h5">
+        <Typography component="span" variant="h5">
           {tApp("App.RequireAuthModal.account_required")}
         </Typography>
       </DialogTitle>

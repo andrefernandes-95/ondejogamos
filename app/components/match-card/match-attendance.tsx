@@ -29,13 +29,22 @@ export function useMatchAttendance(matchId: string, onAttendanceChanged: () => v
   return { error, handleAttendance };
 }
 
-type MatchAttendanceProps = { match: FullMatch; details?: boolean };
+type MatchAttendanceProps = { match: FullMatch; details?: boolean; compact?: boolean };
 
-export function MatchAttendanceStatus({ match, details }: MatchAttendanceProps) {
+export function MatchAttendanceStatus({ match, details, compact }: MatchAttendanceProps) {
   const t = useTranslations(details ? "App.MatchDetailsPage" : "App.MatchCard");
+  const agenda = useTranslations("App.Agenda");
   const remaining = match.min_attendance - 1 - match.attendances.length;
   const color = remaining <= 0 ? "warning" : "success";
   const full = details ? "enough_players_you_can_still_join" : "match_is_full_you_can_still_participate";
+
+  if (compact) {
+    return (
+      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+        {remaining <= 0 ? t(full) : agenda("players_needed", { count: remaining })}
+      </Typography>
+    );
+  }
   return (
     <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
       <Group color={color} />
