@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "node --import tsx --test app/utils/*.test.ts app/schemas/*.test.ts app/validations/*.test.ts app/services/*.test.ts app/components/match-details-page/*.test.ts app/components/area-selector/*.test.ts",
     "seed-locations": "tsx --env-file=.env scripts/seed-locations.ts"
   },

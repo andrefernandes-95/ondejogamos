@@ -56,6 +56,9 @@ elapsed matches or signups as verified attendance.
   residual risks; do not call unverified work fully done.
 - Only add documentation that helps future work. Explain what changed, how
   it was verified, and the user/product effect.
+- After pushing, check the GitHub Actions result and the Railway deployment
+  status. A commit on `main` is not a successful deployment. Railway blocks
+  failed checks only after its "Wait for CI" option is enabled.
 
 ## Contextual skills
 
