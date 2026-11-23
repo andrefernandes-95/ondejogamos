@@ -24,6 +24,8 @@
     "MATCH_CREATE_FAILED": "Could not schedule the match. Try again.",
     "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
     "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
+    "MATCH_ALREADY_STARTED": "This match has already started. Registrations can no longer be changed.",
+    "MATCH_CANCELLED": "This match was cancelled. Registrations can no longer be changed.",
     "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
     "MATCH_READ_FAILED": "Could not load the matches. Try again.",
     "INVALID_PITCH_DATA": "Check the pitch details and try again.",
@@ -121,6 +123,7 @@
     "MatchCard": {
       "match_is_full_you_can_still_participate": "Match is full. You can still participate!",
       "scheduled_by_you": "Scheduled by you",
+      "registration_closed": "Registration closed",
       "cancel_participation": "Cancel Participation",
       "open_match_details": "Open match details",
       "see_details": "See Details",
@@ -239,6 +242,7 @@
       "minutes": "Minutes",
       "enough_players_you_can_still_join": "Enough players. You can still join!",
       "scheduled_by_you": "Scheduled by you",
+      "registration_closed": "Registration closed",
       "cancel_participation": "Cancel Participation",
       "player_list": "Player List",
       "spots_available": "{count} spots available"

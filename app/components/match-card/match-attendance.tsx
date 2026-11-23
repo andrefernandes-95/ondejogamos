@@ -58,6 +58,9 @@ export function MatchAttendanceAction({ match, details, handleAttendance }: Matc
 }) {
   const t = useTranslations(details ? "App.MatchDetailsPage" : "App.MatchCard");
   if (match.is_creator) return <Typography variant="caption">{t("scheduled_by_you")}</Typography>;
+  if (!match.accepts_attendance) {
+    return <Typography variant="caption" color="text.secondary">{t("registration_closed")}</Typography>;
+  }
   if (!match.is_attending) return <ParticipateButton handleAttendance={handleAttendance} />;
   return (
     <Button variant="text" onClick={() => handleAttendance({ isAttending: false })}>

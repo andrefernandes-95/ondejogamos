@@ -5,6 +5,8 @@ import {
   registerAttendance,
 } from "@/app/services/attendance";
 import { apiError } from "@/app/utils/api-error";
+import { parseAttendanceMatchId } from "@/app/utils/attendance-match-id";
+import { AttendanceError } from "@/app/services/attendance";
 
 export async function POST(request: Request) {
   const session = await auth.api.getSession({
@@ -25,30 +27,29 @@ export async function POST(request: Request) {
     return apiError("INVALID_FORM", 400);
   }
 
-  const match_id = Number(formData.get("match_id"));
-  if (!Number.isInteger(match_id) || match_id < 1) {
+  const match_id = parseAttendanceMatchId(formData.get("match_id"));
+  if (match_id === null) {
     return apiError("INVALID_ATTENDANCE_DATA", 400);
   }
 
-  let result: Awaited<ReturnType<typeof registerAttendance>>;
-
   try {
-    result = await registerAttendance(match_id, user_id);
+    const result = await registerAttendance(match_id, user_id);
+    return Response.json(result.attendance, { status: result.created ? 201 : 200 });
   } catch (error) {
-    console.error(`Falha ao registar presença`, error);
-
+    if (error instanceof AttendanceError) {
+      return apiError(error.code, error.status);
+    }
+    console.error("Falha ao registar presença", error);
     return apiError("ATTENDANCE_CREATE_FAILED", 500);
   }
-
-  return Response.json(result, { status: 201 });
 }
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const match_id = url.searchParams.get("match_id");
 
-  const parsedMatchId = Number(match_id);
-  if (!Number.isInteger(parsedMatchId) || parsedMatchId < 1) {
+  const parsedMatchId = parseAttendanceMatchId(match_id);
+  if (parsedMatchId === null) {
     return apiError("INVALID_QUERY", 400);
   }
 
@@ -80,16 +81,18 @@ export async function DELETE(request: Request) {
     return apiError("INVALID_FORM", 400);
   }
 
-  const match_id = Number(formData.get("match_id"));
-  if (!Number.isInteger(match_id) || match_id < 1) {
+  const match_id = parseAttendanceMatchId(formData.get("match_id"));
+  if (match_id === null) {
     return apiError("INVALID_ATTENDANCE_DATA", 400);
   }
 
   try {
     await deleteAttendance(match_id, user_id);
   } catch (error) {
-    console.error(`Falha ao apagar presença`, error);
-
+    if (error instanceof AttendanceError) {
+      return apiError(error.code, error.status);
+    }
+    console.error("Falha ao apagar presença", error);
     return apiError("ATTENDANCE_DELETE_FAILED", 500);
   }
 
