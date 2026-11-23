@@ -9,7 +9,7 @@ import {
 } from "./attendance";
 import { deleteMatch } from "./delete-match";
 import { confirmMatchPlayed } from "./confirm-match-played";
-import { updateMatch } from "./match-writes";
+import { MatchScheduleError, saveMatch, updateMatch } from "./match-writes";
 import { listOrganizedMatches } from "./organized-matches";
 import { deleteFromPitch } from "./pitches";
 
@@ -267,4 +267,49 @@ test("only the organizer can confirm an ended, non-cancelled match", { skip: !db
   assert.equal(statusFor(matches.concurrent), "upcoming");
   assert.equal(statusFor(matches.past), "pending");
   assert.deepEqual(await listOrganizedMatches(playerId, db), []);
+});
+
+test("scheduling serializes same-pitch writes and permits adjacent slots and own edits", { skip: !db }, async () => {
+  if (!db || !historyPitchId) {
+    return;
+  }
+  const startsAt = new Date(Date.now() + 12 * 3_600_000);
+  const afterMinutes = (minutes: number) => new Date(startsAt.getTime() + minutes * 60_000).toISOString();
+  const input = {
+    startsAt: startsAt.toISOString(),
+    createdBy: hostId,
+    pitchId: historyPitchId,
+    durationInMinutes: 45,
+    format: "5x5",
+    minAttendance: 10,
+    description: "",
+  };
+  const firstAttempts = await Promise.allSettled([saveMatch(input, db), saveMatch(input, db)]);
+  const saved = firstAttempts.filter((attempt) => attempt.status === "fulfilled");
+  const conflicts = firstAttempts.filter((attempt) => attempt.status === "rejected");
+  matchIds.push(...saved.map((attempt) => Number(attempt.value.id)));
+  assert.equal(saved.length, 1);
+  assert.equal(conflicts.length, 1);
+  assert.ok(conflicts[0].reason instanceof MatchScheduleError);
+  assert.equal(conflicts[0].reason.code, "MATCH_TIME_CONFLICT");
+
+  const firstId = Number(saved[0].value.id);
+  const adjacent = await saveMatch({ ...input, startsAt: afterMinutes(45) }, db);
+  matchIds.push(Number(adjacent.id));
+  assert.equal((await updateMatch({ ...input, id: firstId }, hostId, db))?.id, String(firstId));
+
+  await assert.rejects(
+    updateMatch({ ...input, id: firstId, startsAt: afterMinutes(30) }, hostId, db),
+    { message: "MATCH_TIME_CONFLICT" },
+  );
+  const { rows: [retained] } = await db.query("SELECT starts_at FROM matches WHERE id = $1", [firstId]);
+  assert.deepEqual(retained.starts_at, startsAt);
+
+  const edits = await Promise.allSettled([
+    updateMatch({ ...input, id: firstId, startsAt: afterMinutes(120) }, hostId, db),
+    updateMatch({ ...input, id: Number(adjacent.id), startsAt: afterMinutes(120) }, hostId, db),
+  ]);
+  assert.equal(edits.filter((edit) => edit.status === "fulfilled" && edit.value).length, 1);
+  assert.equal(edits.filter((edit) => edit.status === "rejected" &&
+    edit.reason instanceof MatchScheduleError && edit.reason.code === "MATCH_TIME_CONFLICT").length, 1);
 });

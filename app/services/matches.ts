@@ -4,6 +4,7 @@ import type { Match } from "@/app/models/match";
 export { getFullMatchById, listAllMatches, listFullMatches } from "./full-matches";
 export { saveMatch, updateMatch, type SaveMatchInput, type UpdateMatchInput } from "./match-writes";
 export { deleteMatch } from "./delete-match";
+export { getPitchMatchesForDateInterval } from "./pitch-availability";
 
 export async function listMatches(area: string): Promise<Match[]> {
   const result = await pool.query(
@@ -27,29 +28,6 @@ export async function listMatches(area: string): Promise<Match[]> {
             ORDER BY starts_at
         `,
     [area],
-  );
-
-  return result.rows;
-}
-
-export async function getPitchMatchesForDateInterval(
-  pitch_id: string,
-  from: string,
-  until: string,
-): Promise<Match[]> {
-  const result = await pool.query(
-    `
-            SELECT m.*
-            FROM "matches" AS m
-            WHERE
-              m.pitch_id = $1
-              AND m.starts_at < $3::timestamptz
-              AND (
-                m.starts_at + m.duration_in_minutes * INTERVAL '1 minute'
-              ) > $2::timestamptz
-            ORDER BY m.starts_at DESC, m.id DESC
-        `,
-    [pitch_id, from, until],
   );
 
   return result.rows;

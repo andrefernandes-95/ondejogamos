@@ -2,6 +2,7 @@ import auth from "@/app/lib/auth";
 import { apiError } from "@/app/utils/api-error";
 import { parseAttendanceMatchId } from "@/app/utils/attendance-match-id";
 import { confirmMatchPlayed } from "@/app/services/confirm-match-played";
+import { MatchScheduleError } from "@/app/services/match-writes";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
@@ -82,6 +83,9 @@ export async function POST(request: Request) {
   try {
     result = await saveMatch(matchInput);
   } catch (error) {
+    if (error instanceof MatchScheduleError) {
+      return apiError(error.code, error.code === "PITCH_NOT_FOUND" ? 404 : 409);
+    }
     console.error(`Falha ao agendar jogo`, error);
 
     return apiError("MATCH_CREATE_FAILED", 500);
@@ -140,6 +144,9 @@ export async function PUT(request: Request) {
   try {
     result = await updateMatch(matchInput, session.user.id);
   } catch (error) {
+    if (error instanceof MatchScheduleError) {
+      return apiError(error.code, error.code === "PITCH_NOT_FOUND" ? 404 : 409);
+    }
     console.error(`Falha ao atualizar jogo`, error);
 
     return apiError("MATCH_UPDATE_FAILED", 500);

@@ -23,6 +23,7 @@
     "INVALID_MATCH_DATA": "Check the match details and try again.",
     "MATCH_CREATE_FAILED": "Could not schedule the match. Try again.",
     "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
+    "MATCH_TIME_CONFLICT": "This pitch is already booked for part of that time. Choose another slot.",
     "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
     "MATCH_DELETE_AFTER_KICKOFF": "This match has already started and can no longer be removed.",
     "MATCH_CONFIRMATION_UNAVAILABLE": "You can only confirm a match after its scheduled end and if it hasn't been cancelled.",
