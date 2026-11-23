@@ -68,3 +68,5 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
           console.log(JSON.stringify({ counts, advisories }, null, 2));
           NODE
+      - name: Block high-severity production advisories
+        run: npm audit --omit=dev --audit-level=high
