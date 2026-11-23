@@ -10,7 +10,7 @@ import {
 import { deleteMatch } from "./delete-match";
 import { confirmMatchPlayed } from "./confirm-match-played";
 import { MatchScheduleError, saveMatch, updateMatch } from "./match-writes";
-import { listOrganizedMatches } from "./organized-matches";
+import { listProfileMatches } from "./profile-matches";
 import { deleteFromPitch } from "./pitches";
 
 const databaseUrl = process.env.ATTENDANCE_TEST_DATABASE_URL;
@@ -89,6 +89,7 @@ before(async () => {
   await addMatch("ongoing", new Date(Date.now() - 30 * 60_000));
   await addMatch("completed", new Date(Date.now() - 2 * 3_600_000));
   await addMatch("cancelledCompleted", new Date(Date.now() - 2 * 3_600_000), new Date());
+  await addMatch("profileJoin", future);
 });
 
 after(async () => {
@@ -259,14 +260,25 @@ test("only the organizer can confirm an ended, non-cancelled match", { skip: !db
   );
   assert.deepEqual(match.played_confirmed_at, results[0].confirmedAt);
 
-  const organized = await listOrganizedMatches(hostId, db);
+  const organized = await listProfileMatches(hostId, "organized", db);
   const statusFor = (id: number) => organized.find((match) => match.id === String(id))?.status;
   assert.equal(statusFor(matches.completed), "played");
   assert.equal(statusFor(matches.cancelledCompleted), "cancelled");
   assert.equal(statusFor(matches.ongoing), "ongoing");
   assert.equal(statusFor(matches.concurrent), "upcoming");
   assert.equal(statusFor(matches.past), "pending");
-  assert.deepEqual(await listOrganizedMatches(playerId, db), []);
+  assert.deepEqual(await listProfileMatches(playerId, "organized", db), []);
+});
+
+test("the player match list includes only their own registrations", { skip: !db }, async () => {
+  if (!db) {
+    return;
+  }
+  await registerAttendance(matches.profileJoin, playerId, db);
+  const joined = await listProfileMatches(playerId, "joined", db);
+  assert.ok(joined.some((match) => match.id === String(matches.profileJoin)));
+  const other = await listProfileMatches(otherId, "joined", db);
+  assert.ok(!other.some((match) => match.id === String(matches.profileJoin)));
 });
 
 test("scheduling serializes same-pitch writes and permits adjacent slots and own edits", { skip: !db }, async () => {

@@ -234,13 +234,14 @@
       "search_for_a_pitch_or_a_place": "Search for a pitch or a place",
       "no_results": "No results"
     },
-    "OrganizedMatches": {
-      "link": "My organized matches",
-      "title": "Recently organized matches",
+    "ProfileMatches": {
+      "title": "My matches",
+      "organized": "Organized",
+      "joined": "Registrations",
       "back": "Back to profile",
-      "empty": "You haven't organized any matches yet.",
-      "date": "{day} at {time}",
-      "pending": "Awaiting confirmation",
+      "empty_organized": "You haven't organized any matches yet.",
+      "empty_joined": "You haven't joined any matches yet.",
+      "pending": "Awaiting organizer confirmation",
       "played": "Confirmed",
       "cancelled": "Cancelled",
       "upcoming": "Scheduled",

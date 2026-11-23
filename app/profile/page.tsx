@@ -15,7 +15,7 @@ export default async function ProfilePage() {
   const [areas, row, t] = await Promise.all([
     listAreas(),
     findOwnerCard(session.user.id),
-    getTranslations("App.OrganizedMatches"),
+    getTranslations("App.ProfileMatches"),
   ]);
   if (!row) redirect(AppRoutes.LOGIN);
   const portrait = row.avatar_storage_key ? "/api/player-card/portrait" : null;
@@ -24,8 +24,8 @@ export default async function ProfilePage() {
   return (
     <Container component="main" maxWidth="md" sx={{ py: { xs: 3, sm: 5 } }}>
       <OwnerCard initial={{ ...data, areas }} />
-      <Button href={AppRoutes.ORGANIZED_MATCHES} sx={{ display: "flex", mx: "auto", mt: 2 }}>
-        {t("link")}
+      <Button href={AppRoutes.JOINED_MATCHES} sx={{ display: "flex", mx: "auto", mt: 2 }}>
+        {t("title")}
       </Button>
     </Container>
   );

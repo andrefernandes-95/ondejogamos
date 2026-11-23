@@ -54,7 +54,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               <Stack direction="row" sx={{
                 alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap",
               }}>
-                <MatchAttendanceStatus match={match} details />
+                {match.accepts_attendance && <MatchAttendanceStatus match={match} details />}
                 <MatchAttendanceAction match={match} details handleAttendance={handleAttendance} />
               </Stack>
               <Divider />

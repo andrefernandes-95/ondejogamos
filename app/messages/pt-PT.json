@@ -234,13 +234,14 @@
       "search_for_a_pitch_or_a_place": "Pesquisar por campo ou localização",
       "no_results": "Sem resultados"
     },
-    "OrganizedMatches": {
-      "link": "Os meus jogos organizados",
-      "title": "Últimos jogos organizados",
+    "ProfileMatches": {
+      "title": "Os meus jogos",
+      "organized": "Organizados",
+      "joined": "Inscrições",
       "back": "Voltar ao perfil",
-      "empty": "Ainda não organizaste nenhum jogo.",
-      "date": "{day} às {time}",
-      "pending": "A aguardar confirmação",
+      "empty_organized": "Ainda não organizaste nenhum jogo.",
+      "empty_joined": "Ainda não te inscreveste em nenhum jogo.",
+      "pending": "A aguardar confirmação do organizador",
       "played": "Confirmado",
       "cancelled": "Cancelado",
       "upcoming": "Agendado",
