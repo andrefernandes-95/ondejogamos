@@ -47,7 +47,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                 <MatchAttendanceAction match={match} details handleAttendance={handleAttendance} />
               </Stack>
               <Divider />
-              <Box sx={{ alignSelf: "flex-end" }}><MatchShareButtons id={match.id} /></Box>
+              <Box sx={{ alignSelf: "flex-end" }}><MatchShareButtons match={match} /></Box>
             </Stack>
           </Stack>
         </Card>
