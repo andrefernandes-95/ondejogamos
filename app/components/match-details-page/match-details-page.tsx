@@ -8,7 +8,7 @@ import MatchPitchPhoto from "@/app/components/match-card/match-pitch-photo";
 import MatchShareButtons from "@/app/components/match-share-buttons/match-share-buttons";
 import type { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
-import { ChevronLeft } from "@mui/icons-material";
+import { ChevronLeft, EventAvailable } from "@mui/icons-material";
 import { Alert, Box, Button, Card, Container, Divider, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,14 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                 <MatchAttendanceAction match={match} details handleAttendance={handleAttendance} />
               </Stack>
               <Divider />
-              <Box sx={{ alignSelf: "flex-end" }}><MatchShareButtons match={match} /></Box>
+              <Stack direction="row" sx={{ justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+                {match.accepts_attendance && (
+                  <Button href={AppRoutes.MATCH_CALENDAR(match.id)} size="small" startIcon={<EventAvailable />}>
+                    {t("add_to_calendar")}
+                  </Button>
+                )}
+                <Box><MatchShareButtons match={match} /></Box>
+              </Stack>
             </Stack>
           </Stack>
         </Card>

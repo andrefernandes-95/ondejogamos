@@ -5,6 +5,7 @@ export const AppRoutes = {
   PROFILE: "/profile",
   ORGANIZED_MATCHES: "/profile/organized-matches",
   MATCH_DETAILS: (id: string) => `/match/${id}`,
+  MATCH_CALENDAR: (id: string) => `/match/${id}/calendar`,
   PLAYERS: "/players",
   PITCHES: "/pitches",
 };

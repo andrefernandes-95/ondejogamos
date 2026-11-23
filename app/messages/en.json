@@ -249,6 +249,8 @@
     "MatchDetailsPage": {
       "confirm_played": "Confirm the match took place",
       "repeat_match": "Schedule a similar match",
+      "add_to_calendar": "Add to calendar",
+      "calendar_title": "{format} football · Onde Jogamos",
       "played_confirmed": "Match confirmed by the organizer",
       "could_not_join_game": "Could not join game",
       "go_back": "Go back",
