@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   Container,
-  Divider,
   Stack,
   Typography,
 } from "@mui/material";

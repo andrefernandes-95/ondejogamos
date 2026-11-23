@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NextIntlClientProvider } from "next-intl";
 import { GameCount } from "./area-selector";
@@ -15,14 +14,9 @@ const messages = {
 
 function renderCount(count: number) {
   return renderToStaticMarkup(
-    createElement(
-      NextIntlClientProvider,
-      {
-        locale: "pt-PT",
-        messages,
-        children: createElement(GameCount, { count }),
-      },
-    ),
+    <NextIntlClientProvider locale="pt-PT" messages={messages}>
+      <GameCount count={count} />
+    </NextIntlClientProvider>,
   );
 }
 
