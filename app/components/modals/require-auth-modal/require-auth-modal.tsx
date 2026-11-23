@@ -2,6 +2,7 @@
 
 import { authClient } from "@/app/lib/auth-client";
 import { AppRoutes } from "@/app/utils/routes";
+import { authUrl } from "@/app/utils/auth-return";
 import { AccountCircle } from "@mui/icons-material";
 import {
   Button,
@@ -47,16 +48,10 @@ export function RequireAuthModalInner({
     setOpen(false);
   };
 
-  const goToSignIn = () => {
+  const navigateToAuth = (route: string) => {
+    const currentPage = window.location.pathname + window.location.search + window.location.hash;
     handleClose();
-    router.replace(AppRoutes.LOGIN);
-    router.refresh();
-  };
-
-  const goToSignUp = () => {
-    handleClose();
-    router.replace(AppRoutes.SIGN_UP);
-    router.refresh();
+    router.replace(authUrl(route, currentPage));
   };
 
   return (
@@ -110,10 +105,10 @@ export function RequireAuthModalInner({
             },
           }}
         >
-          <Button onClick={goToSignIn} variant="contained">
+          <Button onClick={() => navigateToAuth(AppRoutes.LOGIN)} variant="contained">
             {tApp("App.RequireAuthModal.login")}
           </Button>
-          <Button onClick={goToSignUp} variant="contained">
+          <Button onClick={() => navigateToAuth(AppRoutes.SIGN_UP)} variant="contained">
             {tApp("App.RequireAuthModal.create_account")}
           </Button>
         </Stack>

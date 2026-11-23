@@ -22,12 +22,14 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import NextLink from "next/link";
 import { AppRoutes } from "@/app/utils/routes";
+import { authUrl, safeReturnTo } from "@/app/utils/auth-return";
 import { useTranslations } from "next-intl";
 
 type Mode = "login" | "signup";
 
 interface Props {
   mode: Mode;
+  returnTo: string;
 }
 
 const MIN_PASSWORD_LENGTH = 10;
@@ -90,7 +92,7 @@ function createSchema(
 
 type FormValues = z.infer<ReturnType<typeof createSchema>>;
 
-export default function AuthForm({ mode }: Props) {
+export default function AuthForm({ mode, returnTo }: Props) {
   const tApp = useTranslations();
   const router = useRouter();
   const isSignup = mode === "signup";
@@ -125,8 +127,9 @@ export default function AuthForm({ mode }: Props) {
     mode: "onTouched",
   });
 
-  const goHome = () => {
-    router.replace(AppRoutes.HOME);
+  const destination = safeReturnTo(returnTo);
+  const goToDestination = () => {
+    router.replace(destination);
     router.refresh();
   };
 
@@ -140,7 +143,7 @@ export default function AuthForm({ mode }: Props) {
           name: values.name,
           email: values.email,
           password: values.password,
-          callbackURL: "/",
+          callbackURL: destination,
         });
 
         if (result.error) {
@@ -157,7 +160,7 @@ export default function AuthForm({ mode }: Props) {
 
         // With autoSignIn, registration also creates a session
         if (result?.data?.token) {
-          goHome();
+          goToDestination();
           return;
         }
 
@@ -185,7 +188,7 @@ export default function AuthForm({ mode }: Props) {
         return;
       }
 
-      goHome();
+      goToDestination();
     } catch {
       setError("root.server", {
         message: tApp("App.AuthForm.something_went_wrong"),
@@ -363,7 +366,7 @@ export default function AuthForm({ mode }: Props) {
 
             <Link
               component={NextLink}
-              href={isSignup ? AppRoutes.LOGIN : AppRoutes.SIGN_UP}
+              href={authUrl(isSignup ? AppRoutes.LOGIN : AppRoutes.SIGN_UP, destination)}
             >
               {isSignup
                 ? tApp("App.AuthForm.sign_in")
