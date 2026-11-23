@@ -5,7 +5,7 @@ import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
 import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
-import { toMatchFormData } from "@/app/utils/match-form-data";
+import { getMatchFormDefaults, toMatchFormData } from "@/app/utils/match-form-data";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
 import {
@@ -22,17 +22,18 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
+import { useId } from "react";
 
 interface Props {
   selectedArea: string;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   existingMatch?: FullMatch;
+  template?: FullMatch;
+  onCreated?: (matchId: string) => void;
   onAddPitch?: () => void;
   selectedPitch?: string;
 }
-
-const formId = "create-pitch-form";
 
 export default function CreateMatchModal({
   open,
@@ -40,10 +41,13 @@ export default function CreateMatchModal({
   selectedArea,
   selectedPitch,
   existingMatch,
+  template,
+  onCreated,
   onAddPitch,
 }: Props) {
   const tApp = useTranslations();
   const tErrors = useTranslations("ApiErrors");
+  const formId = useId();
 
   const {
     control,
@@ -54,20 +58,7 @@ export default function CreateMatchModal({
     formState: { errors, isSubmitting },
   } = useForm<CreateMatchFormValues>({
     resolver: zodResolver(createMatchSchema),
-    defaultValues: {
-      description: existingMatch ? existingMatch.description : "",
-      pitchId: selectedPitch
-        ? selectedPitch
-        : existingMatch
-          ? existingMatch.pitch.id?.toString()
-          : "",
-      durationInMinutes: existingMatch
-        ? Number(existingMatch.duration_in_minutes)
-        : 60,
-      startsAt: existingMatch ? existingMatch.starts_at?.toISOString() : "",
-      format: existingMatch ? existingMatch.format : "5x5",
-      minAttendance: existingMatch ? existingMatch.min_attendance : 10,
-    },
+    defaultValues: getMatchFormDefaults({ existingMatch, template, selectedPitch }),
   });
 
   const {
@@ -105,6 +96,13 @@ export default function CreateMatchModal({
 
       reset();
       setOpen(false);
+      if (!existingMatch && onCreated) {
+        const created = await response.json().catch(() => null);
+        if (typeof created?.id === "string" && /^[1-9]\d*$/.test(created.id)) {
+          onCreated(created.id);
+          return;
+        }
+      }
       window.location.reload();
     } catch {
       setError("root.server", {

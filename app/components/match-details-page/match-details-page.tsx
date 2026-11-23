@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import ConfirmMatchPlayed from "./confirm-match-played";
 import MatchDetailsInfo from "./match-details-info";
 import MatchPlayers from "./match-players";
+import RepeatMatchButton from "./repeat-match-button";
 
 export default function MatchDetailsPage({ match }: { match: FullMatch }) {
   const t = useTranslations("App.MatchDetailsPage");
@@ -32,6 +33,9 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
               <EditMatch match={match} />
               <DeleteMatch match={match} />
             </Stack>
+          )}
+          {match.is_creator && (match.can_confirm_played || match.played_confirmed_at) && (
+            <RepeatMatchButton match={match} />
           )}
         </Stack>
         {error && <Alert variant="filled" severity="error">{error}</Alert>}

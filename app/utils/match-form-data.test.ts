@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { toMatchFormData } from "@/app/utils/match-form-data";
+import { getMatchFormDefaults, toMatchFormData } from "@/app/utils/match-form-data";
 import { CreateMatchFormValues } from "@/app/schemas/match";
 
 const validMatch: CreateMatchFormValues = {
@@ -30,4 +30,20 @@ test("omits the ID for a new match and normalizes optional values", () => {
   assert.equal(formData.has("id"), false);
   assert.equal(formData.get("description"), "");
   assert.equal(formData.get("durationInMinutes"), "60");
+});
+
+test("repeating a game copies its settings and requires a fresh date", () => {
+  const match = {
+    id: "17",
+    pitch: { id: 42 },
+    starts_at: new Date(validMatch.startsAt),
+    format: "7x7" as const,
+    description: "Bring a light shirt",
+    duration_in_minutes: 90,
+    min_attendance: 14,
+  };
+  const repeated = getMatchFormDefaults({ template: match });
+  assert.deepEqual(repeated, { ...validMatch, startsAt: "", format: "7x7", minAttendance: 14 });
+  assert.equal(toMatchFormData(repeated).has("id"), false);
+  assert.equal(getMatchFormDefaults({ existingMatch: match }).startsAt, validMatch.startsAt);
 });

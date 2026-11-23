@@ -248,6 +248,7 @@
     },
     "MatchDetailsPage": {
       "confirm_played": "Confirmar que o jogo aconteceu",
+      "repeat_match": "Marcar jogo parecido",
       "played_confirmed": "Jogo confirmado pelo organizador",
       "could_not_join_game": "Não foi possível aderir ao jogo",
       "go_back": "Voltar atrás",
