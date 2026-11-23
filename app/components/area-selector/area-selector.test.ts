@@ -17,8 +17,11 @@ function renderCount(count: number) {
   return renderToStaticMarkup(
     createElement(
       NextIntlClientProvider,
-      { locale: "pt-PT", messages },
-      createElement(GameCount, { count }),
+      {
+        locale: "pt-PT",
+        messages,
+        children: createElement(GameCount, { count }),
+      },
     ),
   );
 }
