@@ -1,0 +1,70 @@
+name: Dependency audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/dependency-audit.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/dependency-audit.yml
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Dependency vulnerability report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Audit dependency lockfile
+        shell: bash
+        run: |
+          npm audit --package-lock-only --json > audit.json || result=$?
+          if [ "${result:-0}" -gt 1 ]; then
+            echo "npm audit failed to run (exit code ${result})" >&2
+            exit 1
+          fi
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('audit.json', 'utf8'));
+          if (report.error || !report.metadata?.vulnerabilities) {
+            throw new Error('npm audit did not return a valid vulnerability report');
+          }
+          const counts = report.metadata.vulnerabilities;
+          const advisories = Object.entries(report.vulnerabilities || {})
+            .map(([name, item]) => ({
+              name,
+              severity: item.severity,
+              isDirect: item.isDirect,
+              via: item.via.filter(v => typeof v === 'object').map(v => ({
+                title: v.title, url: v.url, range: v.range
+              })),
+              fix: item.fixAvailable
+            }));
+          const lines = [
+            '# Dependency audit',
+            '',
+            `Found ${counts.total} vulnerable packages (critical: ${counts.critical}, high: ${counts.high}, moderate: ${counts.moderate}, low: ${counts.low}).`,
+            '',
+            '| Package | Severity | Direct | Fix available | Advisories |',
+            '| --- | --- | --- | --- | --- |',
+            ...advisories.map(a => `| ${a.name} | ${a.severity} | ${a.isDirect ? 'yes' : 'no'} | ${JSON.stringify(a.fix)} | ${a.via.map(v => v.title).join('; ').replaceAll('|', '/')} |`)
+          ];
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+          console.log(JSON.stringify({ counts, advisories }, null, 2));
+          NODE
