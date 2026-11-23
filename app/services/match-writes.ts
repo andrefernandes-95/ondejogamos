@@ -40,8 +40,9 @@ export interface UpdateMatchInput extends SaveMatchInput {
 export async function updateMatch(
   match: UpdateMatchInput,
   userId: string,
-): Promise<Match> {
-  const result = await pool.query(
+  db = pool,
+): Promise<Match | null> {
+  const result = await db.query(
     `
       UPDATE MATCHES
       SET
@@ -51,7 +52,7 @@ export async function updateMatch(
         min_attendance = $6,
         starts_at = $7,
         duration_in_minutes = $8
-      WHERE id = $1 AND created_by = $2
+      WHERE id = $1 AND created_by = $2 AND starts_at > clock_timestamp()
       RETURNING *
     `,
     [

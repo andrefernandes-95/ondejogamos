@@ -299,9 +299,9 @@ export async function DELETE(request: Request) {
 
     if (
       error instanceof Error &&
-      error.message === "PITCH_HAS_ACTIVE_MATCHES"
+      error.message === "PITCH_HAS_MATCHES"
     ) {
-      return apiError("PITCH_HAS_ACTIVE_MATCHES", 409);
+      return apiError("PITCH_HAS_MATCHES", 409);
     }
 
     return apiError("PITCH_DELETE_FAILED", 500);

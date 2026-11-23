@@ -3,8 +3,9 @@ import { pool } from "@/app/lib/db";
 export async function deleteMatch(
   matchId: string,
   userId: string,
-): Promise<void> {
-  const client = await pool.connect();
+  db = pool,
+): Promise<"deleted" | "not_found" | "started"> {
+  const client = await db.connect();
 
   try {
     await client.query("BEGIN");
@@ -20,7 +21,18 @@ export async function deleteMatch(
     );
 
     if (result.rowCount === 0) {
-      throw new Error(`Match not found or unauthorized`);
+      await client.query("ROLLBACK");
+      return "not_found";
+    }
+
+    // Check the time after acquiring the lock, even if the request arrived earlier.
+    const kickoff = await client.query<{ started: boolean }>(
+      "SELECT starts_at <= clock_timestamp() AS started FROM matches WHERE id = $1",
+      [matchId],
+    );
+    if (kickoff.rows[0].started) {
+      await client.query("ROLLBACK");
+      return "started";
     }
 
     await client.query(
@@ -38,6 +50,7 @@ export async function deleteMatch(
     );
 
     await client.query("COMMIT");
+    return "deleted";
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;

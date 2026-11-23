@@ -26,7 +26,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
       <Stack spacing={2}>
         <Stack direction="row" sx={{ justifyContent: "space-between", flexWrap: "wrap" }}>
           <Button href={AppRoutes.HOME} startIcon={<ChevronLeft />}>{t("go_back")}</Button>
-          {match.is_creator && (
+          {match.is_creator && match.accepts_attendance && (
             <Stack direction="row" sx={{ alignItems: "center" }}>
               <EditMatch match={match} />
               <DeleteMatch match={match} />

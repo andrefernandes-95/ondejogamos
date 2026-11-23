@@ -1,5 +1,6 @@
 import auth from "@/app/lib/auth";
 import { apiError } from "@/app/utils/api-error";
+import { parseAttendanceMatchId } from "@/app/utils/attendance-match-id";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
@@ -167,12 +168,19 @@ export async function DELETE(request: Request) {
     return apiError("INVALID_FORM", 400);
   }
 
-  if (!formData.has("id")) {
+  const matchId = parseAttendanceMatchId(formData.get("id"));
+  if (matchId === null) {
     return apiError("INVALID_FORM", 400);
   }
 
   try {
-    await deleteMatch(formData.get("id") as string, session.user.id);
+    const result = await deleteMatch(String(matchId), session.user.id);
+    if (result === "not_found") {
+      return apiError("MATCH_NOT_FOUND", 404);
+    }
+    if (result === "started") {
+      return apiError("MATCH_DELETE_AFTER_KICKOFF", 409);
+    }
   } catch (error) {
     console.error(`Falha ao remover jogo`, error);
 

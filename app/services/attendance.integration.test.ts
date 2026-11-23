@@ -7,6 +7,9 @@ import {
   deleteAttendance,
   registerAttendance,
 } from "./attendance";
+import { deleteMatch } from "./delete-match";
+import { updateMatch } from "./match-writes";
+import { deleteFromPitch } from "./pitches";
 
 const databaseUrl = process.env.ATTENDANCE_TEST_DATABASE_URL;
 const db = databaseUrl ? new Pool({ connectionString: databaseUrl }) : null;
@@ -19,9 +22,10 @@ const municipality = `ci-municipality-${suffix}`;
 const matchIds: number[] = [];
 const matches: Record<string, number> = {};
 let pitchId: number | undefined;
+let historyPitchId: string | undefined;
 
-async function addMatch(name: string, startsAt: Date, cancelledAt: Date | null = null) {
-  if (!db || pitchId === undefined) throw new Error("No test database");
+async function addMatch(name: string, startsAt: Date, cancelledAt: Date | null = null, fieldId = pitchId) {
+  if (!db || fieldId === undefined) throw new Error("No test database");
   const { rows } = await db.query<{ id: string }>(
     `
       INSERT INTO matches
@@ -29,7 +33,7 @@ async function addMatch(name: string, startsAt: Date, cancelledAt: Date | null =
       VALUES ($1, $2, '5x5', $3, 60, 10, $4)
       RETURNING id
     `,
-    [hostId, pitchId, startsAt, cancelledAt],
+    [hostId, fieldId, startsAt, cancelledAt],
   );
   const id = Number(rows[0].id);
   matchIds.push(id);
@@ -64,6 +68,11 @@ before(async () => {
     [area, municipality, hostId],
   );
   pitchId = Number(pitch.rows[0].id);
+  const historyPitch = await db.query<{ id: string }>(
+    "INSERT INTO pitches (area, municipality, name, created_by) VALUES ($1, $2, 'CI History Pitch', $3) RETURNING id",
+    [area, municipality, hostId],
+  );
+  historyPitchId = historyPitch.rows[0].id;
 
   const future = new Date(Date.now() + 3_600_000);
   const past = new Date(Date.now() - 3_600_000);
@@ -73,6 +82,8 @@ before(async () => {
   await addMatch("cancelled", future, new Date());
   await addMatch("leave", future);
   await addMatch("retain", future);
+  await addMatch("deleteFuture", future);
+  await addMatch("keepHistory", future, null, Number(historyPitchId));
 });
 
 after(async () => {
@@ -84,6 +95,9 @@ after(async () => {
     }
     if (pitchId !== undefined) {
       await db.query("DELETE FROM pitches WHERE id = $1", [pitchId]);
+    }
+    if (historyPitchId !== undefined) {
+      await db.query("DELETE FROM pitches WHERE id = $1", [historyPitchId]);
     }
     await db.query("DELETE FROM locations WHERE area = $1 AND municipality = $2", [area, municipality]);
     await db.query('DELETE FROM "user" WHERE id = ANY($1::text[])', [[hostId, playerId, otherId]]);
@@ -170,4 +184,49 @@ test("cancellation after kickoff preserves historical attendance", { skip: !db }
     [matches.retain, playerId],
   );
   assert.equal(rows[0].total, 1);
+});
+
+test("only the organizer can delete a future match", { skip: !db }, async () => {
+  if (!db) {
+    return;
+  }
+  const id = String(matches.deleteFuture);
+  await registerAttendance(matches.deleteFuture, playerId, db);
+  assert.equal(await deleteMatch(id, otherId, db), "not_found");
+  assert.equal(await deleteMatch(id, hostId, db), "deleted");
+  const { rowCount } = await db.query("SELECT 1 FROM attendance WHERE match_id = $1", [id]);
+  assert.equal(rowCount, 0);
+});
+
+test("match deletion, rescheduling and pitch deletion preserve history after kickoff", { skip: !db }, async () => {
+  if (!db || historyPitchId === undefined) {
+    return;
+  }
+  const id = matches.keepHistory;
+  await registerAttendance(id, playerId, db);
+  const { rows: [original] } = await db.query<{ starts_at: Date }>(
+    "UPDATE matches SET starts_at = NOW() - INTERVAL '2 hours' WHERE id = $1 RETURNING starts_at",
+    [id],
+  );
+
+  assert.equal(await updateMatch({
+    id,
+    startsAt: new Date(Date.now() + 3600_000).toISOString(),
+    pitchId: historyPitchId,
+    format: "5x5",
+    minAttendance: 10,
+    durationInMinutes: 60,
+    description: "",
+    createdBy: hostId,
+  }, hostId, db), null);
+  assert.equal(await deleteMatch(String(id), hostId, db), "started");
+  await assert.rejects(deleteFromPitch(historyPitchId, hostId, db), {
+    message: "PITCH_HAS_MATCHES",
+  });
+
+  const { rows } = await db.query(
+    "SELECT m.starts_at FROM matches m JOIN attendance a ON a.match_id = m.id WHERE m.id = $1 AND a.user_id = $2",
+    [id, playerId],
+  );
+  assert.deepEqual(rows, [original]);
 });

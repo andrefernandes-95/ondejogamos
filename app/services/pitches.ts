@@ -153,8 +153,9 @@ export async function getPitchById(id: number): Promise<Pitch | null> {
 export async function deleteFromPitch(
   pitch_id: string,
   user_session_id: string,
+  db = pool,
 ): Promise<void> {
-  const client = await pool.connect();
+  const client = await db.connect();
 
   try {
     await client.query("BEGIN");
@@ -170,57 +171,17 @@ export async function deleteFromPitch(
     );
 
     if (result.rowCount === 0) {
-      throw new Error(`PITCH_HAS_ACTIVE_MATCHES`);
+      throw new Error("Pitch not found or unauthorized");
     }
 
-    // Block matches
-    await client.query(
-      `
-        SELECT id
-        FROM "matches"
-        WHERE pitch_id = $1
-        ORDER BY id
-        FOR UPDATE
-      `,
+    const matches = await client.query(
+      "SELECT 1 FROM matches WHERE pitch_id = $1 LIMIT 1",
       [pitch_id],
     );
 
-    const gamesHappening = await client.query(
-      `
-        SELECT
-          EXISTS (
-            SELECT 1
-            FROM matches
-            WHERE pitch_id = $1
-            AND starts_at
-              + duration_in_minutes * INTERVAL '1 minute'
-              > NOW()
-          ) AS has_matches_ongoing
-      `,
-      [pitch_id],
-    );
-
-    if (gamesHappening.rows?.[0]?.has_matches_ongoing) {
-      throw new Error(`Pitch has ongoing matches scheduled`);
+    if (matches.rowCount) {
+      throw new Error("PITCH_HAS_MATCHES");
     }
-
-    await client.query(
-      `
-      DELETE FROM "attendance"
-      WHERE match_id IN (
-        SELECT id
-        FROM "matches"
-        WHERE pitch_id = $1
-      )`,
-      [pitch_id],
-    );
-
-    await client.query(
-      `
-      DELETE FROM "matches"
-      WHERE pitch_id = $1`,
-      [pitch_id],
-    );
 
     await client.query(
       `
