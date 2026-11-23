@@ -5,6 +5,18 @@ import {
 } from "@/app/utils/image";
 import z from "zod";
 
+const pitchImageSchema = z
+  .instanceof(File, { message: "Imagem obrigatória" })
+  .refine((file) => file.size > 0, "A imagem está vazia")
+  .refine(
+    (file) => file.size <= MAX_IMAGE_SIZE,
+    `A imagem não pode exceder ${MAX_IMAGE_SIZE_IN_MB} MB`,
+  )
+  .refine(
+    (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
+    "Usa uma imagem JPEG, PNG ou WEBP",
+  );
+
 const basePitchSchema = z.object({
   name: z.string().trim().min(1, "Nome obrigatório").max(200),
   area: z.string().trim().min(1, "Área obrigatória").max(200),
@@ -23,21 +35,11 @@ const basePitchSchema = z.object({
         return false;
       }
     }, "URL do mapa inválido"),
-  image: z.unknown().optional(),
+  image: pitchImageSchema.optional(),
 });
 
 const createPitchSchema = basePitchSchema.extend({
-  image: z
-    .instanceof(File, { message: "Imagem obrigatória" })
-    .refine((file) => file.size > 0, "A imagem está vazia")
-    .refine(
-      (file) => file.size <= MAX_IMAGE_SIZE,
-      `A imagem não pode exceder ${MAX_IMAGE_SIZE_IN_MB} MB`,
-    )
-    .refine(
-      (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
-      "Usa uma imagem JPEG, PNG ou WEBP",
-    ),
+  image: pitchImageSchema,
 });
 
 export const safeParseFormData = (formData: FormData) =>
@@ -55,5 +57,5 @@ export const safeUpdateParseFormData = (formData: FormData) =>
     area: formData.get("area"),
     municipality: formData.get("municipality"),
     maps_url: formData.get("maps_url") ?? "",
-    image: formData.get("image") ?? "",
+    image: formData.get("image") ?? undefined,
   });

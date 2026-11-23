@@ -100,7 +100,6 @@ export async function POST(request: Request) {
   try {
     result = await savePitch(pitch);
   } catch (error) {
-    console.error("Falha ao guardar o campo", error);
     try {
       await s3.send(
         new DeleteObjectCommand({
@@ -115,6 +114,10 @@ export async function POST(request: Request) {
       });
     }
 
+    if (error instanceof Error && error.message === "PITCH_ALREADY_EXISTS") {
+      return apiError("PITCH_ALREADY_EXISTS", 409);
+    }
+    console.error("Falha ao guardar o campo", error);
     return apiError("PITCH_CREATE_FAILED", 500);
   }
 

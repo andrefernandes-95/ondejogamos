@@ -28,6 +28,7 @@
     "MATCH_READ_FAILED": "Could not load the matches. Try again.",
     "INVALID_PITCH_DATA": "Check the pitch details and try again.",
     "PITCH_CREATE_FAILED": "Could not create the pitch. Try again.",
+    "PITCH_ALREADY_EXISTS": "A pitch with this name already exists in this location.",
     "PITCH_UPDATE_FAILED": "Could not update the pitch. Try again.",
     "PITCH_DELETE_FAILED": "Could not remove the pitch. Try again.",
     "PITCH_NOT_FOUND": "This pitch no longer exists.",

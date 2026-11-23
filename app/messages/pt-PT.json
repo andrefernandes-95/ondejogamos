@@ -28,6 +28,7 @@
     "MATCH_READ_FAILED": "Não foi possível carregar os jogos. Tenta novamente.",
     "INVALID_PITCH_DATA": "Verifica os dados do campo e tenta novamente.",
     "PITCH_CREATE_FAILED": "Não foi possível criar o campo. Tenta novamente.",
+    "PITCH_ALREADY_EXISTS": "Já existe um campo com esse nome nessa localidade.",
     "PITCH_UPDATE_FAILED": "Não foi possível atualizar o campo. Tenta novamente.",
     "PITCH_DELETE_FAILED": "Não foi possível remover o campo. Tenta novamente.",
     "PITCH_NOT_FOUND": "Este campo já não existe.",

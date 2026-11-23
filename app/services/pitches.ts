@@ -85,15 +85,12 @@ export type SavePitchInput = Pick<
 >;
 
 export async function savePitch(pitch: SavePitchInput): Promise<Pitch> {
-  const result = await pool.query(
+  const result = await pool.query<Pitch>(
     `
       INSERT INTO PITCHES(
         name, area, municipality, maps_url, image_url, created_by
       ) values ($1, $2, $3, $4, $5, $6)
-      ON CONFLICT (area, municipality, name)
-      DO UPDATE SET
-        maps_url = EXCLUDED.maps_url,
-        image_url = EXCLUDED.image_url
+      ON CONFLICT (area, municipality, name) DO NOTHING
       RETURNING *
     `,
     [
@@ -106,6 +103,9 @@ export async function savePitch(pitch: SavePitchInput): Promise<Pitch> {
     ],
   );
 
+  if (!result.rows[0]) {
+    throw new Error("PITCH_ALREADY_EXISTS");
+  }
   return result.rows[0];
 }
 
