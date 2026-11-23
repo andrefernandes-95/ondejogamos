@@ -50,7 +50,7 @@ export async function listAllPitches(user_id: string): Promise<PitchFull[]> {
               COALESCE(p.created_by = $1, false) AS is_creator
             FROM pitches AS p
             LEFT JOIN "user" AS u ON created_by = u.id
-            LEFT JOIN "matches" AS m ON m.pitch_id = p.id
+            LEFT JOIN "matches" AS m ON m.pitch_id = p.id AND m.cancelled_at IS NULL
             GROUP BY p.id, u.name
             ORDER BY name
         `,

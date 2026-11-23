@@ -12,7 +12,7 @@ export interface Match {
   min_attendance: number; // 10 players
   created_at: Date;
   starts_at: Date;
-  cancelled_at: Date;
+  cancelled_at: Date | null;
   description: string;
 }
 

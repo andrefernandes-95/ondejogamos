@@ -25,7 +25,7 @@ export async function listUsers(): Promise<Player[]> {
                 u."createdAt",
                 COUNT(m.id)::int AS games_created
             FROM "user" AS u
-            LEFT JOIN "matches" AS m ON m.created_by = u.id
+            LEFT JOIN "matches" AS m ON m.created_by = u.id AND m.cancelled_at IS NULL
             LEFT JOIN player_profiles AS p ON p.user_id = u.id
             GROUP BY u.id, p.user_id
             ORDER BY u."createdAt" DESC

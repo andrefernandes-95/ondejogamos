@@ -23,16 +23,20 @@ export class AttendanceError extends Error {
   }
 }
 
-function ensureMatchOpen(match: MatchRow) {
+function ensureMatchNotCancelled(match: MatchRow) {
   if (match.cancelled_at) {
     throw new AttendanceError("MATCH_CANCELLED", 409);
   }
+}
+
+function ensureMatchOpen(match: MatchRow) {
+  ensureMatchNotCancelled(match);
   if (new Date(match.starts_at).getTime() <= Date.now()) {
     throw new AttendanceError("MATCH_ALREADY_STARTED", 409);
   }
 }
 
-/** Serialize attendance changes with match edits/deletions. */
+/** Serialize attendance changes with match edits and cancellations. */
 async function withLockedMatch<T>(
   matchId: number,
   db: Database,
@@ -61,13 +65,15 @@ async function withLockedMatch<T>(
 
 export async function listAttendancesForMatch(
   match_id: number,
+  db = pool,
 ): Promise<Attendance[]> {
-  const result = await pool.query(
+  const result = await db.query(
     `
       SELECT
         a.id, a.match_id, a.created_at, a.updated_at,
         u.id AS user_id, u.name AS username
       FROM attendance AS a
+      JOIN matches AS m ON m.id = a.match_id AND m.cancelled_at IS NULL
       LEFT JOIN "user" AS u ON u.id = a.user_id
       WHERE a.match_id = $1
       ORDER BY a.created_at, a.id
@@ -86,6 +92,8 @@ export async function registerAttendance(
     if (match.created_by === userId) {
       throw new AttendanceError("FORBIDDEN", 403);
     }
+
+    ensureMatchNotCancelled(match);
 
     // A retry remains successful even if the game has since started.
     const existing = await client.query<Attendance>(

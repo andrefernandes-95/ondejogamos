@@ -5,7 +5,7 @@ import { confirmMatchPlayed } from "@/app/services/confirm-match-played";
 import { MatchScheduleError } from "@/app/services/match-writes";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
-  deleteMatch,
+  cancelMatch,
   listAllMatches,
   listFullMatches,
   saveMatch,
@@ -209,7 +209,7 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const result = await deleteMatch(String(matchId), session.user.id);
+    const result = await cancelMatch(String(matchId), session.user.id);
     if (result === "not_found") {
       return apiError("MATCH_NOT_FOUND", 404);
     }

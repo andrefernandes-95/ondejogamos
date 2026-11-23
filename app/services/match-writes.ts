@@ -92,7 +92,7 @@ export async function updateMatch(
   return withPitchScheduleLock(match.pitchId, db, async (client) => {
     const current = await client.query(
       `SELECT id FROM matches
-       WHERE id = $1 AND created_by = $2 AND starts_at > clock_timestamp()
+       WHERE id = $1 AND created_by = $2 AND cancelled_at IS NULL AND starts_at > clock_timestamp()
        FOR UPDATE`,
       [match.id, userId],
     );
@@ -105,7 +105,7 @@ export async function updateMatch(
       `UPDATE matches
        SET pitch_id = $3, description = $4, format = $5,
            min_attendance = $6, starts_at = $7, duration_in_minutes = $8
-       WHERE id = $1 AND created_by = $2 AND starts_at > clock_timestamp()
+       WHERE id = $1 AND created_by = $2 AND cancelled_at IS NULL AND starts_at > clock_timestamp()
        RETURNING *`,
       [
         match.id, userId, match.pitchId, match.description, match.format,

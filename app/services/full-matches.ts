@@ -26,6 +26,7 @@ const fullMatchQuery = (details = false) => `
       JOIN "user" AS attendee ON attendee.id = a.user_id
       LEFT JOIN player_profiles AS attendee_profile ON attendee_profile.user_id = attendee.id
       WHERE a.match_id = m.id
+        AND (m.cancelled_at IS NULL OR m.created_by = $1)
     ), '[]'::jsonb) AS attendances,
     EXISTS(SELECT 1 FROM attendance AS a WHERE a.match_id = m.id AND a.user_id = $1) AS is_attending,
     COALESCE(m.created_by = $1, false) AS is_creator
@@ -35,9 +36,10 @@ const fullMatchQuery = (details = false) => `
   LEFT JOIN player_profiles AS host_profile ON host_profile.user_id = host.id
 `;
 
-export async function listFullMatches(area: string, userId: string): Promise<FullMatch[]> {
-  const { rows } = await pool.query<FullMatch>(
-    `${fullMatchQuery()} WHERE p.area = $2 AND m.starts_at >= NOW() ORDER BY m.starts_at, m.id`,
+export async function listFullMatches(area: string, userId: string, db = pool): Promise<FullMatch[]> {
+  const { rows } = await db.query<FullMatch>(
+    `${fullMatchQuery()} WHERE p.area = $2 AND m.starts_at >= NOW() AND m.cancelled_at IS NULL
+      ORDER BY m.starts_at, m.id`,
     [userId, area],
   );
   return rows;
@@ -45,13 +47,13 @@ export async function listFullMatches(area: string, userId: string): Promise<Ful
 
 export async function listAllMatches(userId: string): Promise<FullMatch[]> {
   const { rows } = await pool.query<FullMatch>(
-    `${fullMatchQuery()} WHERE m.starts_at >= NOW() ORDER BY m.starts_at, m.id`, [userId],
+    `${fullMatchQuery()} WHERE m.starts_at >= NOW() AND m.cancelled_at IS NULL ORDER BY m.starts_at, m.id`, [userId],
   );
   return rows;
 }
 
-export async function getFullMatchById(id: number, userId?: string | null): Promise<FullMatch | null> {
-  const { rows } = await pool.query<FullMatch>(
+export async function getFullMatchById(id: number, userId?: string | null, db = pool): Promise<FullMatch | null> {
+  const { rows } = await db.query<FullMatch>(
     `${fullMatchQuery(true)} WHERE m.id = $2`,
     [userId, id],
   );

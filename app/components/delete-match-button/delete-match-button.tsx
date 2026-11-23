@@ -1,5 +1,4 @@
 import { FullMatch } from "@/app/models/match";
-import { AppRoutes } from "@/app/utils/routes";
 import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
 import { Cancel } from "@mui/icons-material";
 import {
@@ -20,16 +19,18 @@ interface Props {
   match: FullMatch;
 }
 
-export default function DeleteMatch({ match }: Props) {
+export default function CancelMatch({ match }: Props) {
   const tApp = useTranslations();
   const tErrors = useTranslations("ApiErrors");
   const [confirm, setConfirm] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   const router = useRouter();
 
-  const deleteMatch = async () => {
+  const cancelMatch = async () => {
     setServerError("");
+    setCancelling(true);
 
     try {
       const body = new FormData();
@@ -46,16 +47,24 @@ export default function DeleteMatch({ match }: Props) {
         return;
       }
 
-      router.replace(AppRoutes.HOME);
+      setConfirm(false);
       router.refresh();
     } catch {
       setServerError(tErrors("INTERNAL_ERROR"));
+    } finally {
+      setCancelling(false);
     }
   };
 
+  function closeDialog() {
+    if (!cancelling) {
+      setConfirm(false);
+    }
+  }
+
   return (
     <>
-      <Dialog open={confirm} onClose={() => setConfirm(false)} fullWidth>
+      <Dialog open={confirm} onClose={closeDialog} fullWidth>
         <DialogTitle
           color="error"
           sx={{
@@ -76,7 +85,7 @@ export default function DeleteMatch({ match }: Props) {
               <Alert severity="error">{serverError}</Alert>
             ) : (
               <Typography>
-                {tApp("App.DeleteMatchButton.this_action_is_irreversible")}
+                {tApp("App.DeleteMatchButton.cancellation_description")}
               </Typography>
             )}
           </Stack>
@@ -95,7 +104,7 @@ export default function DeleteMatch({ match }: Props) {
             p: 2,
           }}
         >
-          <Button color="error" onClick={() => setConfirm(false)}>
+          <Button color="error" onClick={closeDialog} disabled={cancelling}>
             {tApp("App.DeleteMatchButton.cancel")}
           </Button>
           <Stack
@@ -110,7 +119,7 @@ export default function DeleteMatch({ match }: Props) {
               },
             }}
           >
-            <Button color="error" onClick={deleteMatch} variant="contained">
+            <Button color="error" onClick={cancelMatch} variant="contained" loading={cancelling}>
               {tApp("App.DeleteMatchButton.cancel_match")}
             </Button>
           </Stack>

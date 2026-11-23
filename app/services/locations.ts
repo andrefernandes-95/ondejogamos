@@ -26,7 +26,7 @@ export async function listLocationsWithGameCount(): Promise<
               COUNT(m.id)::int AS game_count
             FROM "locations" AS l
             LEFT JOIN "pitches" AS p ON p.municipality = l.municipality AND p.area = l.area
-            LEFT JOIN "matches" AS m ON m.pitch_id = p.id AND m.starts_at >= NOW()
+            LEFT JOIN "matches" AS m ON m.pitch_id = p.id AND m.starts_at >= NOW() AND m.cancelled_at IS NULL
             GROUP BY l.area, l.municipality
             ORDER BY l.area, l.municipality
         `);

@@ -5,9 +5,12 @@ import { Pool } from "pg";
 import {
   AttendanceError,
   deleteAttendance,
+  listAttendancesForMatch,
   registerAttendance,
 } from "./attendance";
-import { deleteMatch } from "./delete-match";
+import { cancelMatch } from "./cancel-match";
+import { getFullMatchById, listFullMatches } from "./full-matches";
+import { getPitchMatchesForDateInterval } from "./pitch-availability";
 import { confirmMatchPlayed } from "./confirm-match-played";
 import { MatchScheduleError, saveMatch, updateMatch } from "./match-writes";
 import { listProfileMatches } from "./profile-matches";
@@ -84,7 +87,7 @@ before(async () => {
   await addMatch("cancelled", future, new Date());
   await addMatch("leave", future);
   await addMatch("retain", future);
-  await addMatch("deleteFuture", future);
+  await addMatch("cancelFuture", new Date(Date.now() + 10 * 3_600_000), null, Number(historyPitchId));
   await addMatch("keepHistory", future, null, Number(historyPitchId));
   await addMatch("ongoing", new Date(Date.now() - 30 * 60_000));
   await addMatch("completed", new Date(Date.now() - 2 * 3_600_000));
@@ -192,19 +195,31 @@ test("cancellation after kickoff preserves historical attendance", { skip: !db }
   assert.equal(rows[0].total, 1);
 });
 
-test("only the organizer can delete a future match", { skip: !db }, async () => {
-  if (!db) {
+test("cancelling a future match preserves registrations and frees the pitch", { skip: !db }, async () => {
+  if (!db || !historyPitchId) {
     return;
   }
-  const id = String(matches.deleteFuture);
-  await registerAttendance(matches.deleteFuture, playerId, db);
-  assert.equal(await deleteMatch(id, otherId, db), "not_found");
-  assert.equal(await deleteMatch(id, hostId, db), "deleted");
-  const { rowCount } = await db.query("SELECT 1 FROM attendance WHERE match_id = $1", [id]);
-  assert.equal(rowCount, 0);
+  const id = matches.cancelFuture;
+  await registerAttendance(id, playerId, db);
+  assert.equal(await cancelMatch(String(id), otherId, db), "not_found");
+  assert.equal(await cancelMatch(String(id), hostId, db), "cancelled");
+  assert.equal(await cancelMatch(String(id), hostId, db), "cancelled");
+  const cancelledMatch = await getFullMatchById(id, playerId, db);
+  assert.ok(cancelledMatch?.cancelled_at);
+  assert.equal(cancelledMatch.accepts_attendance, false);
+  assert.deepEqual(cancelledMatch.attendances, []);
+  assert.equal((await getFullMatchById(id, hostId, db))?.attendances.length, 1);
+  assert.deepEqual(await listAttendancesForMatch(id, db), []);
+  assert.ok(!(await listFullMatches(area, playerId, db)).some((match) => match.id === String(id)));
+  assert.equal((await listProfileMatches(playerId, "joined", db)).find((match) => match.id === String(id))?.status, "cancelled");
+  await assert.rejects(registerAttendance(id, playerId, db), { message: "MATCH_CANCELLED" });
+
+  const start = new Date(cancelledMatch.starts_at);
+  const end = new Date(start.getTime() + 60 * 60_000);
+  assert.deepEqual(await getPitchMatchesForDateInterval(historyPitchId, start.toISOString(), end.toISOString(), db), []);
 });
 
-test("match deletion, rescheduling and pitch deletion preserve history after kickoff", { skip: !db }, async () => {
+test("match cancellation, rescheduling and pitch deletion preserve history after kickoff", { skip: !db }, async () => {
   if (!db || historyPitchId === undefined) {
     return;
   }
@@ -225,7 +240,7 @@ test("match deletion, rescheduling and pitch deletion preserve history after kic
     description: "",
     createdBy: hostId,
   }, hostId, db), null);
-  assert.equal(await deleteMatch(String(id), hostId, db), "started");
+  assert.equal(await cancelMatch(String(id), hostId, db), "started");
   await assert.rejects(deleteFromPitch(historyPitchId, hostId, db), {
     message: "PITCH_HAS_MATCHES",
   });

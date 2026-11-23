@@ -24,8 +24,8 @@
     "MATCH_CREATE_FAILED": "Could not schedule the match. Try again.",
     "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
     "MATCH_TIME_CONFLICT": "This pitch is already booked for part of that time. Choose another slot.",
-    "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
-    "MATCH_DELETE_AFTER_KICKOFF": "This match has already started and can no longer be removed.",
+    "MATCH_DELETE_FAILED": "Could not cancel the match. Try again.",
+    "MATCH_DELETE_AFTER_KICKOFF": "This match has already started and can no longer be cancelled.",
     "MATCH_CONFIRMATION_UNAVAILABLE": "You can only confirm a match after its scheduled end and if it hasn't been cancelled.",
     "MATCH_CONFIRMATION_FAILED": "Could not confirm the match. Try again.",
     "MATCH_ALREADY_STARTED": "This match has already started. Registrations can no longer be changed.",
@@ -120,7 +120,7 @@
       "could_not_cancel_game": "Could not cancel game",
       "an_error_occurred": "An error occurred",
       "are_you_sure_you_want_to_cancel_this_match": "Are you sure you want to cancel this match?",
-      "this_action_is_irreversible": "This action is irreversible",
+      "cancellation_description": "The match will leave the schedule. Anyone with the link can see it was cancelled.",
       "cancel": "Cancel",
       "cancel_match": "Cancel Match"
     },
@@ -249,6 +249,7 @@
     },
     "MatchDetailsPage": {
       "confirm_played": "Confirm the match took place",
+      "match_cancelled": "Match cancelled by the organizer",
       "repeat_match": "Schedule a similar match",
       "add_to_calendar": "Add to calendar",
       "calendar_title": "{format} football · Onde Jogamos",

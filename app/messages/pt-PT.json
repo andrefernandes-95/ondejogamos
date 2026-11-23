@@ -24,8 +24,8 @@
     "MATCH_CREATE_FAILED": "Não foi possível agendar o jogo. Tenta novamente.",
     "MATCH_UPDATE_FAILED": "Não foi possível atualizar o jogo. Tenta novamente.",
     "MATCH_TIME_CONFLICT": "O campo já tem um jogo marcado para parte desse horário. Escolhe outra hora.",
-    "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
-    "MATCH_DELETE_AFTER_KICKOFF": "Este jogo já começou e já não pode ser removido.",
+    "MATCH_DELETE_FAILED": "Não foi possível cancelar o jogo. Tenta novamente.",
+    "MATCH_DELETE_AFTER_KICKOFF": "Este jogo já começou e já não pode ser cancelado.",
     "MATCH_CONFIRMATION_UNAVAILABLE": "Só podes confirmar um jogo após a hora prevista de fim e se não tiver sido cancelado.",
     "MATCH_CONFIRMATION_FAILED": "Não foi possível confirmar o jogo. Tenta novamente.",
     "MATCH_ALREADY_STARTED": "Este jogo já começou. Já não é possível alterar inscrições.",
@@ -120,7 +120,7 @@
       "could_not_cancel_game": "Não foi possível cancelar o jogo",
       "an_error_occurred": "Ocorreu um erro",
       "are_you_sure_you_want_to_cancel_this_match": "Desejas cancelar o jogo?",
-      "this_action_is_irreversible": "Esta acção é irreversível",
+      "cancellation_description": "O jogo sai da agenda. Quem tiver o link poderá ver que foi cancelado.",
       "cancel": "Cancelar",
       "cancel_match": "Cancelar Jogo"
     },
@@ -249,6 +249,7 @@
     },
     "MatchDetailsPage": {
       "confirm_played": "Confirmar que o jogo aconteceu",
+      "match_cancelled": "Jogo cancelado pelo organizador",
       "repeat_match": "Marcar jogo parecido",
       "add_to_calendar": "Adicionar ao calendário",
       "calendar_title": "Futebol {format} · Onde Jogamos",
