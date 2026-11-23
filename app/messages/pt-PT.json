@@ -25,6 +25,8 @@
     "MATCH_UPDATE_FAILED": "Não foi possível atualizar o jogo. Tenta novamente.",
     "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
     "MATCH_DELETE_AFTER_KICKOFF": "Este jogo já começou e já não pode ser removido.",
+    "MATCH_CONFIRMATION_UNAVAILABLE": "Só podes confirmar um jogo após a hora prevista de fim e se não tiver sido cancelado.",
+    "MATCH_CONFIRMATION_FAILED": "Não foi possível confirmar o jogo. Tenta novamente.",
     "MATCH_ALREADY_STARTED": "Este jogo já começou. Já não é possível alterar inscrições.",
     "MATCH_CANCELLED": "Este jogo foi cancelado. Já não é possível alterar inscrições.",
     "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
@@ -231,7 +233,21 @@
       "search_for_a_pitch_or_a_place": "Pesquisar por campo ou localização",
       "no_results": "Sem resultados"
     },
+    "OrganizedMatches": {
+      "link": "Os meus jogos organizados",
+      "title": "Últimos jogos organizados",
+      "back": "Voltar ao perfil",
+      "empty": "Ainda não organizaste nenhum jogo.",
+      "date": "{day} às {time}",
+      "pending": "A aguardar confirmação",
+      "played": "Confirmado",
+      "cancelled": "Cancelado",
+      "upcoming": "Agendado",
+      "ongoing": "A decorrer"
+    },
     "MatchDetailsPage": {
+      "confirm_played": "Confirmar que o jogo aconteceu",
+      "played_confirmed": "Jogo confirmado pelo organizador",
       "could_not_join_game": "Não foi possível aderir ao jogo",
       "go_back": "Voltar atrás",
       "place": "Local",

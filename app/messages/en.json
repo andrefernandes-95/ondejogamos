@@ -25,6 +25,8 @@
     "MATCH_UPDATE_FAILED": "Could not update the match. Try again.",
     "MATCH_DELETE_FAILED": "Could not remove the match. Try again.",
     "MATCH_DELETE_AFTER_KICKOFF": "This match has already started and can no longer be removed.",
+    "MATCH_CONFIRMATION_UNAVAILABLE": "You can only confirm a match after its scheduled end and if it hasn't been cancelled.",
+    "MATCH_CONFIRMATION_FAILED": "Could not confirm the match. Try again.",
     "MATCH_ALREADY_STARTED": "This match has already started. Registrations can no longer be changed.",
     "MATCH_CANCELLED": "This match was cancelled. Registrations can no longer be changed.",
     "MATCH_NOT_FOUND": "This match no longer exists or cannot be changed.",
@@ -231,7 +233,21 @@
       "search_for_a_pitch_or_a_place": "Search for a pitch or a place",
       "no_results": "No results"
     },
+    "OrganizedMatches": {
+      "link": "My organized matches",
+      "title": "Recently organized matches",
+      "back": "Back to profile",
+      "empty": "You haven't organized any matches yet.",
+      "date": "{day} at {time}",
+      "pending": "Awaiting confirmation",
+      "played": "Confirmed",
+      "cancelled": "Cancelled",
+      "upcoming": "Scheduled",
+      "ongoing": "In progress"
+    },
     "MatchDetailsPage": {
+      "confirm_played": "Confirm the match took place",
+      "played_confirmed": "Match confirmed by the organizer",
       "could_not_join_game": "Could not join game",
       "go_back": "Go back",
       "place": "Place",

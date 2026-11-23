@@ -18,6 +18,8 @@ export interface Match {
 
 export interface FullMatch extends Match {
   accepts_attendance: boolean;
+  played_confirmed_at?: Date | string | null;
+  can_confirm_played?: boolean;
   attendances: Array<{
     user_id: string;
     user_name: string;

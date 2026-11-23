@@ -12,6 +12,7 @@ import { ChevronLeft } from "@mui/icons-material";
 import { Alert, Box, Button, Card, Container, Divider, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import ConfirmMatchPlayed from "./confirm-match-played";
 import MatchDetailsInfo from "./match-details-info";
 import MatchPlayers from "./match-players";
 
@@ -39,6 +40,12 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
             <MatchPitchPhoto src={match.pitch.image_url!} details />
             <Stack spacing={2} sx={{ p: 2, minWidth: 0, flexGrow: 1 }}>
               <MatchDetailsInfo match={match} />
+              <ConfirmMatchPlayed
+                key={match.id}
+                matchId={match.id}
+                confirmed={Boolean(match.played_confirmed_at)}
+                canConfirm={Boolean(match.can_confirm_played)}
+              />
               <Divider />
               <Stack direction="row" sx={{
                 alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap",

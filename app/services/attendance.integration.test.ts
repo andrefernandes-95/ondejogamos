@@ -8,7 +8,9 @@ import {
   registerAttendance,
 } from "./attendance";
 import { deleteMatch } from "./delete-match";
+import { confirmMatchPlayed } from "./confirm-match-played";
 import { updateMatch } from "./match-writes";
+import { listOrganizedMatches } from "./organized-matches";
 import { deleteFromPitch } from "./pitches";
 
 const databaseUrl = process.env.ATTENDANCE_TEST_DATABASE_URL;
@@ -84,6 +86,9 @@ before(async () => {
   await addMatch("retain", future);
   await addMatch("deleteFuture", future);
   await addMatch("keepHistory", future, null, Number(historyPitchId));
+  await addMatch("ongoing", new Date(Date.now() - 30 * 60_000));
+  await addMatch("completed", new Date(Date.now() - 2 * 3_600_000));
+  await addMatch("cancelledCompleted", new Date(Date.now() - 2 * 3_600_000), new Date());
 });
 
 after(async () => {
@@ -229,4 +234,37 @@ test("match deletion, rescheduling and pitch deletion preserve history after kic
     [id, playerId],
   );
   assert.deepEqual(rows, [original]);
+});
+
+test("only the organizer can confirm an ended, non-cancelled match", { skip: !db }, async () => {
+  if (!db) {
+    return;
+  }
+  for (const id of [matches.concurrent, matches.ongoing, matches.cancelledCompleted]) {
+    assert.equal((await confirmMatchPlayed(id, hostId, db)).status, "unavailable");
+  }
+  assert.equal((await confirmMatchPlayed(matches.completed, playerId, db)).status, "not_found");
+
+  const results = await Promise.all(
+    Array.from({ length: 5 }, () => confirmMatchPlayed(matches.completed, hostId, db)),
+  );
+  assert.equal(results[0].status, "confirmed");
+  for (const result of results) {
+    assert.deepEqual(result, results[0]);
+  }
+
+  const { rows: [match] } = await db.query(
+    "SELECT played_confirmed_at FROM matches WHERE id = $1",
+    [matches.completed],
+  );
+  assert.deepEqual(match.played_confirmed_at, results[0].confirmedAt);
+
+  const organized = await listOrganizedMatches(hostId, db);
+  const statusFor = (id: number) => organized.find((match) => match.id === String(id))?.status;
+  assert.equal(statusFor(matches.completed), "played");
+  assert.equal(statusFor(matches.cancelledCompleted), "cancelled");
+  assert.equal(statusFor(matches.ongoing), "ongoing");
+  assert.equal(statusFor(matches.concurrent), "upcoming");
+  assert.equal(statusFor(matches.past), "pending");
+  assert.deepEqual(await listOrganizedMatches(playerId, db), []);
 });

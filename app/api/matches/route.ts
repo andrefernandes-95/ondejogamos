@@ -1,6 +1,7 @@
 import auth from "@/app/lib/auth";
 import { apiError } from "@/app/utils/api-error";
 import { parseAttendanceMatchId } from "@/app/utils/attendance-match-id";
+import { confirmMatchPlayed } from "@/app/services/confirm-match-played";
 import { createMatchSchema, editMatchSchema } from "@/app/schemas/match";
 import {
   deleteMatch,
@@ -149,6 +150,33 @@ export async function PUT(request: Request) {
   }
 
   return Response.json(result, { status: 200 });
+}
+
+export async function PATCH(request: Request) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session) {
+    return apiError("AUTHENTICATION_REQUIRED", 401);
+  }
+
+  const formData = await request.formData().catch(() => null);
+  const matchId = parseAttendanceMatchId(formData?.get("id"));
+  if (matchId === null) {
+    return apiError("INVALID_FORM", 400);
+  }
+
+  try {
+    const result = await confirmMatchPlayed(matchId, session.user.id);
+    if (result.status === "confirmed") {
+      return Response.json({ confirmedAt: result.confirmedAt });
+    }
+    if (result.status === "not_found") {
+      return apiError("MATCH_NOT_FOUND", 404);
+    }
+    return apiError("MATCH_CONFIRMATION_UNAVAILABLE", 409);
+  } catch (error) {
+    console.error("Falha ao confirmar jogo realizado", error);
+    return apiError("MATCH_CONFIRMATION_FAILED", 500);
+  }
 }
 
 export async function DELETE(request: Request) {
