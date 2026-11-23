@@ -12,6 +12,17 @@ interface Props {
   onMunicipalityChange: (municipality: string) => void;
 }
 
+export function GameCount({ count }: { count: number }) {
+  const t = useTranslations("App.Agenda");
+  if (count <= 0) return null;
+
+  return (
+    <Typography variant="caption" color="text.secondary">
+      {t("game_count", { count })}
+    </Typography>
+  );
+}
+
 export default function AreaSelector({
   data, area, municipality, districtOpen, setDistrictOpen, onAreaChange, onMunicipalityChange,
 }: Props) {
@@ -35,9 +46,7 @@ export default function AreaSelector({
           {[...counts].map(([name, count]) => (
             <MenuItem key={name} value={name} sx={{ justifyContent: "space-between", gap: 2 }}>
               {name}
-              {count > 0 && <Typography variant="caption" color="text.secondary">
-                {t("game_count", { count })}
-              </Typography>}
+              <GameCount count={count} />
             </MenuItem>
           ))}
         </Select>
@@ -49,8 +58,10 @@ export default function AreaSelector({
           onChange={(event) => onMunicipalityChange(event.target.value)} sx={{ minHeight: 48 }}>
           <MenuItem value="">{t("all")}</MenuItem>
           {municipalities.map((location) => (
-            <MenuItem key={location.municipality} value={location.municipality}>
+            <MenuItem key={location.municipality} value={location.municipality}
+              sx={{ justifyContent: "space-between", gap: 2 }}>
               {location.municipality}
+              <GameCount count={location.game_count} />
             </MenuItem>
           ))}
         </Select>
