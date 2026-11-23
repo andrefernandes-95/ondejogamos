@@ -8,56 +8,58 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const agenda = usePathname() === AppRoutes.HOME;
+  const pathname = usePathname();
   const t = useTranslations("App.Agenda");
+  const isMatchesPage = pathname === AppRoutes.HOME;
+  const isPitchesPage = pathname === AppRoutes.PITCHES;
+  const activeStyle = { bgcolor: "rgba(255, 255, 255, 0.16)" };
 
   return (
-    <>
-      <Box
-        component="nav"
-        sx={(theme) => ({
-          background: theme.palette.primary.main,
-          color: theme.palette.common.white,
-          py: 1,
-        })}
-      >
-        <Container maxWidth="lg">
+    <Box
+      component="nav"
+      sx={(theme) => ({
+        background: theme.palette.primary.main,
+        color: theme.palette.common.white,
+        py: 1,
+      })}
+    >
+      <Container maxWidth="lg">
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", flexWrap: "wrap", gap: 1 }}
+        >
+          <Logo compact />
           <Stack
+            direction="row"
             sx={{
-              flexDirection: {
-                xs: agenda ? "row" : "column",
-                sm: "row",
-              },
-              alignItems: {
-                xs: "center",
-              },
-              pt: {
-                xs: agenda ? 0 : 2,
-                sm: 0,
-              },
-              justifyContent: {
-                xs: agenda ? "space-between" : "center",
-                sm: "space-between",
-              },
+              order: { xs: 3, md: 1 },
+              width: { xs: "100%", md: "auto" },
+              ml: { xs: 0, md: 1 },
               gap: 1,
             }}
           >
-            <Stack direction="row" sx={{ alignItems: "center", gap: { md: 2 } }}>
-              <Logo compact={agenda} />
-              {agenda && (
-                <Stack direction="row" sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
-                  <Button href={AppRoutes.HOME} color="inherit" aria-current="page"
-                    sx={{ bgcolor: "rgba(255, 255, 255, 0.16)" }}>
-                    {t("nav_matches")}
-                  </Button>
-                  <Button href={AppRoutes.PITCHES} color="inherit">{t("nav_pitches")}</Button>
-                </Stack>
-              )}
-            </Stack>
-            <AuthNavbar compact={agenda} />
+            <Button
+              href={AppRoutes.HOME}
+              color="inherit"
+              aria-current={isMatchesPage ? "page" : undefined}
+              sx={isMatchesPage ? activeStyle : undefined}
+            >
+              {t("nav_matches")}
+            </Button>
+            <Button
+              href={AppRoutes.PITCHES}
+              color="inherit"
+              aria-current={isPitchesPage ? "page" : undefined}
+              sx={isPitchesPage ? activeStyle : undefined}
+            >
+              {t("nav_pitches")}
+            </Button>
           </Stack>
-        </Container>
-      </Box>
-    </>
+          <Box sx={{ order: { xs: 2, md: 2 }, ml: "auto" }}>
+            <AuthNavbar compact />
+          </Box>
+        </Stack>
+      </Container>
+    </Box>
   );
 }
