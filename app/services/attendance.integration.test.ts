@@ -41,7 +41,7 @@ before(async () => {
   const url = new URL(databaseUrl);
   if (
     !["localhost", "127.0.0.1"].includes(url.hostname) ||
-    !/^\\/ondejogamos_(ci|test)$/.test(url.pathname)
+    !["/ondejogamos_ci", "/ondejogamos_test"].includes(url.pathname)
   ) {
     throw new Error("Attendance integration tests require a disposable localhost test database");
   }
