@@ -4,7 +4,7 @@ import { publicPlayerIdentity } from "./public-player-projection";
 
 const fullMatchQuery = (details = false) => `
   SELECT
-    m.id, m.starts_at, m.format, m.description, m.min_attendance,
+    m.id, m.starts_at, m.format, m.description, m.min_attendance, m.cancelled_at,
     ${details ? "m.duration_in_minutes," : ""}
     json_build_object(
       'id', p.id, 'area', p.area, 'municipality', p.municipality,

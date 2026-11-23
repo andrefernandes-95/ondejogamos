@@ -24,6 +24,8 @@
     "MATCH_CREATE_FAILED": "Não foi possível agendar o jogo. Tenta novamente.",
     "MATCH_UPDATE_FAILED": "Não foi possível atualizar o jogo. Tenta novamente.",
     "MATCH_DELETE_FAILED": "Não foi possível remover o jogo. Tenta novamente.",
+    "MATCH_ALREADY_STARTED": "Este jogo já começou. Já não é possível alterar inscrições.",
+    "MATCH_CANCELLED": "Este jogo foi cancelado. Já não é possível alterar inscrições.",
     "MATCH_NOT_FOUND": "Este jogo já não existe ou não pode ser alterado.",
     "MATCH_READ_FAILED": "Não foi possível carregar os jogos. Tenta novamente.",
     "INVALID_PITCH_DATA": "Verifica os dados do campo e tenta novamente.",
@@ -121,6 +123,7 @@
     "MatchCard": {
       "match_is_full_you_can_still_participate": "Já há jogadores suficientes",
       "scheduled_by_you": "Agendaste este jogo",
+      "registration_closed": "Inscrições encerradas",
       "cancel_participation": "Cancelar Participação",
       "open_match_details": "Abrir detalhes da partida",
       "see_details": "Ver detalhes",
@@ -239,6 +242,7 @@
       "minutes": "Minutos",
       "enough_players_you_can_still_join": "Já há jogadores suficientes",
       "scheduled_by_you": "Agendaste este jogo",
+      "registration_closed": "Inscrições encerradas",
       "cancel_participation": "Cancelar Participação",
       "player_list": "Lista de Inscritos",
       "spots_available": "Ainda faltam {count} jogadores"
