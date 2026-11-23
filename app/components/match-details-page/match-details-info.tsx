@@ -5,6 +5,7 @@ import { formatMatchDate } from "@/app/utils/match-date";
 import { AccessTime, CalendarMonth, Group, LocationPin, MyLocation } from "@mui/icons-material";
 import { Divider, Stack, Typography } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
+import MatchDescription from "./match-description";
 
 export default function MatchDetailsInfo({ match }: { match: FullMatch }) {
   const t = useTranslations("App.MatchDetailsPage");
@@ -42,6 +43,7 @@ export default function MatchDetailsInfo({ match }: { match: FullMatch }) {
           {t("duration")}: <strong>{match.duration_in_minutes} {t("minutes")}</strong>
         </Typography>
       </Stack>
+      <MatchDescription description={match.description} title={t("organizer_notes")} />
     </>
   );
 }
