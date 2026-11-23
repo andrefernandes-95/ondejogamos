@@ -1,0 +1,55 @@
+name: Prepare security dependency updates
+
+on:
+  push:
+    branches:
+      - security/dependency-patches-20261123
+    paths:
+      - .github/workflows/temporary-security-upgrade.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ondejogamos_ci
+      BETTER_AUTH_SECRET: ci-only-placeholder-not-for-production-000000
+      BETTER_AUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Update vulnerable direct dependencies and lockfile
+        run: |
+          npm install --package-lock-only --ignore-scripts --save-exact \
+            next@16.4.6 eslint-config-next@16.4.6 sharp@0.35.5 zod@4.6.6
+          npm audit fix --package-lock-only --ignore-scripts || true
+      - name: Install updated lockfile
+        run: npm ci
+      - name: Unit and regression tests
+        run: npm test
+      - name: TypeScript
+        run: npm run typecheck
+      - name: ESLint
+        run: npm run lint
+      - name: Production build
+        run: npm run build
+      - name: Verify no high-severity production dependency advisories
+        shell: bash
+        run: npm audit --omit=dev --audit-level=high
+      - name: Commit reviewed candidate to temporary branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --cached --check
+          git commit -m "fix(deps): patch security advisories in runtime dependencies"
+          git push origin HEAD:refs/heads/security/dependency-patches-20261123
