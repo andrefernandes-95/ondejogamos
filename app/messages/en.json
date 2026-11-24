@@ -125,13 +125,15 @@
       "cancel_match": "Cancel Match"
     },
     "MatchCard": {
-      "match_is_full_you_can_still_participate": "Match is full. You can still participate!",
       "scheduled_by_you": "Scheduled by you",
       "registration_closed": "Registration closed",
       "cancel_participation": "Cancel Participation",
       "open_match_details": "Open match details",
-      "see_details": "See Details",
-      "spots_available": "{count} spots available!"
+      "see_details": "See Details"
+    },
+    "MatchAttendance": {
+      "players_needed": "{count, plural, one {# player needed} other {# players needed}}",
+      "minimum_reached": "Enough players signed up"
     },
     "UploadImageInput": {
       "upload_image": "Upload image"
@@ -256,19 +258,14 @@
       "played_confirmed": "Match confirmed by the organizer",
       "could_not_join_game": "Could not join game",
       "go_back": "Go back",
-      "place": "Place",
-      "open_in_google_maps": "Open in Google Maps",
+      "directions": "Get directions",
       "organized_by": "Organized by",
       "organizer_notes": "Organizer\u0027s notes",
-      "match_format": "Match Format",
-      "duration": "Duration",
-      "minutes": "Minutes",
-      "enough_players_you_can_still_join": "Enough players. You can still join!",
+      "match_summary": "{format} football · {duration, number} min",
       "scheduled_by_you": "Scheduled by you",
       "registration_closed": "Registration closed",
       "cancel_participation": "Cancel Participation",
-      "player_list": "Player List",
-      "spots_available": "{count} spots available"
+      "player_list": "Player List"
     },
     "Matches": {
       "error": "Something went wrong"
@@ -291,8 +288,7 @@
       "empty_day": "No matches are scheduled for this day.",
       "show_upcoming_date": "See the next day with matches",
       "show_all_areas": "See matches in all areas",
-      "format": "{count}-a-side",
-      "players_needed": "{count, plural, one {# player needed} other {# players needed}}"
+      "format": "{count}-a-side"
     },
     "HomeClient": {
       "description": "Want to play casual football? In <strong>Onde Jogamos</strong> you can find matches, join other players and organize games in your area."

@@ -3,7 +3,8 @@ import { formatMatchDate } from "@/app/utils/match-date";
 import { AppRoutes } from "@/app/utils/routes";
 import { Alert, Box, Link, Stack, Typography } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
-import { MatchAttendanceAction, MatchAttendanceStatus, useMatchAttendance } from "./match-attendance";
+import { MatchAttendanceAction, useMatchAttendance } from "./match-attendance";
+import MatchAttendanceStatus from "./match-attendance-status";
 import MatchOrganizer from "./match-organizer";
 import MatchPitchPhoto from "./match-pitch-photo";
 
@@ -66,7 +67,7 @@ export default function MatchCard({
         justifyContent: { xs: "space-between", md: "flex-end" },
         gap: { xs: 1, md: 2 }, mt: { xs: 1, md: 0 },
       }}>
-        <MatchAttendanceStatus match={match} compact />
+        <MatchAttendanceStatus match={match} />
         <MatchAttendanceAction match={match} handleAttendance={handleAttendance} />
       </Stack>
       {error && <Alert severity="error" sx={{ gridArea: "error", mt: 1 }}>{error}</Alert>}

@@ -125,13 +125,15 @@
       "cancel_match": "Cancelar Jogo"
     },
     "MatchCard": {
-      "match_is_full_you_can_still_participate": "Já há jogadores suficientes",
       "scheduled_by_you": "Agendaste este jogo",
       "registration_closed": "Inscrições encerradas",
       "cancel_participation": "Cancelar Participação",
       "open_match_details": "Abrir detalhes da partida",
-      "see_details": "Ver detalhes",
-      "spots_available": "Ainda faltam {count} jogadores!"
+      "see_details": "Ver detalhes"
+    },
+    "MatchAttendance": {
+      "players_needed": "{count, plural, one {Falta # jogador} other {Faltam # jogadores}}",
+      "minimum_reached": "Já há jogadores suficientes"
     },
     "UploadImageInput": {
       "upload_image": "Carregar imagem"
@@ -256,19 +258,14 @@
       "played_confirmed": "Jogo confirmado pelo organizador",
       "could_not_join_game": "Não foi possível aderir ao jogo",
       "go_back": "Voltar atrás",
-      "place": "Local",
-      "open_in_google_maps": "Abrir localização no Google Maps",
+      "directions": "Como chegar",
       "organized_by": "Organizado por",
       "organizer_notes": "Indicações do organizador",
-      "match_format": "Formato da partida",
-      "duration": "Duração",
-      "minutes": "Minutos",
-      "enough_players_you_can_still_join": "Já há jogadores suficientes",
+      "match_summary": "Futebol {format} · {duration, number} min",
       "scheduled_by_you": "Agendaste este jogo",
       "registration_closed": "Inscrições encerradas",
       "cancel_participation": "Cancelar Participação",
-      "player_list": "Lista de Inscritos",
-      "spots_available": "Ainda faltam {count} jogadores"
+      "player_list": "Lista de Inscritos"
     },
     "Matches": {
       "error": "Ocorreu um erro"
@@ -291,8 +288,7 @@
       "empty_day": "Não há jogos agendados para este dia.",
       "show_upcoming_date": "Ver o próximo dia com jogos",
       "show_all_areas": "Ver jogos de todas as zonas",
-      "format": "Futebol {count}",
-      "players_needed": "{count, plural, one {Falta # jogador} other {Faltam # jogadores}}"
+      "format": "Futebol {count}"
     },
     "HomeClient": {
       "description": "Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes encontrar jogos, juntar-te a outros jogadores e organizar partidas na tua zona."
