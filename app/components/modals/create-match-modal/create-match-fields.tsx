@@ -15,6 +15,7 @@ interface Props {
   setValue: UseFormSetValue<CreateMatchFormValues>;
   pitches: Pitch[];
   existingMatch?: FullMatch;
+  fixedSlot?: boolean;
 }
 
 export default function CreateMatchFields({
@@ -22,6 +23,7 @@ export default function CreateMatchFields({
   setValue,
   pitches,
   existingMatch,
+  fixedSlot,
 }: Props) {
   const tApp = useTranslations();
   const pitchId = useWatch({ control, name: "pitchId" });
@@ -29,7 +31,7 @@ export default function CreateMatchFields({
 
   return (
     <>
-      <Controller
+      {!fixedSlot && <Controller
         name="pitchId"
         control={control}
         render={({ field, fieldState }) => (
@@ -40,7 +42,7 @@ export default function CreateMatchFields({
             errorMessage={fieldState.error?.message}
           />
         )}
-      />
+      />}
       <MatchFormatInput
         control={control}
         onChange={(format) => {
@@ -63,7 +65,7 @@ export default function CreateMatchFields({
           />
         )}
       />
-      <Controller
+      {!fixedSlot && <Controller
         name="startsAt"
         control={control}
         render={({ field, fieldState }) => (
@@ -81,7 +83,7 @@ export default function CreateMatchFields({
             )}
           </Stack>
         )}
-      />
+      />}
       <Controller
         name="description"
         control={control}

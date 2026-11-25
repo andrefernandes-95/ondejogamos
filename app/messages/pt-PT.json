@@ -290,6 +290,28 @@
       "show_all_areas": "Ver jogos de todas as zonas",
       "format": "Futebol {count}"
     },
+    "HomeSchedule": {
+      "navigation": "Página inicial",
+      "browse": "Ver jogos",
+      "sign_in": "Iniciar sessão",
+      "when": "Quando?",
+      "where": "Onde?",
+      "day": "Data",
+      "time": "Hora",
+      "search_pitch": "Pesquisar campo",
+      "pitches": "Campos",
+      "pitch_count": "{count, plural, one {# campo} other {# campos}}",
+      "no_pitches": "Nenhum campo encontrado.",
+      "loading": "A carregar",
+      "select": "Selecionar",
+      "select_pitch": "Selecionar {name}",
+      "confirm_title": "Confirmar jogo",
+      "sign_in_to_confirm": "Inicia sessão para confirmar. O campo, a data e a hora ficam guardados.",
+      "confirm_schedule": "Confirmar agendamento",
+      "invalid_time": "Escolhe uma data e hora válidas no futuro (hora de Portugal continental).",
+      "pitch_unavailable": "Não foi possível encontrar este campo. Escolhe outro.",
+      "session_error": "Não foi possível verificar a sessão. Atualiza a página e tenta novamente."
+    },
     "HomeClient": {
       "description": "Falta-te uma futebolada? No <strong>Onde Jogamos</strong> podes encontrar jogos, juntar-te a outros jogadores e organizar partidas na tua zona."
     },

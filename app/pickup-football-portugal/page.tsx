@@ -51,7 +51,7 @@ export default function PickupFootballPage() {
             Meet local players and expats and join a football game near you
           </Typography>
 
-          <Button component="a" href={AppRoutes.HOME}>
+          <Button component="a" href={AppRoutes.GAMES}>
             Join a game
           </Button>
         </Stack>

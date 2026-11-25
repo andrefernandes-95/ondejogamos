@@ -1,5 +1,6 @@
 export const AppRoutes = {
   HOME: "/",
+  GAMES: "/?view=games",
   LOGIN: "/login",
   SIGN_UP: "/signup",
   PROFILE: "/profile",

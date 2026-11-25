@@ -7,17 +7,19 @@ export function getMatchFormDefaults({
   existingMatch,
   template,
   selectedPitch,
+  selectedStart,
 }: {
   existingMatch?: MatchFormSource & Pick<FullMatch, "starts_at">;
   template?: MatchFormSource;
   selectedPitch?: string;
+  selectedStart?: string;
 }): CreateMatchFormValues {
   const source = existingMatch ?? template;
   return {
     description: source?.description ?? "",
     pitchId: selectedPitch || source?.pitch.id?.toString() || "",
     durationInMinutes: Number(source?.duration_in_minutes ?? 60),
-    startsAt: existingMatch ? new Date(existingMatch.starts_at).toISOString() : "",
+    startsAt: existingMatch ? new Date(existingMatch.starts_at).toISOString() : selectedStart ?? "",
     format: source?.format ?? "5x5",
     minAttendance: source?.min_attendance ?? 10,
   };

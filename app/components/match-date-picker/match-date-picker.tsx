@@ -2,8 +2,7 @@
 
 import "dayjs/locale/pt";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+import { LISBON_TIME_ZONE as TIMEZONE, parseLisbonSlot } from "@/app/utils/lisbon-slot";
 import { useEffect, useId, useState } from "react";
 import {
   Stack,
@@ -18,11 +17,6 @@ import type { OccupiedMatchSlot } from "@/app/services/pitch-availability";
 import { matchSlotsOverlap } from "@/app/utils/match-time-range";
 import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
 import { useTranslations } from "next-intl";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const TIMEZONE = "Europe/Lisbon";
 
 const COMMON_TIMES = [
   "16:00",
@@ -46,15 +40,6 @@ const ALL_TIMES = Array.from({ length: 48 }, (_, index) => {
   const minutes = index % 2 === 0 ? "00" : "30";
   return `${hours}:${minutes}`;
 });
-
-function parseLisbonSlot(day: string, time: string) {
-  const localValue = `${day} ${time}`;
-  const date = dayjs.tz(localValue, TIMEZONE);
-  if (!date.isValid() || date.format("YYYY-MM-DD HH:mm") !== localValue) {
-    return null;
-  }
-  return date;
-}
 
 interface Props {
   value: string;

@@ -7,7 +7,7 @@ import { Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-export default function AuthNavbar({ compact = false }: { compact?: boolean }) {
+export default function AuthNavbar({ compact = false, home = false }: { compact?: boolean; home?: boolean }) {
   const tApp = useTranslations();
   const { data: session, isPending, error } = authClient.useSession();
 
@@ -55,7 +55,7 @@ export default function AuthNavbar({ compact = false }: { compact?: boolean }) {
     return (
       <Container>
         <Typography align="center" sx={{
-          color: "white", mr: 1, display: compact ? { xs: "none", md: "block" } : undefined,
+          mr: 1, display: home ? "none" : compact ? { xs: "none", md: "block" } : undefined,
         }}>
           {tApp("App.AuthNavbar.greeting")}, {session.user.name}
         </Typography>
@@ -85,10 +85,10 @@ export default function AuthNavbar({ compact = false }: { compact?: boolean }) {
   return (
     <Container>
       <Button href={AppRoutes.LOGIN} color="inherit" startIcon={!compact && <ExitToApp />}>
-        {tApp("App.AuthNavbar.login")}
+        {tApp(home ? "App.HomeSchedule.sign_in" : "App.AuthNavbar.login")}
       </Button>
       <Button href={AppRoutes.SIGN_UP} color="inherit" startIcon={<GroupAdd />}
-        sx={{ display: compact ? { xs: "none", sm: "inline-flex" } : undefined }}>
+        sx={{ display: home ? "none" : compact ? { xs: "none", sm: "inline-flex" } : undefined }}>
         {tApp("App.AuthNavbar.create_account")}
       </Button>
     </Container>

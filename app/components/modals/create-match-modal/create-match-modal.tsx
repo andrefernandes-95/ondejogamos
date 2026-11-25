@@ -5,6 +5,9 @@ import { useListPitchesForArea } from "@/app/hooks/pitches";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues, createMatchSchema } from "@/app/schemas/match";
 import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
+import { authUrl } from "@/app/utils/auth-return";
+import { AppRoutes } from "@/app/utils/routes";
+import { formatMatchDate } from "@/app/utils/match-date";
 import { getMatchFormDefaults, toMatchFormData } from "@/app/utils/match-form-data";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -21,7 +24,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useId } from "react";
 
 interface Props {
@@ -33,6 +36,8 @@ interface Props {
   onCreated?: (matchId: string) => void;
   onAddPitch?: () => void;
   selectedPitch?: string;
+  slot?: { pitchId: string; name: string; municipality: string; startsAt: string };
+  authReturnTo?: string;
 }
 
 export default function CreateMatchModal({
@@ -44,10 +49,15 @@ export default function CreateMatchModal({
   template,
   onCreated,
   onAddPitch,
+  slot,
+  authReturnTo,
 }: Props) {
   const tApp = useTranslations();
   const tErrors = useTranslations("ApiErrors");
+  const tSchedule = useTranslations("App.HomeSchedule");
+  const locale = useLocale();
   const formId = useId();
+  const date = slot && formatMatchDate(new Date(slot.startsAt), locale, true);
 
   const {
     control,
@@ -58,7 +68,9 @@ export default function CreateMatchModal({
     formState: { errors, isSubmitting },
   } = useForm<CreateMatchFormValues>({
     resolver: zodResolver(createMatchSchema),
-    defaultValues: getMatchFormDefaults({ existingMatch, template, selectedPitch }),
+    defaultValues: getMatchFormDefaults({
+      existingMatch, template, selectedPitch: slot?.pitchId ?? selectedPitch, selectedStart: slot?.startsAt,
+    }),
   });
 
   const {
@@ -66,7 +78,7 @@ export default function CreateMatchModal({
     loading: pitchesLoading,
     error: pitchesError,
     retry,
-  } = useListPitchesForArea(selectedArea);
+  } = useListPitchesForArea(selectedArea, !slot);
 
   const actionLabels = {
     cancel: tApp("App.CreateMatchModal.cancel"),
@@ -75,8 +87,8 @@ export default function CreateMatchModal({
     schedule: tApp("Match.schedule"),
   };
 
-  const isPitchListEmpty = !pitchesLoading && !pitchesError && pitches.length === 0;
-  const canSubmit = !pitchesLoading && !pitchesError && pitches.length > 0;
+  const isPitchListEmpty = !slot && !pitchesLoading && !pitchesError && pitches.length === 0;
+  const canSubmit = !authReturnTo && (Boolean(slot) || (!pitchesLoading && !pitchesError && pitches.length > 0));
 
   const onSubmit = async (values: CreateMatchFormValues) => {
     try {
@@ -112,8 +124,10 @@ export default function CreateMatchModal({
   };
 
   return (
-    <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+    <Dialog open={open} onClose={() => { if (!isSubmitting) { setOpen(false); } }} fullWidth
+      aria-labelledby={`${formId}-title`}>
       <DialogTitle
+        id={`${formId}-title`}
         color="primary"
         sx={{
           flexDirection: "row",
@@ -124,14 +138,23 @@ export default function CreateMatchModal({
         }}
       >
         <PlaceIcon />
-        <Typography variant="h5">
-          {tApp("App.CreateMatchModal.title", { area: selectedArea })}
+        <Typography component="span" variant="h5">
+          {slot ? tSchedule("confirm_title") : tApp("App.CreateMatchModal.title", { area: selectedArea })}
         </Typography>
       </DialogTitle>
 
       <DialogContent>
         <Box component="form" id={formId} onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2} sx={{ py: 2, gap: 2 }}>
+            {slot && date && (
+              <Stack sx={{ p: 2, bgcolor: "action.hover", borderLeft: 3, borderColor: "primary.main" }}>
+                <Typography sx={{ fontWeight: 750 }}>{slot.name}</Typography>
+                <Typography>{slot.municipality}, {selectedArea}</Typography>
+                <Typography>{date.day} · {date.time}</Typography>
+              </Stack>
+            )}
+            {authReturnTo && <Typography>{tSchedule("sign_in_to_confirm")}</Typography>}
+            {slot && errors.startsAt && <Alert severity="error">{tSchedule("invalid_time")}</Alert>}
             {errors.root?.server?.message && (
               <Alert severity="error" role="alert">
                 {errors.root.server.message}
@@ -164,19 +187,26 @@ export default function CreateMatchModal({
                 {tApp("App.CreateMatchModal.no_pitches", { area: selectedArea })}
               </Typography>
             )}
-            {!pitchesLoading && !pitchesError && pitches.length > 0 && (
+            {canSubmit && (
               <CreateMatchFields
                 control={control}
                 setValue={setValue}
                 pitches={pitches}
                 existingMatch={existingMatch}
+                fixedSlot={Boolean(slot)}
               />
             )}
           </Stack>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setOpen(false)}>{actionLabels.cancel}</Button>
+        <Button disabled={isSubmitting} onClick={() => setOpen(false)}>{actionLabels.cancel}</Button>
+        {authReturnTo && (
+          <>
+            <Button href={authUrl(AppRoutes.SIGN_UP, authReturnTo)}>{tApp("App.AuthNavbar.create_account")}</Button>
+            <Button variant="contained" href={authUrl(AppRoutes.LOGIN, authReturnTo)}>{tSchedule("sign_in")}</Button>
+          </>
+        )}
 
         {canSubmit && (
           <Button
@@ -185,7 +215,7 @@ export default function CreateMatchModal({
             variant="contained"
             disabled={isSubmitting}
           >
-            {existingMatch ? actionLabels.save : actionLabels.schedule}
+            {slot ? tSchedule("confirm_schedule") : existingMatch ? actionLabels.save : actionLabels.schedule}
           </Button>
         )}
         {isPitchListEmpty && (

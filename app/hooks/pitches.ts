@@ -3,14 +3,18 @@ import { readApiErrorCodeFromResponse } from "@/app/utils/api-error";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
-export function useListPitchesForArea(area: string) {
+export function useListPitchesForArea(area: string, enabled = true) {
   const tErrors = useTranslations("ApiErrors");
   const [pitches, setPitches] = useState<Pitch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
+  const [loadedArea, setLoadedArea] = useState<string>();
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const controller = new AbortController();
 
     const fetchPitchesForArea = async () => {
@@ -29,7 +33,9 @@ export function useListPitchesForArea(area: string) {
         }
 
         const pitchesForArea: Pitch[] = await response.json();
-        setPitches(pitchesForArea);
+        if (!controller.signal.aborted) {
+          setPitches(pitchesForArea);
+        }
       } catch (caughtError) {
         if (!controller.signal.aborted) {
           setPitches([]);
@@ -41,6 +47,7 @@ export function useListPitchesForArea(area: string) {
         }
       } finally {
         if (!controller.signal.aborted) {
+          setLoadedArea(area);
           setLoading(false);
         }
       }
@@ -48,12 +55,12 @@ export function useListPitchesForArea(area: string) {
 
     void fetchPitchesForArea();
     return () => controller.abort();
-  }, [area, reloadKey, tErrors]);
+  }, [area, enabled, reloadKey, tErrors]);
 
   return {
-    pitches,
-    loading,
-    error,
+    pitches: loadedArea === area ? pitches : [],
+    loading: enabled && (loading || loadedArea !== area),
+    error: loadedArea === area ? error : "",
     retry: () => setReloadKey((key) => key + 1),
   };
 }

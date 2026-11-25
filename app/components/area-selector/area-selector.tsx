@@ -10,6 +10,7 @@ interface Props {
   setDistrictOpen: (open: boolean) => void;
   onAreaChange: (area: string) => void;
   onMunicipalityChange: (municipality: string) => void;
+  requireArea?: boolean;
 }
 
 export function GameCount({ count }: { count: number }) {
@@ -24,7 +25,7 @@ export function GameCount({ count }: { count: number }) {
 }
 
 export default function AreaSelector({
-  data, area, municipality, districtOpen, setDistrictOpen, onAreaChange, onMunicipalityChange,
+  data, area, municipality, districtOpen, setDistrictOpen, onAreaChange, onMunicipalityChange, requireArea,
 }: Props) {
   const t = useTranslations("App.Agenda");
   const counts = new Map<string, number>();
@@ -42,11 +43,11 @@ export default function AreaSelector({
           open={districtOpen} onOpen={() => setDistrictOpen(true)} onClose={() => setDistrictOpen(false)}
           onChange={(event) => onAreaChange(event.target.value)}
           sx={{ minHeight: 48 }}>
-          <MenuItem value="">{t("all")}</MenuItem>
+          {(!requireArea || !counts.size) && <MenuItem value="">{t("all")}</MenuItem>}
           {[...counts].map(([name, count]) => (
             <MenuItem key={name} value={name} sx={{ justifyContent: "space-between", gap: 2 }}>
               {name}
-              <GameCount count={count} />
+              {!requireArea && <GameCount count={count} />}
             </MenuItem>
           ))}
         </Select>
@@ -61,7 +62,7 @@ export default function AreaSelector({
             <MenuItem key={location.municipality} value={location.municipality}
               sx={{ justifyContent: "space-between", gap: 2 }}>
               {location.municipality}
-              <GameCount count={location.game_count} />
+              {!requireArea && <GameCount count={location.game_count} />}
             </MenuItem>
           ))}
         </Select>
