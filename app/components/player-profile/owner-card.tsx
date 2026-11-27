@@ -5,8 +5,7 @@ import { authClient } from "@/app/lib/auth-client";
 import type { PlayerCardEditorData } from "@/app/models/player-card";
 import { visibleCard } from "@/app/utils/player-card";
 import { EditOutlined, Public } from "@mui/icons-material";
-import { Alert, Button, Chip, Stack, Typography } from "@mui/material";
-import { visuallyHidden } from "@mui/utils";
+import { Alert, Button, Chip, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import CardLinkDialog from "./card-link-dialog";
@@ -23,7 +22,6 @@ export default function OwnerCard({ initial }: { initial: PlayerCardEditorData }
 
   return (
     <Stack spacing={2} sx={{ alignItems: "center" }}>
-      <Typography component="h1" sx={visuallyHidden}>{t("title")}</Typography>
       <PlayerProfile card={visibleCard(data)} labels={labels} />
       <Stack direction="row" sx={{ justifyContent: "center", flexWrap: "wrap", gap: 1.25, maxWidth: "100%" }}>
         <Button variant="outlined" startIcon={<EditOutlined />}

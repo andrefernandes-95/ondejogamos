@@ -6,12 +6,13 @@ import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/app/lib/auth-client";
+import PageContainer from "@/app/components/page-container/page-container";
+import PageTitle from "@/app/components/page-title/page-title";
 import {
   Alert,
   Box,
   Button,
   Card,
-  Container,
   IconButton,
   InputAdornment,
   Link,
@@ -197,22 +198,14 @@ export default function AuthForm({ mode, returnTo }: Props) {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ py: 8 }}>
+    <PageContainer maxWidth="xs">
       <Card variant="outlined" sx={{ p: { xs: 3, sm: 4 } }}>
         <Stack spacing={3}>
-          <Box>
-            <Typography component="h1" variant="h5">
-              {isSignup
-                ? tApp("App.AuthForm.sign_up")
-                : tApp("App.AuthForm.sign_in")}
-            </Typography>
-
-            <Typography color="text.secondary" sx={{ mt: 1 }}>
-              {isSignup
-                ? tApp("App.AuthForm.create_an_account_to_organize_and_participate_in_games")
-                : tApp("App.AuthForm.sign_in_to_your_account")}
-            </Typography>
-          </Box>
+          <PageTitle compact
+            title={tApp(isSignup ? "App.AuthForm.sign_up" : "App.AuthForm.sign_in")}
+            description={tApp(isSignup
+              ? "App.AuthForm.create_an_account_to_organize_and_participate_in_games"
+              : "App.AuthForm.sign_in_to_your_account")} />
 
           {errors.root?.server?.message && (
             <Alert severity="error">{errors.root.server.message}</Alert>
@@ -375,6 +368,6 @@ export default function AuthForm({ mode, returnTo }: Props) {
           </Typography>
         </Stack>
       </Card>
-    </Container>
+    </PageContainer>
   );
 }

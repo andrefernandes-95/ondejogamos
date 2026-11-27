@@ -9,7 +9,7 @@ const languages = [
 ] as const;
 
 function changeLanguage(code: (typeof languages)[number]["code"]) {
-  document.cookie = `locale=${code}; Path=/; Max-Age:31536000; SameSite=Lax`;
+  document.cookie = `locale=${code}; Path=/; Max-Age=31536000; SameSite=Lax`;
   window.location.reload();
 }
 
@@ -24,14 +24,26 @@ export default function LanguageSettings() {
         return (
           <Button
             key={code}
-            onClick={() => { if (!active) changeLanguage(code); }}
-            variant={active ? "contained" : "text"}
+            onClick={() => {
+              if (!active) {
+                changeLanguage(code);
+              }
+            }}
+            variant="text"
+            color="inherit"
             aria-label={t(name)}
             aria-pressed={active}
             size="small"
-            sx={{ minWidth: 44, minHeight: 44 }}
+            sx={{
+              minWidth: 44, minHeight: 44, px: 0.75,
+              color: active ? "common.white" : "#D7E5FC",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.10)" },
+              "&.Mui-focusVisible": { outlineColor: "common.white" },
+            }}
           >
-            {label}
+            <span style={{ textDecoration: active ? "underline" : "none", textUnderlineOffset: "5px" }}>
+              {label}
+            </span>
           </Button>
         );
       })}

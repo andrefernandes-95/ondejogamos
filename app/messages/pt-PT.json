@@ -96,6 +96,8 @@
       "copy_link": "Copiar link"
     },
     "Footer": {
+      "explore": "Explorar",
+      "language": "Idioma",
       "home": "Início",
       "player_list": "Lista de Jogadores",
       "pitches_list": "Lista de Campos"
@@ -175,9 +177,13 @@
       "upcoming_matches_in_area": "Próximos jogos em {area}"
     },
     "MatchShareButtons": {
-      "share_this_match": "Partilhar jogo:",
+      "share_this_match": "Partilhar jogo",
       "lets_play": "Bora jogar? Espreita este jogo: ",
-      "share_on_whatsapp": "Partilhar no WhatsApp"
+      "share_on_whatsapp": "Partilhar no WhatsApp",
+      "copy_link": "Copiar link",
+      "copied": "Link copiado.",
+      "link_label": "Link do jogo",
+      "copy_failed": "Seleciona o endereço para o copiares manualmente."
     },
     "Logo": {
       "a_community_to_play_casual_football": "Uma comunidade para combinar futeboladas"
@@ -265,7 +271,9 @@
       "scheduled_by_you": "Agendaste este jogo",
       "registration_closed": "Inscrições encerradas",
       "cancel_participation": "Cancelar Participação",
-      "player_list": "Lista de Inscritos"
+      "player_list": "Lista de inscritos",
+      "organizer_role": "Organizador",
+      "player_count": "{count, plural, one {# inscrito} other {# inscritos}}"
     },
     "Matches": {
       "error": "Ocorreu um erro"
@@ -291,6 +299,18 @@
       "format": "Futebol {count}"
     },
     "HomeSchedule": {
+      "show_locations": "Mostrar localidades",
+      "hide_locations": "Ocultar localidades",
+      "heading": "Agenda um <blue>jogo</blue>",
+      "subheading": "Encontra um campo perto de ti e escolhe a hora.",
+      "find_pitches": "Encontrar campos",
+      "free_times": "Horários livres na agenda",
+      "select_time": "{name}, às {time}",
+      "more_times": "Mais horas",
+      "custom_time": "Outra hora",
+      "format_label": "Formato do jogo",
+      "duration_label": "Duração",
+      "minutes": "{count} min",
       "navigation": "Página inicial",
       "browse": "Ver jogos",
       "sign_in": "Iniciar sessão",

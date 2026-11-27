@@ -1,32 +1,27 @@
-import { AppRoutes } from "@/app/utils/routes";
 import { ChevronLeft } from "@mui/icons-material";
-import { Box, Button, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
+import { Button, Stack, Typography } from "@mui/material";
+import type { ReactNode } from "react";
 
-export default function PageTitle({ title }: { title: string }) {
-  const tApp = useTranslations();
+export default function PageTitle({ title, description, back, compact }: {
+  title: ReactNode;
+  description?: string;
+  back?: { href: string; label: string };
+  compact?: boolean;
+}) {
   return (
-    <>
-      <Button
-        component="a"
-        href={AppRoutes.HOME}
-        size="small"
-        sx={{
-          flexGrow: 0,
-          alignSelf: "flex-start",
-          gap: 1,
-        }}
-      >
-        <ChevronLeft /> <Typography variant="body1">{tApp("App.PageTitle.back")}</Typography>
-      </Button>
-
-      <Box sx={{ py: 1 }} />
-
-      <Typography variant="h5" sx={{ fontWeight: 900 }} color="primary">
+    <Stack spacing={1}>
+      {back && (
+        <Button href={back.href} startIcon={<ChevronLeft />} sx={{ alignSelf: "flex-start" }}>
+          {back.label}
+        </Button>
+      )}
+      <Typography component="h1" sx={{
+        color: "text.primary", fontWeight: 850, lineHeight: 1.08, letterSpacing: "-.045em", overflowWrap: "anywhere",
+        fontSize: compact ? { xs: "1.85rem", md: "2.25rem" } : { xs: "2.2rem", md: "3.1rem" },
+      }}>
         {title}
       </Typography>
-
-      <Box sx={{ py: 1 }} />
-    </>
+      {description && <Typography color="text.secondary">{description}</Typography>}
+    </Stack>
   );
 }

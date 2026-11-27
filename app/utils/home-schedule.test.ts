@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { authUrl } from "./auth-return";
-import { homeView, matchesPitchSearch, readScheduleSlot } from "./home-schedule";
+import { homeView, matchesPitchSearch, readScheduleOptions, readScheduleSlot } from "./home-schedule";
 
 test("defaults to scheduling and keeps shared agenda filters on the games view", () => {
   assert.equal(homeView(new URLSearchParams()), "schedule");
@@ -31,4 +31,13 @@ test("rejects an invalid pitch, an impossible day and the skipped hour when cloc
   ]) {
     assert.equal(readScheduleSlot(new URLSearchParams(query)), null);
   }
+});
+
+test("restores a valid format and duration and falls back for malformed drafts", () => {
+  assert.deepEqual(readScheduleOptions(new URLSearchParams("scheduleFormat=7x7&scheduleDuration=90")), {
+    format: "7x7", duration: 90,
+  });
+  assert.deepEqual(readScheduleOptions(new URLSearchParams("scheduleFormat=other&scheduleDuration=1.5")), {
+    format: "5x5", duration: 60,
+  });
 });

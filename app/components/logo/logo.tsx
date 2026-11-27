@@ -8,10 +8,13 @@ export const Logo = ({ compact = false, onLight = false }: { compact?: boolean; 
   return (
     <Stack component={Link} href="/" direction="row" spacing={0.5}
       sx={{ alignItems: compact ? "center" : "flex-start", color: onLight ? "primary.main" : "common.white", textDecoration: "none" }}>
-      <Stack sx={{ pt: compact ? 0 : 0.5 }}><BrandMark size={compact ? 18 : 24} color="currentColor" /></Stack>
+      <Stack sx={{
+        pt: compact ? 0 : 0.5,
+        ...(compact && { "& svg": { width: { xs: 14, sm: 18 }, height: { xs: 14, sm: 18 } } }),
+      }}><BrandMark size={compact ? 18 : 24} color="currentColor" /></Stack>
       <Stack>
-        <Typography variant="h5" sx={{
-          fontWeight: 900, fontSize: compact ? { xs: "1rem", sm: "1.5rem" } : undefined,
+        <Typography component="span" variant="h5" sx={{
+          fontWeight: 900, whiteSpace: "nowrap", fontSize: compact ? { xs: "0.92rem", sm: "1.5rem" } : undefined,
         }}>Onde Jogamos</Typography>
         {!compact && <Typography variant="caption">{t("a_community_to_play_casual_football")}</Typography>}
       </Stack>

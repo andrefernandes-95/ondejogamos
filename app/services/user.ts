@@ -1,27 +1,19 @@
 import { pool } from "@/app/lib/db";
-import type { CardBadge } from "@/app/models/player-card";
 import type { PlayerIdentity } from "@/app/models/player-identity";
-import { selectedCardBadges } from "@/app/utils/player-card";
-import { earnedCardBadges, founderEligibility } from "./player-card-badges";
 import { publicPlayerIdentity } from "./public-player-projection";
 
 export interface Player {
   id: string;
   identity: PlayerIdentity;
-  badges: CardBadge[];
   createdAt: string;
   games_created: number;
 }
 
-type PlayerRow = Omit<Player, "badges"> & { selectedBadges: CardBadge[] | null; isFounder: boolean };
-
 export async function listUsers(): Promise<Player[]> {
-  const { rows } = await pool.query<PlayerRow>(`
+  const { rows } = await pool.query<Player>(`
             SELECT
                 u.id,
                 ${publicPlayerIdentity("u", "p")} AS identity,
-                p.selected_badges AS "selectedBadges",
-                ${founderEligibility} AS "isFounder",
                 u."createdAt",
                 COUNT(m.id)::int AS games_created
             FROM "user" AS u
@@ -30,8 +22,5 @@ export async function listUsers(): Promise<Player[]> {
             GROUP BY u.id, p.user_id
             ORDER BY u."createdAt" DESC
         `);
-  return rows.map(({ selectedBadges, isFounder, ...player }) => ({
-    ...player,
-    badges: selectedCardBadges(selectedBadges, earnedCardBadges(isFounder)),
-  }));
+  return rows;
 }

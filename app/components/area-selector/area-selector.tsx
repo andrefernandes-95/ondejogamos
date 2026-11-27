@@ -35,7 +35,9 @@ export default function AreaSelector({
   const municipalities = data.filter((location) => location.area === area);
 
   return (
-    <Stack direction="row" spacing={1} sx={{ gridArea: "filters", minWidth: 0 }}>
+    <Stack direction="row" sx={{ gridArea: "filters", minWidth: 0, gap: 1,
+      "@media (max-width: 349px)": { flexDirection: "column", gap: 1.5 },
+    }}>
       <FormControl fullWidth size="small" sx={{ minWidth: 0 }}>
         <InputLabel id="agenda-area-label" shrink>{t("district")}</InputLabel>
         <Select value={area} labelId="agenda-area-label" id="agenda-area"

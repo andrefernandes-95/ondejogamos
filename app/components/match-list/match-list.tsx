@@ -59,19 +59,11 @@ export default function MatchList({
             {error}
           </Alert>
         ) : dailyMatches.length ? (
-          <Box component="ul" sx={{
-            listStyle: "none", p: 0, m: 0, position: "relative",
-            "&::before": {
-              content: '""', display: { xs: "none", md: "block" }, position: "absolute",
-              insetInlineStart: 5, top: "calc(var(--row-height) / 2)",
-              bottom: "calc(var(--row-height) / 2)", width: 2, bgcolor: "primary.main",
-            },
-            "--row-height": "130px",
-          }}>
+          <Stack component="ul" spacing={{ xs: 1.25, sm: 1.5 }} sx={{ listStyle: "none", p: 0, m: 0, mt: 1 }}>
             {dailyMatches.map(({ match }) => (
               <MatchCard match={match} key={match.id} onAttendanceChanged={refresh} />
             ))}
-          </Box>
+          </Stack>
         ) : (
           <Stack spacing={1} sx={{ py: 2, alignItems: "flex-start" }} aria-live="polite">
             <Typography color="text.secondary">{t("empty_day")}</Typography>

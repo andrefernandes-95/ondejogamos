@@ -1,64 +1,32 @@
+import PageContainer from "@/app/components/page-container/page-container";
 import PageTitle from "@/app/components/page-title/page-title";
 import PlayerIdentity from "@/app/components/player-identity/player-identity";
-import { Player } from "@/app/services/user";
-import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
-import {
-  Container,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import type { Player } from "@/app/services/user";
+import { Box, Stack, Typography } from "@mui/material";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function PlayerList({ data }: { data: Player[] }) {
-  const tApp = useTranslations();
+  const t = useTranslations("App.PlayerList");
   const locale = useLocale();
-  return (
-    <Container maxWidth="lg" sx={{ p: 2 }}>
-      <PageTitle title={tApp("App.PlayerList.player_list")} />
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{tApp("App.PlayerList.name")}</TableCell>
-              <TableCell>{tApp("App.PlayerList.joined_at")}</TableCell>
-              <TableCell>
-                {tApp("App.PlayerList.games_scheduled")}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((player) => {
-              const weekDay = new Intl.DateTimeFormat(locale, {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                timeZone: "Europe/Lisbon",
-              }).format(new Date(player.createdAt));
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "Europe/Lisbon" });
 
-              return (
-                <TableRow key={player.id}>
-                  <TableCell>
-                    <PlayerIdentity player={player.identity}
-                      preview={{ badges: player.badges, founderLabel: tApp("App.PlayerCard.founder") }} />
-                  </TableCell>
-                  <TableCell>
-                    <Typography>{weekDay}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography>{player.games_created}</Typography>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Container>
+  return (
+    <PageContainer maxWidth="md">
+      <Stack spacing={2}>
+        <PageTitle title={t("player_list")} />
+        <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
+          {data.map((player) => (
+            <Stack key={player.id} component="li" direction={{ xs: "column", sm: "row" }}
+              sx={{ justifyContent: "space-between", alignItems: { sm: "center" }, gap: 1.5, py: 2, borderTop: 1, borderColor: "divider" }}>
+              <PlayerIdentity player={player.identity} size={56} />
+              <Stack direction="row" sx={{ gap: 2, flexWrap: "wrap" }}>
+                <Typography variant="body2" color="text.secondary">{t("joined_at")} · {date.format(new Date(player.createdAt))}</Typography>
+                <Typography variant="body2" color="text.secondary">{t("games_scheduled")} · {player.games_created}</Typography>
+              </Stack>
+            </Stack>
+          ))}
+        </Box>
+      </Stack>
+    </PageContainer>
   );
 }

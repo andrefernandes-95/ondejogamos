@@ -4,29 +4,18 @@ import { useTranslations } from "next-intl";
 
 export default function PitchUrlButton({
   maps_url,
-  isSmall = false,
+  showLabel = false,
 }: {
   maps_url: string;
-  isSmall?: boolean;
+  showLabel?: boolean;
 }) {
   const tApp = useTranslations();
   return (
-    <>
-      {maps_url && (
-        <Button
-          component="a"
-          href={maps_url}
-          size="small"
-          sx={{ minWidth: "unset" }}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={
-            tApp("App.PitchUrlButton.open_in_google_maps")
-          }
-        >
-          <OpenInNew sx={{ fontSize: isSmall ? 14 : 18 }} />
-        </Button>
-      )}
-    </>
+    <Button href={maps_url} size="small" target="_blank" rel="noopener noreferrer"
+      aria-label={showLabel ? undefined : tApp("App.PitchUrlButton.open_in_google_maps")}
+      sx={{ alignSelf: "flex-start", minWidth: 44, gap: 1 }}>
+      {showLabel && tApp("App.MatchDetailsPage.directions")}
+      <OpenInNew sx={{ fontSize: 16 }} />
+    </Button>
   );
 }

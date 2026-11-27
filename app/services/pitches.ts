@@ -20,8 +20,8 @@ export interface PitchFull extends Pitch {
 
 export async function listPitchesForArea(
   area: string,
-): Promise<SavePitchInput[]> {
-  const result = await pool.query(
+): Promise<PitchSummary[]> {
+  const result = await pool.query<PitchSummary>(
     `
             SELECT id, name, image_url, maps_url, municipality FROM pitches
             WHERE area = $1
@@ -32,6 +32,8 @@ export async function listPitchesForArea(
 
   return result.rows;
 }
+
+export type PitchSummary = Pick<Pitch, "id" | "name" | "image_url" | "maps_url" | "municipality">;
 
 export async function listAllPitches(user_id: string): Promise<PitchFull[]> {
   const result = await pool.query(

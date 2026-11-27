@@ -2,11 +2,12 @@
 
 import AreaSelector from "@/app/components/area-selector/area-selector";
 import MatchList from "@/app/components/match-list/match-list";
-import { brandBlueLight } from "@/app/design/brand-colors";
+import PageContainer from "@/app/components/page-container/page-container";
+import PageTitle from "@/app/components/page-title/page-title";
 import { homeView, updateHomeSearch } from "@/app/utils/home-schedule";
 import ScheduleView from "./schedule-view";
 import type { LocationWithGameCount } from "@/app/services/locations";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -35,16 +36,14 @@ export default function HomeClient({ data, initialArea, today }: Props) {
 
   if (homeView(search) === "schedule") {
     return (
-      <Box sx={{ bgcolor: brandBlueLight }}>
-        <Container maxWidth="lg" sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 3, md: 4 } }}>
-          <ScheduleView data={data} initialArea={initialArea} today={today} />
-        </Container>
-      </Box>
+      <PageContainer>
+        <ScheduleView data={data} initialArea={initialArea} today={today} />
+      </PageContainer>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2.5, md: 4 } }}>
+    <PageContainer>
       <Stack spacing={{ xs: 2.5, md: 3 }}>
         <Box sx={{
           display: "grid",
@@ -54,12 +53,7 @@ export default function HomeClient({ data, initialArea, today }: Props) {
           gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "auto minmax(0, 1fr)" },
           alignItems: "center", gap: { xs: 1.25, md: 2.5 },
         }}>
-          <Typography component="h1" sx={{
-            gridArea: "heading", fontSize: { xs: "1.35rem", sm: "1.75rem", md: "2.5rem" },
-            lineHeight: 1.12, fontWeight: 800, letterSpacing: "-0.025em",
-          }}>
-            {t("title")}
-          </Typography>
+          <Box sx={{ gridArea: "heading" }}><PageTitle title={t("title")} compact /></Box>
           <AreaSelector data={data} area={area} municipality={municipality}
             districtOpen={districtOpen} setDistrictOpen={setDistrictOpen}
             onAreaChange={changeArea}
@@ -71,6 +65,6 @@ export default function HomeClient({ data, initialArea, today }: Props) {
           onDayChange={(day) => updateHomeSearch({ area, date: day })}
           onClearLocation={() => changeArea("")} />
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

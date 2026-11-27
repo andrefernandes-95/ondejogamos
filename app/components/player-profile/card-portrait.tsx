@@ -4,10 +4,11 @@ interface Props {
   size: number;
   finish: CardFinish;
   photo?: string;
+  lazy?: boolean;
   name: string;
 }
 
-export default function CardPortrait({ size, finish, photo, name }: Props) {
+export default function CardPortrait({ size, finish, photo, name, lazy }: Props) {
   const diameter = size * 0.64;
   const initials = name.trim().split(/\s+/).slice(0, 2).map((word) => [...word][0]).join("");
   return (
@@ -26,7 +27,7 @@ export default function CardPortrait({ size, finish, photo, name }: Props) {
       }}>
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element -- shared with ImageResponse
-          <img src={photo} alt="" style={{
+          <img src={photo} alt="" loading={lazy ? "lazy" : undefined} style={{
             display: "block", width: "100%", height: "100%", objectFit: "cover",
             objectPosition: "center", borderRadius: "50%",
           }} />

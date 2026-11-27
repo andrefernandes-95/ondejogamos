@@ -13,6 +13,7 @@ import { getFullMatchById, listFullMatches } from "./full-matches";
 import { getPitchMatchesForDateInterval } from "./pitch-availability";
 import { confirmMatchPlayed } from "./confirm-match-played";
 import { MatchScheduleError, saveMatch, updateMatch } from "./match-writes";
+import { getPublicCardsBySlug } from "./player-cards";
 import { listProfileMatches } from "./profile-matches";
 import { deleteFromPitch } from "./pitches";
 
@@ -339,4 +340,28 @@ test("scheduling serializes same-pitch writes and permits adjacent slots and own
   assert.equal(edits.filter((edit) => edit.status === "fulfilled" && edit.value).length, 1);
   assert.equal(edits.filter((edit) => edit.status === "rejected" &&
     edit.reason instanceof MatchScheduleError && edit.reason.code === "MATCH_TIME_CONFLICT").length, 1);
+});
+
+test("the roster card batch only exposes fields each player enabled", { skip: !db }, async () => {
+  if (!db) {
+    return;
+  }
+  const playerSlug = `card-${playerId}`;
+  const otherSlug = `card-${otherId}`;
+  await db.query(
+    `INSERT INTO player_profiles (user_id, public_slug, avatar_storage_key, visible_fields)
+       VALUES ($1, $2, 'test-private-avatar', ARRAY['played']),
+              ($3, $4, 'test-public-avatar', ARRAY['photo'])
+     ON CONFLICT (user_id) DO UPDATE SET
+       public_slug = EXCLUDED.public_slug,
+       avatar_storage_key = EXCLUDED.avatar_storage_key,
+       visible_fields = EXCLUDED.visible_fields`,
+    [playerId, playerSlug, otherId, otherSlug],
+  );
+  const cards = await getPublicCardsBySlug([playerSlug, otherSlug, "missing-profile"], db);
+  assert.equal(cards.size, 2);
+  const player = cards.get(playerSlug);
+  assert.equal(typeof player?.played, "number");
+  assert.deepEqual(player, { name: "Player", badges: [], played: player?.played });
+  assert.deepEqual(cards.get(otherSlug), { name: "Other", badges: [], photo: `/players/${otherSlug}/portrait` });
 });

@@ -1,6 +1,7 @@
 "use client";
 
-import { Background } from "@/app/components/background/background";
+import PageContainer from "@/app/components/page-container/page-container";
+import { brandBlueLight } from "@/app/design/brand-colors";
 import CancelMatch from "@/app/components/delete-match-button/delete-match-button";
 import EditMatch from "@/app/components/edit-match/edit-match";
 import { MatchAttendanceAction, useMatchAttendance } from "@/app/components/match-card/match-attendance";
@@ -10,24 +11,23 @@ import MatchShareButtons from "@/app/components/match-share-buttons/match-share-
 import type { FullMatch } from "@/app/models/match";
 import { AppRoutes } from "@/app/utils/routes";
 import { ChevronLeft, EventAvailable } from "@mui/icons-material";
-import { Alert, Button, Card, Container, Divider, Stack } from "@mui/material";
+import { Alert, Button, Card, Divider, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import ConfirmMatchPlayed from "./confirm-match-played";
 import MatchDescription from "./match-description";
 import MatchDetailsInfo from "./match-details-info";
-import MatchPlayers from "./match-players";
 import RepeatMatchButton from "./repeat-match-button";
 
-export default function MatchDetailsPage({ match }: { match: FullMatch }) {
+export default function MatchDetailsPage({ match, children }: { match: FullMatch; children?: ReactNode }) {
   const t = useTranslations("App.MatchDetailsPage");
   const router = useRouter();
-  const { error, handleAttendance } = useMatchAttendance(match.id, () => router.refresh());
+  const { error, pending, handleAttendance } = useMatchAttendance(match.id, () => router.refresh());
   const cancelled = Boolean(match.cancelled_at);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Background />
+    <PageContainer>
       <Stack spacing={2}>
         <Stack direction="row" sx={{ justifyContent: "space-between", flexWrap: "wrap" }}>
           <Button href={AppRoutes.GAMES} startIcon={<ChevronLeft />}>{t("go_back")}</Button>
@@ -44,7 +44,7 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
         {error && <Alert variant="filled" severity="error">{error}</Alert>}
         {cancelled && <Alert severity="warning">{t("match_cancelled")}</Alert>}
         <Card variant="outlined" sx={{
-          borderRadius: 6, borderTop: 4, borderTopColor: "primary.main", p: { xs: 2, sm: 3, md: 4 },
+          borderRadius: 6, p: { xs: 2, sm: 3, md: 4 },
         }}>
           <Stack spacing={2.5}>
             <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 2, md: 4 }}>
@@ -59,10 +59,10 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
                 {!cancelled && (
                   <Stack direction="row" sx={{
                     alignItems: "center", justifyContent: "space-between", gap: 1, flexWrap: "wrap",
-                    bgcolor: "action.hover", borderRadius: 3, p: 1.5,
+                    bgcolor: brandBlueLight, borderRadius: 3, p: 1.5,
                   }}>
                     {match.accepts_attendance && <MatchAttendanceStatus match={match} />}
-                    <MatchAttendanceAction match={match} details handleAttendance={handleAttendance} />
+                    <MatchAttendanceAction match={match} details pending={pending} handleAttendance={handleAttendance} />
                   </Stack>
                 )}
               </Stack>
@@ -72,20 +72,19 @@ export default function MatchDetailsPage({ match }: { match: FullMatch }) {
             {!cancelled && (
               <>
                 <Divider />
-                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-                  <MatchShareButtons match={match} />
-                  {match.accepts_attendance && (
-                    <Button href={AppRoutes.MATCH_CALENDAR(match.id)} size="small" startIcon={<EventAvailable />}>
-                      {t("add_to_calendar")}
-                    </Button>
-                  )}
-                </Stack>
+                <MatchShareButtons match={match} />
+                {match.accepts_attendance && (
+                  <Button href={AppRoutes.MATCH_CALENDAR(match.id)} size="small" startIcon={<EventAvailable />}
+                    sx={{ alignSelf: "flex-start" }}>
+                    {t("add_to_calendar")}
+                  </Button>
+                )}
               </>
             )}
           </Stack>
         </Card>
-        {(!cancelled || match.is_creator) && <MatchPlayers match={match} />}
+        {children}
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

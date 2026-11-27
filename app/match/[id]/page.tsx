@@ -1,4 +1,5 @@
 import MatchDetailsPage from "@/app/components/match-details-page/match-details-page";
+import MatchPlayers from "@/app/components/match-details-page/match-players";
 import auth from "@/app/lib/auth";
 import { getFullMatchById } from "@/app/services/matches";
 import { matchShareMetadata } from "@/app/utils/match-share";
@@ -35,5 +36,9 @@ export default async function MatchPage({ params }: Props) {
     notFound();
   }
 
-  return <MatchDetailsPage match={match} />;
+  return (
+    <MatchDetailsPage match={match}>
+      {(!match.cancelled_at || match.is_creator) && <MatchPlayers match={match} />}
+    </MatchDetailsPage>
+  );
 }

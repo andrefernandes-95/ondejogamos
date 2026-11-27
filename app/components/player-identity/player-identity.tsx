@@ -1,47 +1,38 @@
 import PlayerProfile from "@/app/components/player-profile/player-profile";
-import type { CardBadge } from "@/app/models/player-card";
 import type { PlayerIdentity as Player } from "@/app/models/player-identity";
 import { playerCardPath } from "@/app/utils/player-card";
-import { Avatar, Box, Link, Typography } from "@mui/material";
+import { Box, Link, Typography } from "@mui/material";
+import { useTranslations } from "next-intl";
 
 interface Props {
   player: Player;
   label?: string;
-  preview?: { badges: CardBadge[]; founderLabel: string };
+  size?: number;
 }
 
-export default function PlayerIdentity({ player, label, preview }: Props) {
-  const href = playerCardPath(player.publicSlug);
-  const photo = player.hasPublicPhoto ? `${href}/portrait` : undefined;
-  const content = (
-    <>
-      {preview ? (
-        <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
-          <PlayerProfile card={{ name: player.name, photo, badges: preview.badges }}
-            labels={{ founder: preview.founderLabel, played: "", created: "" }} size={64} />
-        </Box>
-      ) : (
-        <Avatar src={photo} alt="" aria-hidden="true" slotProps={{ img: { loading: "lazy" } }}
-          sx={{ width: 32, height: 32, flexShrink: 0, bgcolor: "primary.main", fontSize: "0.875rem" }}>
-          {Array.from(player.name.trim())[0]?.toUpperCase()}
-        </Avatar>
-      )}
+export default function PlayerIdentity({ player, label, size = 40 }: Props) {
+  const t = useTranslations("App.PlayerCard");
+  const href = player.publicSlug ? playerCardPath(player.publicSlug) : undefined;
+  const photo = href && player.hasPublicPhoto ? `${href}/portrait` : undefined;
+
+  return (
+    <Link component={href ? "a" : "span"} href={href} underline={href ? "hover" : "none"}
+      sx={{ display: "inline-flex", width: "fit-content", maxWidth: "100%", alignItems: "center", gap: 1 }}>
+      <Box aria-hidden="true" sx={{ flexShrink: 0 }}>
+        <PlayerProfile card={{ name: player.name, photo, badges: player.isFounderCard ? ["founder"] : [] }}
+          labels={{ founder: t("founder"), played: "", created: "" }} size={size} compact />
+      </Box>
       <Box sx={{ minWidth: 0, overflowWrap: "anywhere" }}>
         {label && <Typography component="span" variant="caption" color="text.secondary"
           sx={{ display: "block" }}>{label}</Typography>}
         <Typography component="span" variant="body2" sx={{ fontWeight: 600 }}>
           {player.name}
         </Typography>
-        {preview?.badges.includes("founder") && (
+        {player.isFounderCard && (
           <Typography component="span" variant="caption" color="text.secondary"
-            sx={{ display: "block" }}>{preview.founderLabel}</Typography>
+            sx={{ display: "block" }}>{t("founder")}</Typography>
         )}
       </Box>
-    </>
-  );
-  const layout = { width: "fit-content", maxWidth: "100%", alignItems: "center", gap: 1 };
-
-  return (
-    <Link href={href} underline="hover" sx={{ display: "inline-flex", ...layout }}>{content}</Link>
+    </Link>
   );
 }

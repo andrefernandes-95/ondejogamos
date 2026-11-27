@@ -21,20 +21,23 @@ export default function WeekCalendar({ day, today, matchDays, onDayChange, onWee
     <Box sx={{
       display: "grid",
       gridTemplateAreas: { xs: '"month previous next" "days days days"', md: '"month previous days next"' },
-      gridTemplateColumns: { xs: "1fr 44px 44px", md: "auto 44px minmax(0, 1fr) 44px" },
+      gridTemplateColumns: { xs: "minmax(0, 1fr) 40px 40px", md: "auto 44px minmax(0, 1fr) 44px" },
       alignItems: "center", border: 1, borderColor: "divider", borderRadius: 2,
       p: { xs: 0.5, md: 1 }, gap: { xs: 0, md: 1 },
     }}>
-      <Typography sx={{ gridArea: "month", px: 1, fontWeight: 700, "&::first-letter": { textTransform: "uppercase" } }}>
+      <Typography sx={{
+        gridArea: "month", px: { xs: 0.5, sm: 1 }, fontWeight: 750,
+        fontSize: { xs: "0.875rem", sm: "1rem" }, "&::first-letter": { textTransform: "uppercase" },
+      }}>
         {month}
       </Typography>
-      <IconButton sx={{ gridArea: "previous", minWidth: 44, minHeight: 44 }}
+      <IconButton sx={{ gridArea: "previous", p: 0, minHeight: 44 }}
         aria-label={t("previous_week")} disabled={week[0] <= today}
         onClick={() => onWeekChange(-1)}>
         <ChevronLeft />
       </IconButton>
       <Box role="group" aria-label={t("days")} sx={{
-        gridArea: "days", display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+        gridArea: "days", display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: "2px",
       }}>
         {week.map((date) => {
           const selected = day === date;
@@ -45,12 +48,12 @@ export default function WeekCalendar({ day, today, matchDays, onDayChange, onWee
               aria-label={hasMatches ? t("day_with_matches", { date: fullDate }) : fullDate}
               variant={selected ? "contained" : "text"} color={selected ? "primary" : "inherit"}
               disabled={date < today} onClick={() => onDayChange(date)}
-              sx={{ minWidth: 0, px: 0, py: 0.75, minHeight: 60 }}>
-              <Stack sx={{ alignItems: "center" }}>
-                <Typography component="span" variant="caption" sx={{ textTransform: "capitalize" }}>
-                  {formatAgendaDay(date, locale, { weekday: "short" })}
+              sx={{ minWidth: 0, px: 0, py: 0.75, minHeight: 54, borderRadius: 2 }}>
+              <Stack sx={{ alignItems: "center", minWidth: 0 }}>
+                <Typography component="span" variant="caption" sx={{ textTransform: "capitalize", fontSize: { xs: "0.66rem", sm: "0.75rem" } }}>
+                  {formatAgendaDay(date, locale, { weekday: "short" }).slice(0, 3)}
                 </Typography>
-                <Typography component="span" sx={{ fontWeight: 700, fontSize: "1.25rem", lineHeight: 1.25 }}>
+                <Typography component="span" sx={{ fontWeight: 750, fontSize: { xs: "1rem", sm: "1.25rem" }, lineHeight: 1.2 }}>
                   {formatAgendaDay(date, locale, { day: "numeric" })}
                 </Typography>
                 <Box aria-hidden="true" sx={{
@@ -62,7 +65,7 @@ export default function WeekCalendar({ day, today, matchDays, onDayChange, onWee
           );
         })}
       </Box>
-      <IconButton sx={{ gridArea: "next", minWidth: 44, minHeight: 44 }}
+      <IconButton sx={{ gridArea: "next", p: 0, minHeight: 44 }}
         aria-label={t("next_week")} onClick={() => onWeekChange(1)}>
         <ChevronRight />
       </IconButton>

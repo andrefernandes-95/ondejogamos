@@ -96,6 +96,8 @@
       "copy_link": "Copy link"
     },
     "Footer": {
+      "explore": "Explore",
+      "language": "Language",
       "home": "Home",
       "player_list": "Player List",
       "pitches_list": "Pitches List"
@@ -175,9 +177,13 @@
       "upcoming_matches_in_area": "Upcoming matches in {area}"
     },
     "MatchShareButtons": {
-      "share_this_match": "Share this match:",
+      "share_this_match": "Share match",
       "lets_play": "Lets play!",
-      "share_on_whatsapp": "Share on Whatsapp"
+      "share_on_whatsapp": "Share on WhatsApp",
+      "copy_link": "Copy link",
+      "copied": "Link copied.",
+      "link_label": "Match link",
+      "copy_failed": "Select the address to copy it manually."
     },
     "Logo": {
       "a_community_to_play_casual_football": "A community to play casual football"
@@ -265,7 +271,9 @@
       "scheduled_by_you": "Scheduled by you",
       "registration_closed": "Registration closed",
       "cancel_participation": "Cancel Participation",
-      "player_list": "Player List"
+      "player_list": "Registered players",
+      "organizer_role": "Organizer",
+      "player_count": "{count, plural, one {# player} other {# players}}"
     },
     "Matches": {
       "error": "Something went wrong"
@@ -291,6 +299,18 @@
       "format": "{count}-a-side"
     },
     "HomeSchedule": {
+      "show_locations": "Show locations",
+      "hide_locations": "Hide locations",
+      "heading": "Schedule a <blue>match</blue>",
+      "subheading": "Find a pitch near you and pick a time.",
+      "find_pitches": "Find pitches",
+      "free_times": "Open times in the match agenda",
+      "select_time": "{name}, at {time}",
+      "more_times": "More times",
+      "custom_time": "Another time",
+      "format_label": "Match format",
+      "duration_label": "Duration",
+      "minutes": "{count} min",
       "navigation": "Home views",
       "browse": "Find games",
       "sign_in": "Sign in",

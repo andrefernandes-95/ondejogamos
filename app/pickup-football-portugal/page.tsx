@@ -1,14 +1,14 @@
 import { AppRoutes } from "@/app/utils/routes";
+import PageContainer from "@/app/components/page-container/page-container";
+import PageTitle from "@/app/components/page-title/page-title";
 import {
   Button,
   Card,
-  Container,
   Stack,
-  Typography,
 } from "@mui/material";
 import { Metadata } from "next";
 
-const title = "Pickup Football in Portugal | Onde Jogamo";
+const title = "Pickup Football in Portugal | Onde Jogamos";
 
 const description =
   "Find casual football games in Portugal. Join local players and expats, organize a match and find your next football game.";
@@ -40,22 +40,16 @@ export const metadata: Metadata = {
 
 export default function PickupFootballPage() {
   return (
-    <Container maxWidth="md" lang="en" sx={{ py: 2 }}>
-      <Card variant="outlined">
-        <Stack sx={{ gap: 2, p: 2 }}>
-          <Typography variant="h6">
-            Find pickup football games in Portugal
-          </Typography>
-
-          <Typography>
-            Meet local players and expats and join a football game near you
-          </Typography>
-
-          <Button component="a" href={AppRoutes.GAMES}>
+    <PageContainer maxWidth="md">
+      <Card variant="outlined" lang="en">
+        <Stack spacing={2} sx={{ alignItems: "flex-start", p: { xs: 1, sm: 2 } }}>
+          <PageTitle title="Find pickup football games in Portugal"
+            description="Meet local players and expats and join a football game near you." />
+          <Button href={AppRoutes.GAMES} variant="contained">
             Join a game
           </Button>
         </Stack>
       </Card>
-    </Container>
+    </PageContainer>
   );
 }

@@ -1,8 +1,11 @@
 import auth from "@/app/lib/auth";
+import PageContainer from "@/app/components/page-container/page-container";
+import PageTitle from "@/app/components/page-title/page-title";
+import ViewNavigation from "@/app/components/view-navigation/view-navigation";
 import { listProfileMatches, type ProfileMatchView } from "@/app/services/profile-matches";
 import { authUrl } from "@/app/utils/auth-return";
 import { AppRoutes } from "@/app/utils/routes";
-import { Box, Button, Chip, Container, Link, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Link, Stack, Typography } from "@mui/material";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -27,51 +30,33 @@ export default async function ProfileMatches({ view }: { view: ProfileMatchView 
   });
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
+    <PageContainer maxWidth="md">
       <Stack spacing={2}>
-        <Button href={AppRoutes.PROFILE} sx={{ alignSelf: "flex-start" }}>
-          {t("back")}
-        </Button>
-        <Typography component="h1" variant="h4">{t("title")}</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button
-            href={AppRoutes.ORGANIZED_MATCHES}
-            variant={isOrganizerView ? "contained" : "outlined"}
-            aria-current={isOrganizerView ? "page" : undefined}
-          >
-            {t("organized")}
-          </Button>
-          <Button
-            href={AppRoutes.JOINED_MATCHES}
-            variant={isOrganizerView ? "outlined" : "contained"}
-            aria-current={isOrganizerView ? undefined : "page"}
-          >
-            {t("joined")}
-          </Button>
-        </Stack>
+        <PageTitle title={t("title")} back={{ href: AppRoutes.PROFILE, label: t("back") }} />
+        <ViewNavigation label={t("title")} links={[
+          { href: AppRoutes.ORGANIZED_MATCHES, label: t("organized"), active: isOrganizerView },
+          { href: AppRoutes.JOINED_MATCHES, label: t("joined"), active: !isOrganizerView },
+        ]} />
         {matches.length === 0 && (
           <Typography color="text.secondary">{t(isOrganizerView ? "empty_organized" : "empty_joined")}</Typography>
         )}
         <Stack component="ul" spacing={1} sx={{ listStyle: "none", m: 0, p: 0 }}>
           {matches.map((match) => (
-              <Box component="li" key={match.id}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Stack spacing={0.75} sx={{ alignItems: "flex-start" }}>
-                    <Link href={AppRoutes.MATCH_DETAILS(match.id)} sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>
-                      {match.pitch_name}
-                    </Link>
-                    <Typography color="text.secondary">{dateFormatter.format(match.starts_at)}</Typography>
-                    <Chip
-                      label={t(match.status)}
-                      size="small"
-                      color={match.status === "played" ? "success" : "default"}
-                    />
-                  </Stack>
-                </Paper>
-              </Box>
+            <Box component="li" key={match.id} sx={{ py: 2, borderTop: 1, borderColor: "divider" }}>
+              <Stack direction={{ xs: "column", sm: "row" }}
+                sx={{ alignItems: { xs: "flex-start", sm: "center" }, justifyContent: "space-between", gap: 1.5 }}>
+                <Box>
+                  <Link href={AppRoutes.MATCH_DETAILS(match.id)} sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>
+                    {match.pitch_name}
+                  </Link>
+                  <Typography variant="body2" color="text.secondary">{dateFormatter.format(match.starts_at)}</Typography>
+                </Box>
+                <Chip label={t(match.status)} size="small" color={match.status === "played" ? "success" : "default"} />
+              </Stack>
+            </Box>
           ))}
         </Stack>
       </Stack>
-    </Container>
+    </PageContainer>
   );
 }

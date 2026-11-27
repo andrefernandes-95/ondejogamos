@@ -1,9 +1,9 @@
 import { pool } from "@/app/lib/db";
 import { defaultCardFields } from "@/app/models/player-card";
-import type { CardBadge, CardField } from "@/app/models/player-card";
+import type { CardBadge, CardContent, CardField } from "@/app/models/player-card";
 import { playerSlug, publicCardId } from "@/app/schemas/player-card";
 import { visibleCard, playerCardPath, selectedCardBadges } from "@/app/utils/player-card";
-import { getCardStats } from "./card-stats";
+import { getCardStatsForUsers } from "./card-stats";
 import { earnedCardBadges, founderEligibility } from "./player-card-badges";
 
 interface CardRow {
@@ -21,7 +21,7 @@ interface CardRow {
 const selectCard = `
   SELECT u.id AS user_id, u.name, p.public_slug, p.preferred_area, p.preferred_position,
          p.avatar_storage_key, p.visible_fields, p.selected_badges,
-         ${founderEligibility} AS is_founder
+         ${founderEligibility()} AS is_founder
   FROM "user" u JOIN player_profiles p ON p.user_id = u.id`;
 
 export async function findOwnerCard(userId: string) {
@@ -43,13 +43,13 @@ export async function findPublicCard(identifier: string) {
   return rows[0] ?? null;
 }
 
-export async function cardData(row: CardRow, portrait: string | null) {
+function cardDataWithStats(row: CardRow, portrait: string | null, stats = { played: 0, created: 0 }) {
   const earned = earnedCardBadges(row.is_founder);
   return {
     slug: row.public_slug,
     earned,
     portrait,
-    ...(await getCardStats(row.user_id)),
+    ...stats,
     settings: {
       name: row.name,
       area: row.preferred_area,
@@ -60,9 +60,33 @@ export async function cardData(row: CardRow, portrait: string | null) {
   };
 }
 
+export async function cardData(row: CardRow, portrait: string | null) {
+  const stats = await getCardStatsForUsers([row.user_id]);
+  return cardDataWithStats(row, portrait, stats.get(row.user_id));
+}
+
+function publicCardContent(row: CardRow, stats: { played: number; created: number } | undefined) {
+  const portrait = row.avatar_storage_key ? `${playerCardPath(row.public_slug)}/portrait` : null;
+  return visibleCard(cardDataWithStats(row, portrait, stats));
+}
+
 export async function getPublicCard(identifier: string) {
   const row = await findPublicCard(identifier);
-  if (!row) return null;
-  const portrait = row.avatar_storage_key ? `${playerCardPath(row.public_slug)}/portrait` : null;
-  return { slug: row.public_slug, card: visibleCard(await cardData(row, portrait)) };
+  if (!row) {
+    return null;
+  }
+  const stats = await getCardStatsForUsers([row.user_id]);
+  return { slug: row.public_slug, card: publicCardContent(row, stats.get(row.user_id)) };
+}
+
+export async function getPublicCardsBySlug(slugs: string[], db = pool): Promise<Map<string, CardContent>> {
+  if (!slugs.length) {
+    return new Map();
+  }
+  const { rows } = await db.query<CardRow>(
+    `${selectCard} WHERE p.public_slug = ANY($1::text[])`,
+    [slugs],
+  );
+  const stats = await getCardStatsForUsers(rows.map((row) => row.user_id), db);
+  return new Map(rows.map((row) => [row.public_slug, publicCardContent(row, stats.get(row.user_id))]));
 }

@@ -2,10 +2,12 @@
 
 import MatchDatePicker from "@/app/components/match-date-picker/match-date-picker";
 import MatchFormatInput from "@/app/components/match-format-input/match-format-input";
+import MatchDurationInput from "@/app/components/match-duration-input/match-duration-input";
 import PitchSelector from "@/app/components/pitch-selector/pitch-selector";
 import { FullMatch } from "@/app/models/match";
 import { CreateMatchFormValues } from "@/app/schemas/match";
 import { Pitch } from "@/app/services/pitches";
+import { minimumPlayersByFormat } from "@/app/utils/home-schedule";
 import { Stack, TextField, Typography } from "@mui/material";
 import { Control, Controller, UseFormSetValue, useWatch } from "react-hook-form";
 import { useTranslations } from "next-intl";
@@ -43,28 +45,22 @@ export default function CreateMatchFields({
           />
         )}
       />}
-      <MatchFormatInput
+      {!fixedSlot && <MatchFormatInput
         control={control}
         onChange={(format) => {
-          const minimumPlayers = { "5x5": 10, "7x7": 14, "11x11": 22 };
-          setValue("minAttendance", minimumPlayers[format as keyof typeof minimumPlayers], {
+          setValue("minAttendance", minimumPlayersByFormat[format], {
             shouldDirty: true,
           });
         }}
-      />
-      <Controller
+      />}
+      {!fixedSlot && <Controller
         name="durationInMinutes"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField
-            {...field}
-            type="number"
-            label={tApp("App.CreateMatchModal.duration_minutes")}
-            helperText={fieldState.error?.message}
-            error={!!fieldState.error}
-          />
+          <MatchDurationInput name={field.name} onBlur={field.onBlur} inputRef={field.ref}
+            value={String(field.value ?? "")} onChange={field.onChange} error={fieldState.error?.message} />
         )}
-      />
+      />}
       {!fixedSlot && <Controller
         name="startsAt"
         control={control}

@@ -36,7 +36,10 @@ interface Props {
   onCreated?: (matchId: string) => void;
   onAddPitch?: () => void;
   selectedPitch?: string;
-  slot?: { pitchId: string; name: string; municipality: string; startsAt: string };
+  slot?: {
+    pitchId: string; name: string; municipality: string; startsAt: string;
+    format: CreateMatchFormValues["format"]; duration: number;
+  };
   authReturnTo?: string;
 }
 
@@ -70,6 +73,7 @@ export default function CreateMatchModal({
     resolver: zodResolver(createMatchSchema),
     defaultValues: getMatchFormDefaults({
       existingMatch, template, selectedPitch: slot?.pitchId ?? selectedPitch, selectedStart: slot?.startsAt,
+      selectedOptions: slot,
     }),
   });
 
@@ -151,6 +155,7 @@ export default function CreateMatchModal({
                 <Typography sx={{ fontWeight: 750 }}>{slot.name}</Typography>
                 <Typography>{slot.municipality}, {selectedArea}</Typography>
                 <Typography>{date.day} · {date.time}</Typography>
+                <Typography>{slot.format} · {tSchedule("minutes", { count: slot.duration })}</Typography>
               </Stack>
             )}
             {authReturnTo && <Typography>{tSchedule("sign_in_to_confirm")}</Typography>}

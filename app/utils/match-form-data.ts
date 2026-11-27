@@ -1,5 +1,6 @@
 import type { FullMatch } from "@/app/models/match";
 import type { CreateMatchFormValues } from "@/app/schemas/match";
+import { minimumPlayersByFormat } from "./home-schedule";
 
 type MatchFormSource = Pick<FullMatch, "description" | "pitch" | "duration_in_minutes" | "format" | "min_attendance">;
 
@@ -8,20 +9,22 @@ export function getMatchFormDefaults({
   template,
   selectedPitch,
   selectedStart,
+  selectedOptions,
 }: {
   existingMatch?: MatchFormSource & Pick<FullMatch, "starts_at">;
   template?: MatchFormSource;
   selectedPitch?: string;
   selectedStart?: string;
+  selectedOptions?: { format: CreateMatchFormValues["format"]; duration: number };
 }): CreateMatchFormValues {
   const source = existingMatch ?? template;
   return {
     description: source?.description ?? "",
     pitchId: selectedPitch || source?.pitch.id?.toString() || "",
-    durationInMinutes: Number(source?.duration_in_minutes ?? 60),
+    durationInMinutes: Number(source?.duration_in_minutes ?? selectedOptions?.duration ?? 60),
     startsAt: existingMatch ? new Date(existingMatch.starts_at).toISOString() : selectedStart ?? "",
-    format: source?.format ?? "5x5",
-    minAttendance: source?.min_attendance ?? 10,
+    format: source?.format ?? selectedOptions?.format ?? "5x5",
+    minAttendance: source?.min_attendance ?? minimumPlayersByFormat[selectedOptions?.format ?? "5x5"],
   };
 }
 

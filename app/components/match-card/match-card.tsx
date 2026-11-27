@@ -1,7 +1,9 @@
 import type { FullMatch } from "@/app/models/match";
 import { formatMatchDate } from "@/app/utils/match-date";
 import { AppRoutes } from "@/app/utils/routes";
-import { Alert, Box, Link, Stack, Typography } from "@mui/material";
+import { ArrowForwardRounded, ScheduleRounded } from "@mui/icons-material";
+import { Alert, Box, Button, Card, Link, Stack, Typography } from "@mui/material";
+import { softEntrance } from "@/app/design/motion";
 import { useLocale, useTranslations } from "next-intl";
 import { MatchAttendanceAction, useMatchAttendance } from "./match-attendance";
 import MatchAttendanceStatus from "./match-attendance-status";
@@ -15,45 +17,35 @@ export default function MatchCard({
   onAttendanceChanged: () => void;
 }) {
   const t = useTranslations("App.Agenda");
+  const tCard = useTranslations("App.MatchCard");
   const { time } = formatMatchDate(match.starts_at, useLocale());
-  const { error, handleAttendance } = useMatchAttendance(match.id, onAttendanceChanged);
+  const { error, pending, handleAttendance } = useMatchAttendance(match.id, onAttendanceChanged);
   const locality = [match.pitch.municipality, match.pitch.area].filter(Boolean).join(", ");
+  const detailsUrl = AppRoutes.MATCH_DETAILS(String(match.id));
 
   return (
-    <Box component="li" sx={{
-      display: "grid",
+    <Card component="li" variant="outlined" sx={{
+      ...softEntrance, display: "grid", borderRadius: 3, p: { xs: 1.5, sm: 2 },
       gridTemplateAreas: {
         xs: '"photo details" "attendance attendance" "error error"',
-        md: '"time photo details attendance" "error error error error"',
+        md: '"photo details attendance" "error error error"',
       },
-      gridTemplateColumns: { xs: "minmax(76px, 30%) minmax(0, 1fr)", md: "105px 160px minmax(0, 1fr) auto" },
-      columnGap: { xs: 1.5, md: 2 }, alignItems: "center",
-      minHeight: { md: "var(--row-height)" }, py: { xs: 1.75, md: 1.5 },
-      "& + &": { borderTop: 1, borderColor: "divider" },
+      gridTemplateColumns: { xs: "64px minmax(0, 1fr)", sm: "104px minmax(0, 1fr)", md: "152px minmax(0, 1fr) auto" },
+      columnGap: { xs: 1.25, md: 2 }, alignItems: "center",
     }}>
-      <Box sx={{ gridArea: "photo" }}>
+      <Box sx={{ gridArea: "photo", alignSelf: { xs: "start", md: "center" } }}>
         <MatchPitchPhoto src={match.pitch.image_url} compact />
       </Box>
-      <Typography component="time" dateTime={new Date(match.starts_at).toISOString()}
-        sx={{
-          display: { xs: "none", md: "block" }, gridArea: "time", position: "relative", pl: 2.75,
-          fontWeight: 750, fontSize: "1.5rem", fontVariantNumeric: "tabular-nums",
-          "&::before": {
-            content: '""', position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)",
-            width: 12, height: 12, borderRadius: "50%", bgcolor: "primary.main",
-          },
-        }}>
-        {time}
-      </Typography>
       <Stack spacing={0.5} sx={{ gridArea: "details", minWidth: 0, overflowWrap: "anywhere" }}>
-        <Typography component="time" dateTime={new Date(match.starts_at).toISOString()}
-          color="primary" sx={{
-            display: { xs: "block", md: "none" }, fontWeight: 750,
-            fontSize: "1.3rem", fontVariantNumeric: "tabular-nums", lineHeight: 1.15,
+        <Typography component="time" dateTime={new Date(match.starts_at).toISOString()} color="primary"
+          sx={{
+            display: "inline-flex", alignItems: "center", gap: 0.5, alignSelf: "flex-start",
+            fontWeight: 800, fontVariantNumeric: "tabular-nums", lineHeight: 1.2,
           }}>
+          <ScheduleRounded sx={{ fontSize: 16 }} />
           {time}
         </Typography>
-        <Link href={AppRoutes.MATCH_DETAILS(String(match.id))} underline="hover" color="text.primary"
+        <Link href={detailsUrl} underline="hover" color="text.primary"
           sx={{ fontWeight: 750, fontSize: { xs: "1rem", md: "1.25rem" }, lineHeight: 1.2 }}>
           {match.pitch.name}
         </Link>
@@ -62,15 +54,20 @@ export default function MatchCard({
         </Typography>
         <MatchOrganizer player={match.creator} />
       </Stack>
-      <Stack direction="row" sx={{
-        gridArea: "attendance", alignItems: "center", flexWrap: "wrap",
-        justifyContent: { xs: "space-between", md: "flex-end" },
-        gap: { xs: 1, md: 2 }, mt: { xs: 1, md: 0 },
+      <Stack sx={{
+        gridArea: "attendance", alignItems: { xs: "flex-start", md: "flex-end" },
+        gap: 0.75, mt: { xs: 1.25, md: 0 }, pt: { xs: 1.25, md: 0 }, pl: { md: 2 },
       }}>
         <MatchAttendanceStatus match={match} />
-        <MatchAttendanceAction match={match} handleAttendance={handleAttendance} />
+        <Stack direction="row" sx={{ alignItems: "center", flexWrap: "wrap", gap: 0.75 }}>
+          <Button href={detailsUrl} variant="outlined" size="small" endIcon={<ArrowForwardRounded />}
+            sx={{ "@media (max-width: 349px)": { px: 1, fontSize: "0.82rem", "& .MuiButton-endIcon": { display: "none" } } }}>
+            {tCard("see_details")}
+          </Button>
+          <MatchAttendanceAction match={match} pending={pending} handleAttendance={handleAttendance} />
+        </Stack>
       </Stack>
       {error && <Alert severity="error" sx={{ gridArea: "error", mt: 1 }}>{error}</Alert>}
-    </Box>
+    </Card>
   );
 }

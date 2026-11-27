@@ -1,63 +1,51 @@
-import { CreateMatchFormValues } from "@/app/schemas/match";
-import {
-  FormGroup,
-  FormLabel,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
-import { Control, Controller } from "react-hook-form";
+import ControlLabel from "@/app/components/control-label/control-label";
+import type { CreateMatchFormValues } from "@/app/schemas/match";
+import { scheduleFormats } from "@/app/utils/home-schedule";
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
+import { useId } from "react";
+import { type Control, Controller } from "react-hook-form";
 
-interface Props {
-  control: Control<CreateMatchFormValues>;
-  onChange: (format: string) => void;
+type Format = CreateMatchFormValues["format"];
+
+export function MatchFormatPicker({ value, onChange, onBlur, error }: {
+  value: Format;
+  onChange: (format: Format) => void;
+  onBlur?: () => void;
+  error?: string;
+}) {
+  const t = useTranslations("App.MatchFormatInput");
+  const labelId = useId();
+
+  return (
+    <Stack spacing={0.5} sx={{ alignItems: "flex-start" }}>
+      <ControlLabel id={labelId}>{t("match_format")}</ControlLabel>
+      <ToggleButtonGroup exclusive value={value} aria-labelledby={labelId} onBlur={onBlur}
+        onChange={(_, next: Format | null) => {
+          if (next) {
+            onChange(next);
+          }
+        }}>
+        {scheduleFormats.map((format) => (
+          <ToggleButton key={format} value={format}>{format.replace("x", "×")}</ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+      {error && <Typography color="error" variant="body2">{error}</Typography>}
+    </Stack>
+  );
 }
 
-export default function MatchFormatInput({ control, onChange }: Props) {
-  const tApp = useTranslations();
+export default function MatchFormatInput({ control, onChange }: {
+  control: Control<CreateMatchFormValues>;
+  onChange: (format: Format) => void;
+}) {
   return (
-    <Controller
-      name="format"
-      control={control}
-      render={({ field, fieldState }) => {
-        const labelId = "match-format-label";
-        const groupId = "match-format";
-        return (
-          <Stack sx={{ flexDirection: "column" }}>
-            <FormGroup>
-              <FormLabel id={labelId} color="primary">
-                {tApp("App.MatchFormatInput.match_format")}
-              </FormLabel>
-              <ToggleButtonGroup
-                id={groupId}
-                value={field.value}
-                exclusive
-                onChange={(_, value) => {
-                  if (!value) {
-                    return;
-                  }
-                  field.onChange(value);
-                  onChange?.(value);
-                }}
-                onBlur={field.onBlur}
-                aria-labelledby={labelId}
-              >
-                <ToggleButton value="5x5">5x5</ToggleButton>
-                <ToggleButton value="7x7">7x7</ToggleButton>
-                <ToggleButton value="11x11">11x11</ToggleButton>
-              </ToggleButtonGroup>
-
-              {fieldState?.error && (
-                <Typography color="error">
-                  {fieldState?.error?.message}
-                </Typography>
-              )}
-            </FormGroup>
-          </Stack>
-        );
-      }}
-    />
+    <Controller name="format" control={control} render={({ field, fieldState }) => (
+      <MatchFormatPicker value={field.value} onBlur={field.onBlur} error={fieldState.error?.message}
+        onChange={(format) => {
+          field.onChange(format);
+          onChange(format);
+        }} />
+    )} />
   );
 }
